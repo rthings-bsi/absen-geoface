@@ -51,9 +51,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Tunggu 15 detik antar percobaan" }, { status: 429 });
     }
 
-    // Cooldown 30 minutes after 5 failed attempts
-    if (pegawaiData.failed_attempts >= 5 && diffSec < 1800) {
-      const remaining = Math.ceil((1800 - diffSec) / 60);
+    // Cooldown 5 minutes after 5 failed attempts
+    if (pegawaiData.failed_attempts >= 5 && diffSec < 300) {
+      const remaining = Math.ceil((300 - diffSec) / 60);
       return NextResponse.json({
         error: `Terlalu banyak percobaan gagal. Coba lagi dalam ${remaining} menit`,
       }, { status: 429 });

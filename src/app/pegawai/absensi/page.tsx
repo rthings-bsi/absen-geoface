@@ -277,9 +277,15 @@ export default function AbsensiPage() {
         }),
       });
 
+      // Handle 429 rate limit
+      if (res.status === 429) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData?.error || "Terlalu banyak percobaan. Tunggu beberapa saat.");
+      }
+
       if (!res.ok) {
         const errData = await res.json();
-        throw new Error(errData.message || "Gagal melakukan absensi");
+        throw new Error(errData?.error || errData.message || "Gagal melakukan absensi");
       }
 
       toast.success(
@@ -546,7 +552,7 @@ export default function AbsensiPage() {
             <div className="grid grid-cols-2 gap-3">
               <Button
                 onClick={() => handleAbsen("masuk")}
-                disabled={isProcessing || !todayStatus?.masuk === false || faceStatus !== "verified" || gpsStatus !== "success"}
+                disabled={isProcessing || (todayStatus?.masuk !== null && todayStatus?.masuk !== undefined) || faceStatus !== "verified" || gpsStatus !== "success"}
                 className="h-14 lg:h-16 text-base font-bold bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg shadow-emerald-200/50 hover:shadow-xl hover:shadow-emerald-300/50 transition-all duration-200 disabled:opacity-40"
               >
                 {isProcessing ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Clock className="h-5 w-5 mr-2" />}
@@ -558,7 +564,7 @@ export default function AbsensiPage() {
 
               <Button
                 onClick={() => handleAbsen("pulang")}
-                disabled={isProcessing || todayStatus?.masuk === null || todayStatus?.pulang !== null || faceStatus !== "verified" || gpsStatus !== "success"}
+                disabled={isProcessing || !todayStatus?.masuk || todayStatus?.pulang !== null || faceStatus !== "verified" || gpsStatus !== "success"}
                 className="h-14 lg:h-16 text-base font-bold bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 text-white shadow-lg shadow-sky-200/50 hover:shadow-xl hover:shadow-sky-300/50 transition-all duration-200 disabled:opacity-40"
               >
                 {isProcessing ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Clock className="h-5 w-5 mr-2" />}
