@@ -1,21 +1,29 @@
 import { NextResponse } from "next/server";
-import { db } from "@/db";
-import { users } from "@/db/schema";
 
 export async function GET() {
   try {
-    const allUsers = await db.select({ id: users.id, email: users.email }).from(users);
+    // Test direct postgres connection (bypass Drizzle)
+    const postgres = (await import("postgres")).default;
+    const sql = postgres(process.env.DATABASE_URL || "", {
+      prepare: false,
+      ssl: { rejectUnauthorized: false },
+      connect_timeout: 10,
+    });
+
+    const result = await sql`SELECT id, email FROM users LIMIT 5`;
+    await sql.end();
+
     return NextResponse.json({
       ok: true,
-      db_url_set: !!process.env.DATABASE_URL,
       db_url_prefix: process.env.DATABASE_URL?.substring(0, 30) + "...",
-      users: allUsers,
+      users: result,
     });
   } catch (error: any) {
     return NextResponse.json({
       ok: false,
       error: error.message,
-      db_url_set: !!process.env.DATABASE_URL,
+      stack: error.stack?.split("\n").slice(0, 5),
+      cause: error.cause?.message || null,
       db_url_prefix: process.env.DATABASE_URL?.substring(0, 30) + "...",
     }, { status: 500 });
   }
