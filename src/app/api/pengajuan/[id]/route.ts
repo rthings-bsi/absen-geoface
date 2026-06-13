@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { pengajuan, pegawai, notifikasi } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { alias } from "drizzle-orm/sqlite-core";
+import { alias } from "drizzle-orm/pg-core";
 
 const approver = alias(pegawai, "approver");
 

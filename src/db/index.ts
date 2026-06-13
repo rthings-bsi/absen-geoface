@@ -1,18 +1,10 @@
-import Database from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 import * as schema from "./schema";
-import path from "path";
 
-// Gunakan better-sqlite3 untuk file-based SQLite (Node.js only, no edge runtime)
-const sqlitePath = path.resolve(process.cwd(), process.env.DATABASE_URL?.replace("file:", "") || "data/absensi.db");
-const sqlite = new Database(sqlitePath);
+const connectionString = process.env.DATABASE_URL || "";
 
-// Performance optimizations
-sqlite.pragma("journal_mode = WAL");
-sqlite.pragma("foreign_keys = ON");
-sqlite.pragma("cache_size = -20000"); // 20MB page cache
-sqlite.pragma("busy_timeout = 5000"); // 5s busy timeout
-sqlite.pragma("synchronous = NORMAL"); // faster than FULL, safe with WAL
-
-export const db = drizzle(sqlite, { schema });
+// Untuk Vercel (serverless), gunakan prepared statements: false
+const client = postgres(connectionString, { prepare: false });
+export const db = drizzle(client, { schema });
 export type DbClient = typeof db;

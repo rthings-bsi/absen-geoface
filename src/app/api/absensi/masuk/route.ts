@@ -96,7 +96,7 @@ export async function POST(request: Request) {
 
   // Reset failed attempts
   await db.update(pegawai)
-    .set({ failed_attempts: 0, last_absen_attempt: sql`(datetime('now','localtime'))` })
+    .set({ failed_attempts: 0, last_absen_attempt: sql`(now() at time zone 'Asia/Jakarta')` })
     .where(eq(pegawai.id, id_pegawai));
 
   // Send notification to all admins
