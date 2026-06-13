@@ -26,6 +26,16 @@ data/
 .claude/
 *.md
 
+# Local scripts & docs
+CLEANUP.sh
+FLOW_DIAGRAM.txt
+LOGIN_QUICK_REFERENCE.txt
+TEST_GUIDE.sh
+test-admin-auth.js
+
+# Build artifacts
+tsconfig.tsbuildinfo
+
 # Logs
 *.log
 npm-debug.log*
