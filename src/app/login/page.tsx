@@ -30,6 +30,10 @@ function LoginForm() {
   const [error, setError] = useState(searchParams?.get("error") || "");
   const [touched, setTouched] = useState({ email: false, password: false });
 
+  // Track if elements should animate (after mount) — MUST be before any conditional return
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   useEffect(() => {
     if (status === "authenticated" && session?.user) {
       router.replace(session.user.can_admin ? "/admin/dashboard" : "/pegawai/dashboard");
@@ -76,10 +80,6 @@ function LoginForm() {
 
   const hasEmailError = touched.email && !form.email;
   const hasPasswordError = touched.password && !form.password;
-
-  // Track if elements should animate (after mount)
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-sky-100 flex overflow-hidden relative">
