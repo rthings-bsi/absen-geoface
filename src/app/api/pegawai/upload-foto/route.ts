@@ -3,8 +3,18 @@ import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { pegawai } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+
+// Inisialisasi S3 client untuk Supabase Storage (S3-compatible)
+const s3 = new S3Client({
+  region: "auto",
+  endpoint: "https://xzsjurveiasdvteuvdgb.storage.supabase.co/storage/v1/s3",
+  credentials: {
+    accessKeyId: "943935eb73ee7edb27274970449d8652a75fb9f5220e647f0833126ba1d9bfa1",
+    secretAccessKey: "b8d34ffef747960e80b7e46745ea3ad8",
+  },
+  forcePathStyle: true, // S3-compatible storage membutuhkan ini
+});
 
 // POST: Upload foto profile
 export async function POST(request: Request) {
@@ -35,24 +45,27 @@ export async function POST(request: Request) {
     const buffer = Buffer.from(await file.arrayBuffer());
     const ext = file.name.split(".").pop() || "jpg";
     const fileName = `foto-${session.user.id_pegawai}-${Date.now()}.${ext}`;
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "foto-profile");
+    const key = `foto-profile/${fileName}`;
 
-    // Ensure directory exists
-    await mkdir(uploadDir, { recursive: true });
+    // Upload ke Supabase Storage via S3 API
+    await s3.send(new PutObjectCommand({
+      Bucket: "uploads",
+      Key: key,
+      Body: buffer,
+      ContentType: file.type,
+    }));
 
-    const filePath = path.join(uploadDir, fileName);
-    await writeFile(filePath, buffer);
-
-    const fotoUrl = `/uploads/foto-profile/${fileName}`;
+    // URL public
+    const publicUrl = `https://xzsjurveiasdvteuvdgb.storage.supabase.co/storage/v1/object/public/uploads/${key}`;
 
     // Update database
     await db.update(pegawai)
-      .set({ foto_profile: fotoUrl })
+      .set({ foto_profile: publicUrl })
       .where(eq(pegawai.id, session.user.id_pegawai));
 
     return NextResponse.json({
       success: true,
-      foto: fotoUrl,
+      foto: publicUrl,
     });
   } catch (err) {
     console.error("Upload error:", err);
