@@ -268,7 +268,8 @@ export default function AbsensiPage() {
     setError(null);
 
     try {
-      if (!gpsPosition && !gpsSkipped) {
+      const pos = gpsPosition || (gpsSkipped ? { lat: -6.2671, lng: 107.2726 } : null);
+      if (!pos) {
         throw new Error("Lokasi belum didapatkan");
       }
       if (distance !== null && distance > maxDistance && !gpsSkipped) {
@@ -288,8 +289,8 @@ export default function AbsensiPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          latitude: gpsPosition.lat,
-          longitude: gpsPosition.lng,
+          latitude: pos.lat,
+          longitude: pos.lng,
           confidence: Math.round(confidence),
           foto: capturedFoto,
         }),
