@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { struktur_organisasi, pegawai, jabatan } from "@/db/schema";
-import { eq, asc } from "drizzle-orm";
+import { eq, asc, isNull } from "drizzle-orm";
 
 export async function GET() {
   const rows = await db
@@ -36,6 +36,11 @@ export async function GET() {
   return NextResponse.json(data);
 }
 
+// GET /api/struktur/pegawai - ambil daftar pegawai untuk dropdown
+export async function OPTIONS() {
+  return NextResponse.json({}, { status: 200 });
+}
+
 export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user?.can_admin) {
@@ -46,6 +51,7 @@ export async function POST(request: Request) {
   const inserted = await db.insert(struktur_organisasi).values({
     nama: body.nama,
     id_parent: body.parent_id || body.id_parent || null,
+    id_pegawai_kepala: body.id_pegawai_kepala || null,
     level: 0,
     urutan: 0,
   }).returning() as any[];
@@ -63,8 +69,14 @@ export async function PUT(request: Request) {
   const { searchParams } = new URL(request.url);
   const id = parseInt(searchParams.get("id") || "0");
   const body = await request.json();
+
+  const updateData: Record<string, any> = { nama: body.nama };
+  if (body.id_pegawai_kepala !== undefined) {
+    updateData.id_pegawai_kepala = body.id_pegawai_kepala;
+  }
+
   await db.update(struktur_organisasi)
-    .set({ nama: body.nama })
+    .set(updateData)
     .where(eq(struktur_organisasi.id, id));
 
   return NextResponse.json({ success: true });

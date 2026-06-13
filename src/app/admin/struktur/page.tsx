@@ -13,8 +13,11 @@ import {
 } from "@/components/ui/dialog";
 import {
   Building2, Plus, Pencil, Trash2, ChevronDown, ChevronRight,
-  Users, ChevronDownSquare, User, Search,
+  Users, ChevronDownSquare, User, Search, X,
 } from "lucide-react";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 
 // ─── Types ───────────────────────────────────────────────
@@ -202,13 +205,14 @@ function OrgNodeCard({
 // ─── Main Page ────────────────────────────────────────────
 export default function StrukturPage() {
   const [rawData, setRawData] = useState<StrukturRaw[]>([]);
+  const [pegawaiList, setPegawaiList] = useState<{ id: number; nip: string; nama: string; jabatan_nama: string | null }[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<StrukturNode | null>(null);
   const [parentId, setParentId] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({ nama: "" });
+  const [form, setForm] = useState({ nama: "", id_pegawai_kepala: "" });
   const [viewMode, setViewMode] = useState<"chart" | "list">("chart");
 
   // Build tree from raw data
@@ -226,10 +230,15 @@ export default function StrukturPage() {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/struktur");
-      const json = await res.json();
-      const nodes: StrukturRaw[] = Array.isArray(json) ? json : json.data || [];
+      const [strukRes, pegRes] = await Promise.all([
+        fetch("/api/struktur"),
+        fetch("/api/struktur/pegawai"),
+      ]);
+      const strukJson = await strukRes.json();
+      const pegJson = await pegRes.json();
+      const nodes: StrukturRaw[] = Array.isArray(strukJson) ? strukJson : strukJson.data || [];
       setRawData(nodes);
+      setPegawaiList(Array.isArray(pegJson) ? pegJson : []);
     } catch {
       toast.error("Gagal memuat data struktur");
     } finally {
@@ -241,13 +250,18 @@ export default function StrukturPage() {
 
   // ── CRUD Handlers ──
   const openAddRoot = () => {
-    setEditing(null); setParentId(null); setForm({ nama: "" }); setDialogOpen(true);
+    setEditing(null); setParentId(null); setForm({ nama: "", id_pegawai_kepala: "" }); setDialogOpen(true);
   };
   const openAddChild = (pid: number) => {
-    setEditing(null); setParentId(pid); setForm({ nama: "" }); setDialogOpen(true);
+    setEditing(null); setParentId(pid); setForm({ nama: "", id_pegawai_kepala: "" }); setDialogOpen(true);
   };
   const openEdit = (node: StrukturNode) => {
-    setEditing(node); setParentId(node.id_parent); setForm({ nama: node.nama }); setDialogOpen(true);
+    setEditing(node); setParentId(node.id_parent);
+    setForm({
+      nama: node.nama,
+      id_pegawai_kepala: node.id_pegawai_kepala ? String(node.id_pegawai_kepala) : "",
+    });
+    setDialogOpen(true);
   };
 
   const handleSave = async () => {
@@ -258,6 +272,11 @@ export default function StrukturPage() {
       const method = editing ? "PUT" : "POST";
       const body: Record<string, unknown> = { nama: form.nama };
       if (!editing) body.parent_id = parentId;
+      if (form.id_pegawai_kepala) {
+        body.id_pegawai_kepala = parseInt(form.id_pegawai_kepala);
+      } else if (editing) {
+        body.id_pegawai_kepala = null;
+      }
 
       const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       if (!res.ok) throw new Error("Gagal menyimpan");
@@ -438,6 +457,26 @@ export default function StrukturPage() {
                 placeholder="Contoh: Direktur Utama"
                 autoFocus
               />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Kepala Unit (Opsional)</label>
+              <Select
+                value={form.id_pegawai_kepala}
+                onValueChange={(val) => setForm({ ...form, id_pegawai_kepala: val === "none" ? "" : val })}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Pilih Pegawai..." />
+                </SelectTrigger>
+                <SelectContent className="max-h-60">
+                  <SelectItem value="none" className="text-muted-foreground italic">-- Kosongkan Kepala Unit --</SelectItem>
+                  {pegawaiList.map((p) => (
+                    <SelectItem key={p.id} value={String(p.id)}>
+                      {p.nama} {p.jabatan_nama ? `— ${p.jabatan_nama}` : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <DialogFooter>
