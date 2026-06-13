@@ -15,6 +15,7 @@ export async function GET() {
       urutan: struktur_organisasi.urutan,
       kepala_nip: pegawai.nip,
       kepala_nama: pegawai.nama,
+      kepala_foto: pegawai.foto_profile,
       kepala_jabatan_nama: jabatan.nama,
     })
     .from(struktur_organisasi)
@@ -22,12 +23,13 @@ export async function GET() {
     .leftJoin(jabatan, eq(pegawai.id_jabatan, jabatan.id))
     .orderBy(asc(struktur_organisasi.level), asc(struktur_organisasi.urutan));
 
-  const data = rows.map(({ kepala_nip, kepala_nama, kepala_jabatan_nama, ...rest }) => ({
+  const data = rows.map(({ kepala_nip, kepala_nama, kepala_foto, kepala_jabatan_nama, ...rest }) => ({
     ...rest,
     pegawai_kepala: kepala_nama
       ? {
           nip: kepala_nip,
           nama: kepala_nama,
+          foto_profile: kepala_foto,
           jabatan: kepala_jabatan_nama ? { nama: kepala_jabatan_nama } : null,
         }
       : null,

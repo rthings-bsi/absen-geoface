@@ -18,12 +18,14 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
 
 // ─── Types ───────────────────────────────────────────────
 interface PegawaiKepala {
   nip: string;
   nama: string;
+  foto_profile?: string | null;
   jabatan: { nama: string } | null;
 }
 
@@ -92,8 +94,16 @@ function OrgNodeCard({
         <div className="p-4">
           {/* Ikon & Nama */}
           <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center shadow-lg shadow-sky-200/50 dark:shadow-sky-900/30">
-              <Building2 className="w-5 h-5 text-white" />
+            <div className="flex-shrink-0 w-10 h-10 shadow-lg shadow-sky-200/50 dark:shadow-sky-900/30 rounded-xl overflow-hidden bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center">
+              {node.pegawai_kepala?.foto_profile ? (
+                <img
+                  src={node.pegawai_kepala.foto_profile}
+                  alt={node.pegawai_kepala.nama}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <Building2 className="w-5 h-5 text-white" />
+              )}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-sky-900 dark:text-sky-100 leading-tight break-words">
@@ -101,10 +111,7 @@ function OrgNodeCard({
               </p>
               {node.pegawai_kepala && (
                 <div className="flex items-center gap-1.5 mt-1.5">
-                  <div className="w-5 h-5 rounded-full bg-sky-100 dark:bg-sky-900/50 flex items-center justify-center flex-shrink-0">
-                    <User className="w-3 h-3 text-sky-600 dark:text-sky-400" />
-                  </div>
-                  <span className="text-xs text-sky-600 dark:text-sky-400 truncate">
+                  <span className="text-xs text-sky-600 dark:text-sky-400 font-medium truncate">
                     {node.pegawai_kepala.nama}
                   </span>
                 </div>
@@ -549,9 +556,17 @@ function TreeList({
                 )}
               </button>
 
-              {/* Icon */}
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center flex-shrink-0 shadow-sm">
-                <Building2 className="w-3.5 h-3.5 text-white" />
+              {/* Icon / Foto */}
+              <div className="w-7 h-7 rounded-lg overflow-hidden bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center flex-shrink-0 shadow-sm">
+                {node.pegawai_kepala?.foto_profile ? (
+                  <img
+                    src={node.pegawai_kepala.foto_profile}
+                    alt={node.pegawai_kepala.nama}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <Building2 className="w-3.5 h-3.5 text-white" />
+                )}
               </div>
 
               {/* Name */}
