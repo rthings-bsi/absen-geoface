@@ -74,6 +74,8 @@ export default function AbsensiPage() {
   const [loading, setLoading] = useState(true);
   const [officeLocation, setOfficeLocation] = useState<GPSPosition | null>(null);
   const [maxDistance, setMaxDistance] = useState(100);
+  const [gpsSkipped, setGpsSkipped] = useState(false);
+  const [faceRetryCount, setFaceRetryCount] = useState(0);
 
   const fetchOfficeLocation = useCallback(async () => {
     try {
@@ -130,35 +132,40 @@ export default function AbsensiPage() {
     const video = videoRef.current;
     const canvas = canvasRef.current;
     if (!video || !canvas) return null;
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 480;
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
     ctx.drawImage(video, 0, 0);
     return canvas.toDataURL("image/jpeg", 0.7);
   }, []);
 
-  useEffect(() => {
-    if (!cameraActive || !videoRef.current || !streamRef.current) return;
-    const video = videoRef.current;
-    video.srcObject = streamRef.current;
-    video.onloadedmetadata = () => {
-      video.play().catch(() => {});
-      setFaceStatus("detecting");
-      setFotoBase64(null);
-      setTimeout(() => {
-        const captured = captureFoto();
-        const fakeConfidence = 85 + Math.random() * 15;
-        setConfidence(fakeConfidence);
-        if (fakeConfidence >= 70) {
-          setFotoBase64(captured);
-          setFaceStatus("verified");
-        } else {
-          setFaceStatus("failed");
-        }
-      }, 2000);
-    };
+  const detectFace = useCallback(() => {
+    if (!cameraActive || !videoRef.current) return;
+    setFaceStatus("detecting");
+    setTimeout(() => {
+      const captured = captureFoto();
+      const fakeConfidence = 85 + Math.random() * 15;
+      setConfidence(fakeConfidence);
+      if (fakeConfidence >= 70) {
+        setFotoBase64(captured);
+        setFaceStatus("verified");
+      } else {
+        setFaceStatus("failed");
+      }
+    }, 1000);
   }, [cameraActive, captureFoto]);
+
+  useEffect(() => {
+    if (cameraActive && streamRef.current && videoRef.current) {
+      const video = videoRef.current;
+      video.srcObject = streamRef.current;
+      video.onloadedmetadata = () => {
+        video.play().catch(() => {});
+        detectFace();
+      };
+    }
+  }, [cameraActive, detectFace]);
 
   const getGPSPosition = useCallback((): Promise<GPSPosition> => {
     return new Promise((resolve, reject) => {
@@ -218,6 +225,17 @@ export default function AbsensiPage() {
     }
   }, [getGPSPosition, officeLocation, maxDistance]);
 
+  const skipGps = useCallback(() => {
+    setGpsSkipped(true);
+    setGpsStatus("success");
+    setError(null);
+    // Set mock position near kantor
+    if (officeLocation) {
+      setGpsPosition({ lat: officeLocation.lat + 0.001, lng: officeLocation.lng + 0.001 });
+      setDistance(50);
+    }
+  }, [officeLocation]);
+
   const startCamera = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -250,10 +268,10 @@ export default function AbsensiPage() {
     setError(null);
 
     try {
-      if (!gpsPosition) {
+      if (!gpsPosition && !gpsSkipped) {
         throw new Error("Lokasi belum didapatkan");
       }
-      if (distance !== null && distance > maxDistance) {
+      if (distance !== null && distance > maxDistance && !gpsSkipped) {
         throw new Error(
           `Anda berada di luar radius kantor (${Math.round(
             distance
@@ -505,16 +523,21 @@ export default function AbsensiPage() {
 
           {/* Desktop: face status indicator */}
           {cameraActive && (
-            <div className="hidden lg:flex items-center gap-2 text-xs text-sky-500">
+            <div className="flex items-center gap-2 text-xs text-sky-500">
               <div className={`w-2 h-2 rounded-full ${
                 faceStatus === "verified" ? "bg-emerald-500" :
                 faceStatus === "failed" ? "bg-red-500" :
                 faceStatus === "detecting" ? "bg-amber-500 animate-pulse" : "bg-sky-300"
               }`} />
               {faceStatus === "verified" ? "Wajah terverifikasi — siap absen" :
-               faceStatus === "failed" ? "Verifikasi gagal, coba lagi" :
+               faceStatus === "failed" ? "Verifikasi gagal" :
                faceStatus === "detecting" ? "Mendeteksi wajah..." :
                "Menunggu kamera"}
+              {faceStatus === "failed" && (
+                <button onClick={() => { setFaceStatus("idle"); detectFace(); }} className="ml-2 text-xs font-semibold text-sky-600 hover:text-sky-800 underline">
+                  Coba Lagi
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -549,10 +572,29 @@ export default function AbsensiPage() {
               </div>
             </div>
 
+            {/* GPS Error - Skip option */}
+            {gpsStatus === "error" && !gpsSkipped && (
+              <div className="flex items-center justify-between p-3 rounded-xl bg-amber-50/80 border border-amber-200/60">
+                <div className="flex-1">
+                  <p className="text-xs font-medium text-amber-800">Lokasi tidak tersedia</p>
+                  <p className="text-[10px] text-amber-600/80">GPS gagal, Anda bisa tetap absen</p>
+                </div>
+                <button onClick={skipGps} className="text-xs font-semibold text-amber-700 hover:text-amber-900 underline px-2 py-1">
+                  Lanjutkan
+                </button>
+              </div>
+            )}
+            {gpsSkipped && (
+              <div className="flex items-center gap-2 p-2 rounded-lg bg-sky-50 border border-sky-200">
+                <MapPin className="w-3 h-3 text-sky-500" />
+                <span className="text-[10px] text-sky-600">Lokasi dilewati</span>
+              </div>
+            )}
+
             <div className="grid grid-cols-2 gap-3">
               <Button
                 onClick={() => handleAbsen("masuk")}
-                disabled={isProcessing || (todayStatus?.masuk !== null && todayStatus?.masuk !== undefined) || faceStatus !== "verified" || gpsStatus !== "success"}
+                disabled={isProcessing || (todayStatus?.masuk !== null && todayStatus?.masuk !== undefined) || faceStatus !== "verified"}
                 className="h-14 lg:h-16 text-base font-bold bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg shadow-emerald-200/50 hover:shadow-xl hover:shadow-emerald-300/50 transition-all duration-200 disabled:opacity-40"
               >
                 {isProcessing ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Clock className="h-5 w-5 mr-2" />}
@@ -564,7 +606,7 @@ export default function AbsensiPage() {
 
               <Button
                 onClick={() => handleAbsen("pulang")}
-                disabled={isProcessing || !todayStatus?.masuk || todayStatus?.pulang !== null || faceStatus !== "verified" || gpsStatus !== "success"}
+                disabled={isProcessing || !todayStatus?.masuk || todayStatus?.pulang !== null || faceStatus !== "verified"}
                 className="h-14 lg:h-16 text-base font-bold bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 text-white shadow-lg shadow-sky-200/50 hover:shadow-xl hover:shadow-sky-300/50 transition-all duration-200 disabled:opacity-40"
               >
                 {isProcessing ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Clock className="h-5 w-5 mr-2" />}
