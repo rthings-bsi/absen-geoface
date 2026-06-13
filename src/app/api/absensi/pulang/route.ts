@@ -11,9 +11,13 @@ export async function POST(request: Request) {
   }
 
   const id_pegawai = session.user.id_pegawai;
-  const today = new Date().toISOString().split("T")[0];
+
+  // Gunakan timezone Asia/Jakarta (WIB)
   const now = new Date();
-  const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+  const today = now.toLocaleDateString("sv-SE", { timeZone: "Asia/Jakarta" }); // YYYY-MM-DD
+  const timeStr = now.toLocaleTimeString("sv-SE", { timeZone: "Asia/Jakarta", hour: "2-digit", minute: "2-digit", hour12: false });
+  const nowWib = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Jakarta" }));
+  const nowMinutes = nowWib.getHours() * 60 + nowWib.getMinutes();
 
   // Find today's absensi
   const existing = await db.query.absensi.findFirst({
@@ -47,7 +51,7 @@ export async function POST(request: Request) {
       if (jk) {
         const [pulangH, pulangM] = jk.jam_pulang.split(":").map(Number);
         const pulangMinutes = pulangH * 60 + pulangM;
-        const nowMinutes = now.getHours() * 60 + now.getMinutes();
+        // nowMinutes already set from WIB timezone above
         if (nowMinutes < pulangMinutes - 30) {
           status_pulang = "CepatPulang";
         }

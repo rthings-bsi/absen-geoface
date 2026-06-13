@@ -11,8 +11,9 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url);
-  const month = parseInt(searchParams.get("month") || String(new Date().getMonth() + 1));
-  const year = parseInt(searchParams.get("year") || String(new Date().getFullYear()));
+  const nowWib = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" }));
+  const month = parseInt(searchParams.get("month") || String(nowWib.getMonth() + 1));
+  const year = parseInt(searchParams.get("year") || String(nowWib.getFullYear()));
 
   const firstDay = `${year}-${String(month).padStart(2, "0")}-01`;
   const lastDay = `${year}-${String(month).padStart(2, "0")}-${new Date(year, month, 0).getDate()}`;

@@ -11,9 +11,13 @@ export async function POST(request: Request) {
   }
 
   const id_pegawai = session.user.id_pegawai;
-  const today = new Date().toISOString().split("T")[0];
+
+  // Gunakan timezone Asia/Jakarta (WIB)
   const now = new Date();
-  const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+  const today = now.toLocaleDateString("sv-SE", { timeZone: "Asia/Jakarta" }); // YYYY-MM-DD
+  const timeStr = now.toLocaleTimeString("sv-SE", { timeZone: "Asia/Jakarta", hour: "2-digit", minute: "2-digit", hour12: false });
+  const nowWib = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Jakarta" }));
+  const nowMinutes = nowWib.getHours() * 60 + nowWib.getMinutes();
 
   // Check if already clocked in today
   const existing = await db.query.absensi.findFirst({
@@ -69,7 +73,6 @@ export async function POST(request: Request) {
     if (jk) {
       const [jamH, jamM] = jk.jam_masuk.split(":").map(Number);
       const jamToleransi = jamH * 60 + jamM + jk.toleransi_terlambat;
-      const nowMinutes = now.getHours() * 60 + now.getMinutes();
       if (nowMinutes > jamToleransi) {
         status_masuk = "Terlambat";
       }
