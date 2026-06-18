@@ -11,9 +11,11 @@ export async function GET() {
   }
 
   const id_pegawai = session.user.id_pegawai;
-  const nowWib = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" }));
-  const firstDay = `${nowWib.getFullYear()}-${String(nowWib.getMonth() + 1).padStart(2, "0")}-01`;
-  const lastDay = new Date(nowWib.getFullYear(), nowWib.getMonth() + 1, 0).toISOString().split("T")[0];
+  const now = new Date();
+  const nowWibStr = now.toLocaleDateString("sv-SE", { timeZone: "Asia/Jakarta" }); // YYYY-MM-DD
+  const [wibYear, wibMonth] = nowWibStr.split("-").map(Number);
+  const firstDay = `${wibYear}-${String(wibMonth).padStart(2, "0")}-01`;
+  const lastDay = new Date(wibYear, wibMonth, 0).toISOString().split("T")[0];
 
   // Count absensi this month
   const absensiThisMonth = await db
@@ -47,7 +49,7 @@ export async function GET() {
   const sakit = pengajuanThisMonth.filter((p) => p.jenis === "Sakit").length;
 
   // Count working days (Monday-Friday) as total possible
-  const totalWorkingDays = countWorkingDays(nowWib.getFullYear(), nowWib.getMonth() + 1);
+  const totalWorkingDays = countWorkingDays(wibYear, wibMonth);
   const alpa = Math.max(0, totalWorkingDays - hadir - terlambat - cuti - izin - sakit);
 
   return NextResponse.json({

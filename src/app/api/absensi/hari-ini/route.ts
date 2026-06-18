@@ -10,7 +10,8 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const today = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Jakarta" });
+  const now = new Date();
+  const today = now.toLocaleDateString("sv-SE", { timeZone: "Asia/Jakarta" });
   const data = await db.query.absensi.findFirst({
     where: and(
       eq(absensi.id_pegawai, session.user.id_pegawai),

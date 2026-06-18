@@ -17,8 +17,8 @@ export async function POST(request: Request) {
   const now = new Date();
   const today = now.toLocaleDateString("sv-SE", { timeZone: "Asia/Jakarta" }); // YYYY-MM-DD
   const timeStr = now.toLocaleTimeString("sv-SE", { timeZone: "Asia/Jakarta", hour: "2-digit", minute: "2-digit", hour12: false });
-  const nowWib = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Jakarta" }));
-  const nowMinutes = nowWib.getHours() * 60 + nowWib.getMinutes();
+  const [hh, mm] = timeStr.split(":").map(Number);
+  const nowMinutes = hh * 60 + mm;
 
   // Find today's absensi
   const existing = await db.query.absensi.findFirst({
@@ -78,7 +78,6 @@ export async function POST(request: Request) {
       if (jk) {
         const [pulangH, pulangM] = jk.jam_pulang.split(":").map(Number);
         const pulangMinutes = pulangH * 60 + pulangM;
-        // nowMinutes already set from WIB timezone above
         if (nowMinutes < pulangMinutes - 30) {
           status_pulang = "CepatPulang";
         }

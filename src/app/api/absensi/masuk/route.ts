@@ -17,8 +17,9 @@ export async function POST(request: Request) {
   const now = new Date();
   const today = now.toLocaleDateString("sv-SE", { timeZone: "Asia/Jakarta" }); // YYYY-MM-DD
   const timeStr = now.toLocaleTimeString("sv-SE", { timeZone: "Asia/Jakarta", hour: "2-digit", minute: "2-digit", hour12: false });
-  const nowWib = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Jakarta" }));
-  const nowMinutes = nowWib.getHours() * 60 + nowWib.getMinutes();
+  // Parse jam:menit WIB untuk perbandingan — hindari new Date() dari string lokal yang unreliable
+  const [hh, mm] = timeStr.split(":").map(Number);
+  const nowMinutes = hh * 60 + mm;
 
   // Check if already clocked in today
   const existing = await db.query.absensi.findFirst({
@@ -41,14 +42,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Data pegawai tidak ditemukan" }, { status: 404 });
   }
 
-  // Check rate limiting
+  // Check rate limiting — last_absen_attempt disimpan sebagai string WIB "YYYY-MM-DD HH:mm:ss"
+  // Parsing: tambahkan "+07:00" agar JS tidak salah interpretasi sebagai UTC
   if (pegawaiData.last_absen_attempt) {
-    const lastAttempt = new Date(pegawaiData.last_absen_attempt);
-    const diffMs = now.getTime() - lastAttempt.getTime();
+    const lastAttemptStr = pegawaiData.last_absen_attempt.replace(" ", "T") + "+07:00";
+    const lastAttempt = new Date(lastAttemptStr);
+    const nowWibMs = now.getTime() + (7 * 60 * 60 * 1000); // timestamp epoch dalam WIB
+    const diffMs = nowWibMs - lastAttempt.getTime();
     const diffSec = Math.floor(diffMs / 1000);
 
-    // Minimum 5 seconds between attempts — diturunkan dari 15s
-    if (diffSec < 15) {
+    // Minimum 5 seconds between attempts
+    if (diffSec < 5) {
       return NextResponse.json({ error: "Tunggu 5 detik antar percobaan" }, { status: 429 });
     }
 

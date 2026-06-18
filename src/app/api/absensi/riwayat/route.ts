@@ -11,9 +11,11 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url);
-  const nowWib = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" }));
-  const month = parseInt(searchParams.get("month") || String(nowWib.getMonth() + 1));
-  const year = parseInt(searchParams.get("year") || String(nowWib.getFullYear()));
+  const now = new Date();
+  const nowWibStr = now.toLocaleDateString("sv-SE", { timeZone: "Asia/Jakarta" }); // YYYY-MM-DD
+  const nowWib = { year: parseInt(nowWibStr.slice(0, 4)), month: parseInt(nowWibStr.slice(5, 7)) };
+  const month = parseInt(searchParams.get("month") || String(nowWib.month));
+  const year = parseInt(searchParams.get("year") || String(nowWib.year));
 
   const firstDay = `${year}-${String(month).padStart(2, "0")}-01`;
   const lastDay = `${year}-${String(month).padStart(2, "0")}-${new Date(year, month, 0).getDate()}`;
