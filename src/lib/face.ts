@@ -170,7 +170,7 @@ export function verifyFaceMatch(
  * Threshold constants
  */
 export const FACE_THRESHOLDS = {
-  VERIFICATION: 0.55, // Euclidean distance threshold for face match
+  VERIFICATION: 0.65, // Euclidean distance threshold for face match — dinaikkan dari 0.55 untuk toleransi cahaya/angle
   CAMERA_QUALITY_MIN: 0.50, // Minimum camera quality for attendance
   CAMERA_QUALITY_REGISTRATION: 0.55, // Higher quality for registration
   CONFIDENCE_MIN: 0.50, // Minimum confidence score

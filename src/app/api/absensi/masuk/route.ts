@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { absensi, pegawai, jam_kerja, notifikasi } from "@/db/schema";
 import { eq, and, sql } from "drizzle-orm";
-import { verifyFaceMatch } from "@/lib/face";
+import { verifyFaceMatch, FACE_THRESHOLDS } from "@/lib/face";
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -47,9 +47,9 @@ export async function POST(request: Request) {
     const diffMs = now.getTime() - lastAttempt.getTime();
     const diffSec = Math.floor(diffMs / 1000);
 
-    // Minimum 15 seconds between attempts
+    // Minimum 5 seconds between attempts — diturunkan dari 15s
     if (diffSec < 15) {
-      return NextResponse.json({ error: "Tunggu 15 detik antar percobaan" }, { status: 429 });
+      return NextResponse.json({ error: "Tunggu 5 detik antar percobaan" }, { status: 429 });
     }
 
     // Cooldown 5 minutes after 5 failed attempts
@@ -72,7 +72,7 @@ export async function POST(request: Request) {
     try {
       const storedDescriptor: number[] = JSON.parse(pegawaiData.face_data);
       if (Array.isArray(storedDescriptor) && storedDescriptor.length === 128) {
-        is_face_verified = verifyFaceMatch(face_descriptor, storedDescriptor);
+        is_face_verified = verifyFaceMatch(face_descriptor, storedDescriptor, FACE_THRESHOLDS.VERIFICATION);
       } else {
         face_verify_error = "Data wajah tersimpan tidak valid";
       }

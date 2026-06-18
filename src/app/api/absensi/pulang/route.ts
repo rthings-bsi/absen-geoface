@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { absensi, pegawai, jam_kerja, notifikasi } from "@/db/schema";
 import { eq, and, sql } from "drizzle-orm";
-import { verifyFaceMatch } from "@/lib/face";
+import { verifyFaceMatch, FACE_THRESHOLDS } from "@/lib/face";
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -51,7 +51,7 @@ export async function POST(request: Request) {
     try {
       const storedDescriptor: number[] = JSON.parse(pegawaiData.face_data);
       if (Array.isArray(storedDescriptor) && storedDescriptor.length === 128) {
-        is_face_verified = verifyFaceMatch(face_descriptor, storedDescriptor);
+        is_face_verified = verifyFaceMatch(face_descriptor, storedDescriptor, FACE_THRESHOLDS.VERIFICATION);
       } else {
         face_verify_error = "Data wajah tersimpan tidak valid";
       }
