@@ -16,6 +16,7 @@ import {
 import Card, { CardContent } from "@/components/ui/card";
 import { Badge, Button } from "@/components/ui";
 import Link from "next/link";
+import { useFaceRecognition } from "@/hooks/use-face-recognition";
 
 type GPSPosition = {
   lat: number;
@@ -76,6 +77,8 @@ export default function AbsensiPage() {
   const [maxDistance, setMaxDistance] = useState(100);
   const [gpsSkipped, setGpsSkipped] = useState(false);
   const [faceRetryCount, setFaceRetryCount] = useState(0);
+  const [faceDescriptor, setFaceDescriptor] = useState<number[] | null>(null);
+  const { modelsLoaded, modelError, detectFace } = useFaceRecognition();
 
   const fetchOfficeLocation = useCallback(async () => {
     try {
@@ -140,21 +143,28 @@ export default function AbsensiPage() {
     return canvas.toDataURL("image/jpeg", 0.7);
   }, []);
 
-  const detectFace = useCallback(() => {
+  const runFaceDetection = useCallback(async () => {
     if (!cameraActive || !videoRef.current) return;
     setFaceStatus("detecting");
-    setTimeout(() => {
-      const captured = captureFoto();
-      const fakeConfidence = 85 + Math.random() * 15;
-      setConfidence(fakeConfidence);
-      if (fakeConfidence >= 70) {
-        setFotoBase64(captured);
-        setFaceStatus("verified");
+    try {
+      const result = await detectFace(videoRef.current);
+      if (result) {
+        setFaceDescriptor(result.descriptor);
+        setConfidence(result.confidence);
+        if (result.confidence >= 70) {
+          const captured = captureFoto();
+          setFotoBase64(captured);
+          setFaceStatus("verified");
+        } else {
+          setFaceStatus("failed");
+        }
       } else {
         setFaceStatus("failed");
       }
-    }, 1000);
-  }, [cameraActive, captureFoto]);
+    } catch {
+      setFaceStatus("failed");
+    }
+  }, [cameraActive, captureFoto, detectFace]);
 
   useEffect(() => {
     if (cameraActive && streamRef.current && videoRef.current) {
@@ -162,10 +172,10 @@ export default function AbsensiPage() {
       video.srcObject = streamRef.current;
       video.onloadedmetadata = () => {
         video.play().catch(() => {});
-        detectFace();
+        runFaceDetection();
       };
     }
-  }, [cameraActive, detectFace]);
+  }, [cameraActive, runFaceDetection]);
 
   const getGPSPosition = useCallback((): Promise<GPSPosition> => {
     return new Promise((resolve, reject) => {
@@ -293,6 +303,7 @@ export default function AbsensiPage() {
           longitude: pos.lng,
           confidence: Math.round(confidence),
           foto: capturedFoto,
+          face_descriptor: faceDescriptor, // untuk verifikasi server-side
         }),
       });
 
@@ -535,7 +546,7 @@ export default function AbsensiPage() {
                faceStatus === "detecting" ? "Mendeteksi wajah..." :
                "Menunggu kamera"}
               {faceStatus === "failed" && (
-                <button onClick={() => { setFaceStatus("idle"); detectFace(); }} className="ml-2 text-xs font-semibold text-sky-600 hover:text-sky-800 underline">
+                <button onClick={() => { setFaceStatus("idle"); runFaceDetection(); }} className="ml-2 text-xs font-semibold text-sky-600 hover:text-sky-800 underline">
                   Coba Lagi
                 </button>
               )}

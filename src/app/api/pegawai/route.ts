@@ -39,6 +39,7 @@ export async function GET(request: Request) {
       role: pegawai.role,
       is_active: users.is_active,
       jabatan_nama: jabatan.nama,
+      foto_profile: pegawai.foto_profile,
     })
     .from(pegawai)
     .leftJoin(jabatan, eq(pegawai.id_jabatan, jabatan.id))
@@ -102,10 +103,13 @@ export async function POST(request: Request) {
     return NextResponse.json(newPegawai, { status: 201 });
   } catch (err: any) {
     const msg = err?.message || "";
-    if (msg.includes("UNIQUE") && msg.includes("nip")) {
+    const causeMsg = err?.cause?.message || "";
+    const isUniqueError = msg.includes("UNIQUE") || causeMsg.includes("duplicate key");
+
+    if (isUniqueError && (msg.includes("nip") || causeMsg.includes("nip"))) {
       return NextResponse.json({ error: "NIP sudah terdaftar" }, { status: 409 });
     }
-    if (msg.includes("UNIQUE") && (msg.includes("email") || msg.includes("users.email"))) {
+    if (isUniqueError && (msg.includes("email") || causeMsg.includes("email") || msg.includes("users.email") || causeMsg.includes("users.email"))) {
       return NextResponse.json({ error: "Email sudah terdaftar" }, { status: 409 });
     }
     console.error("POST pegawai error:", err);
@@ -157,10 +161,13 @@ export async function PUT(request: Request) {
     return NextResponse.json({ success: true });
   } catch (err: any) {
     const msg = err?.message || "";
-    if (msg.includes("UNIQUE") && msg.includes("nip")) {
+    const causeMsg = err?.cause?.message || "";
+    const isUniqueError = msg.includes("UNIQUE") || causeMsg.includes("duplicate key");
+
+    if (isUniqueError && (msg.includes("nip") || causeMsg.includes("nip"))) {
       return NextResponse.json({ error: "NIP sudah terdaftar" }, { status: 409 });
     }
-    if (msg.includes("UNIQUE") && (msg.includes("email") || msg.includes("users.email"))) {
+    if (isUniqueError && (msg.includes("email") || causeMsg.includes("email") || msg.includes("users.email") || causeMsg.includes("users.email"))) {
       return NextResponse.json({ error: "Email sudah terdaftar" }, { status: 409 });
     }
     console.error("PUT pegawai error:", err);

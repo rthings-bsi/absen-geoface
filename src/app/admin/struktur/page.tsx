@@ -310,10 +310,10 @@ export default function StrukturPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Struktur Organisasi</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">Struktur Organisasi</h1>
           <p className="text-muted-foreground">Kelola struktur organisasi perusahaan</p>
         </div>
-        <Card>
+        <Card className="border-white/40 dark:border-gray-800/50 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl shadow-sm">
           <CardHeader><Skeleton className="h-5 w-40" /></CardHeader>
           <CardContent className="space-y-3">
             {Array.from({ length: 6 }).map((_, i) => (
@@ -330,7 +330,7 @@ export default function StrukturPage() {
       {/* ── Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Struktur Organisasi</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">Struktur Organisasi</h1>
           <p className="text-muted-foreground">Kelola struktur organisasi perusahaan</p>
         </div>
         <div className="flex items-center gap-2">
@@ -382,7 +382,7 @@ export default function StrukturPage() {
         <div className="overflow-x-auto pb-8">
           <div className="min-w-max">
             {tree.length === 0 ? (
-              <Card>
+              <Card className="border-white/40 dark:border-gray-800/50 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl shadow-sm">
                 <CardContent className="flex flex-col items-center justify-center py-16 text-muted-foreground">
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-sky-100 to-sky-200 dark:from-sky-900/50 dark:to-sky-800/50 flex items-center justify-center mb-4">
                     <Building2 className="w-8 h-8 text-sky-500" />
@@ -414,7 +414,7 @@ export default function StrukturPage() {
 
       {/* ── List View ── */}
       {viewMode === "list" && (
-        <Card>
+        <Card className="border-white/40 dark:border-gray-800/50 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl shadow-sm">
           <CardHeader>
             <div className="flex items-center gap-2">
               <ChevronDownSquare className="w-5 h-5 text-blue-600" />
@@ -522,34 +522,34 @@ function TreeList({
 
   return (
     <>
-      {nodes.map((node) => {
+      {nodes.map((node, index) => {
         const hasChildren = node.children.length > 0;
         const isExpanded = expandedMap[node.id] ?? true;
         const isHighlighted = node.id === highlightedId;
 
         return (
-          <div key={node.id}>
+          <div key={node.id} className="animate-fade-slide-up" style={{ animationDelay: `${index * 50}ms` }}>
             <div
               className={`
-                flex items-center gap-2 py-2.5 px-3 rounded-xl
-                transition-all duration-200 group
+                flex items-center gap-3 py-3 px-4 rounded-2xl
+                transition-all duration-300 group mt-1
                 ${isHighlighted
                   ? "bg-sky-50 dark:bg-sky-900/30 ring-1 ring-sky-300 dark:ring-sky-600"
-                  : "hover:bg-muted/50"
+                  : "hover:bg-white/60 dark:hover:bg-gray-800/40 border border-transparent hover:border-gray-100 dark:hover:border-gray-700/50 shadow-sm hover:shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)]"
                 }
               `}
-              style={{ paddingLeft: `${depth * 24 + 12}px` }}
+              style={{ marginLeft: `${depth * 28}px` }}
             >
               {/* Expand toggle */}
               <button
                 onClick={() => toggle(node.id)}
-                className="p-0.5 rounded hover:bg-muted transition-colors flex-shrink-0"
+                className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors flex-shrink-0"
               >
                 {hasChildren ? (
                   isExpanded ? (
-                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                    <ChevronDown className="w-4 h-4" />
                   ) : (
-                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                    <ChevronRight className="w-4 h-4" />
                   )
                 ) : (
                   <div className="w-4 h-4" />
@@ -557,7 +557,7 @@ function TreeList({
               </button>
 
               {/* Icon / Foto */}
-              <div className="w-7 h-7 rounded-lg overflow-hidden bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center flex-shrink-0 shadow-sm">
+              <div className="w-9 h-9 rounded-xl overflow-hidden bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center flex-shrink-0 shadow-[0_2px_10px_-2px_rgba(56,189,248,0.5)] ring-2 ring-white dark:ring-gray-900">
                 {node.pegawai_kepala?.foto_profile ? (
                   <img
                     src={node.pegawai_kepala.foto_profile}
@@ -565,37 +565,41 @@ function TreeList({
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <Building2 className="w-3.5 h-3.5 text-white" />
+                  <Building2 className="w-4 h-4 text-white" />
                 )}
               </div>
 
               {/* Name */}
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{node.nama}</p>
-                {node.pegawai_kepala && (
-                  <p className="text-[10px] text-muted-foreground truncate">
+              <div className="flex-1 min-w-0 ml-1">
+                <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{node.nama}</p>
+                {node.pegawai_kepala ? (
+                  <p className="text-[11px] font-medium text-sky-600 dark:text-sky-400 truncate mt-0.5">
                     {node.pegawai_kepala.nama}
+                  </p>
+                ) : (
+                  <p className="text-[10px] text-gray-400 dark:text-gray-500 italic mt-0.5">
+                    — lowong —
                   </p>
                 )}
               </div>
 
               {/* Badge */}
               {hasChildren && (
-                <span className="text-[10px] font-medium text-sky-500 dark:text-sky-400 bg-sky-50 dark:bg-sky-900/30 px-2 py-0.5 rounded-full border border-sky-200/50 dark:border-sky-700/50 flex-shrink-0">
-                  {node.children.length}
+                <span className="text-[10px] font-medium text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-900/30 px-2.5 py-1 rounded-full border border-sky-200/50 dark:border-sky-700/50 flex-shrink-0 shadow-sm">
+                  {node.children.length} sub
                 </span>
               )}
 
               {/* Actions */}
-              <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Button variant="ghost" size="icon-sm" onClick={() => onAddChild(node.id)}>
-                  <Plus className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity ml-2">
+                <Button variant="ghost" size="icon-sm" onClick={() => onAddChild(node.id)} className="text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/30 transition-colors">
+                  <Plus className="w-4 h-4" />
                 </Button>
-                <Button variant="ghost" size="icon-sm" onClick={() => onEdit(node)}>
-                  <Pencil className="w-3.5 h-3.5" />
+                <Button variant="ghost" size="icon-sm" onClick={() => onEdit(node)} className="text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:text-blue-400 dark:hover:bg-blue-900/30 transition-colors">
+                  <Pencil className="w-4 h-4" />
                 </Button>
-                <Button variant="ghost" size="icon-sm" onClick={() => onDelete(node.id)}>
-                  <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                <Button variant="ghost" size="icon-sm" onClick={() => onDelete(node.id)} className="text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-400 dark:hover:bg-red-900/30 transition-colors">
+                  <Trash2 className="w-4 h-4" />
                 </Button>
               </div>
             </div>

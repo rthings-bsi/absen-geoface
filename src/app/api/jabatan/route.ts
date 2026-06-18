@@ -5,8 +5,13 @@ import { jabatan, pegawai } from "@/db/schema";
 import { eq, count } from "drizzle-orm";
 
 export async function GET() {
-  const data = await db.query.jabatan.findMany();
-  return NextResponse.json(data);
+  try {
+    const data = await db.query.jabatan.findMany();
+    return NextResponse.json(data);
+  } catch (err: any) {
+    console.error("GET jabatan error:", err?.message || err);
+    return NextResponse.json({ error: "Gagal memuat data jabatan", data: [] }, { status: 500 });
+  }
 }
 
 export async function POST(request: Request) {

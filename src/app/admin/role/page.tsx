@@ -101,7 +101,8 @@ export default function RolePage() {
       });
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || `Gagal menyimpan (${res.status})`);
+        toast.error(errData.error || `Gagal menyimpan (${res.status})`);
+        return;
       }
       toast.success(editing ? "Role berhasil diperbarui" : "Role berhasil ditambahkan");
       setDialogOpen(false);
@@ -147,10 +148,10 @@ export default function RolePage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Role & Permission</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">Role & Permission</h1>
           <p className="text-muted-foreground">Kelola role dan hak akses</p>
         </div>
-        <Card>
+        <Card className="border-white/40 dark:border-gray-800/50 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl shadow-sm">
           <CardHeader><Skeleton className="h-5 w-32" /></CardHeader>
           <CardContent className="space-y-3">
             {Array.from({ length: 3 }).map((_, i) => (
@@ -166,7 +167,7 @@ export default function RolePage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Role & Permission</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">Role & Permission</h1>
           <p className="text-muted-foreground">Kelola role dan hak akses</p>
         </div>
         <Button onClick={openCreate}>
@@ -175,7 +176,7 @@ export default function RolePage() {
         </Button>
       </div>
 
-      <Card>
+      <Card className="border-white/40 dark:border-gray-800/50 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl shadow-sm">
         <CardHeader>
           <div className="flex items-center gap-4">
             <div className="relative flex-1 max-w-sm">
@@ -207,41 +208,55 @@ export default function RolePage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border">
-                    <th className="text-left py-3 px-2 font-medium text-muted-foreground">Nama Role</th>
-                    <th className="text-left py-3 px-2 font-medium text-muted-foreground">Deskripsi</th>
-                    <th className="text-left py-3 px-2 font-medium text-muted-foreground">Permission</th>
-                    <th className="text-right py-3 px-2 font-medium text-muted-foreground">Aksi</th>
+                  <tr className="border-b border-gray-100 dark:border-gray-800">
+                    <th className="text-left py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Nama Role</th>
+                    <th className="text-left py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Deskripsi</th>
+                    <th className="text-left py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Permission</th>
+                    <th className="text-right py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((item) => (
-                    <tr key={item.id} className="border-b border-border hover:bg-muted/50 transition-colors">
-                      <td className="py-3 px-2 font-medium">{item.nama}</td>
-                      <td className="py-3 px-2 text-muted-foreground">{item.deskripsi || "-"}</td>
-                      <td className="py-3 px-2">
+                  {filtered.map((item, index) => (
+                    <tr
+                      key={item.id}
+                      className="border-b border-gray-50 dark:border-gray-800/50 hover:bg-blue-50/30 dark:hover:bg-blue-900/10 transition-colors group animate-fade-slide-up"
+                      style={{ animationDelay: `${index * 50}ms` }}
+                    >
+                      <td className="py-3.5 px-3 font-semibold text-gray-800 dark:text-gray-200">{item.nama}</td>
+                      <td className="py-3.5 px-3 text-gray-500 dark:text-gray-400">{item.deskripsi || <span className="italic text-gray-300 dark:text-gray-600">Tidak ada deskripsi</span>}</td>
+                      <td className="py-3.5 px-3">
                         <div className="flex flex-wrap gap-1">
                           {(item.permissions || []).length === 0 ? (
-                            <span className="text-xs text-muted-foreground">Tidak ada</span>
+                            <span className="text-xs text-gray-400 dark:text-gray-600 italic">Tidak ada</span>
                           ) : (
                             (item.permissions || []).slice(0, 4).map((p) => (
-                              <Badge key={p} variant="secondary" className="text-[10px]">{p}</Badge>
+                              <Badge key={p} variant="secondary" className="text-[10px] bg-indigo-50 text-indigo-600 border-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-800">{p}</Badge>
                             ))
                           )}
                           {(item.permissions || []).length > 4 && (
-                            <Badge variant="secondary" className="text-[10px]">
+                            <Badge variant="secondary" className="text-[10px] bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700">
                               +{item.permissions!.length - 4}
                             </Badge>
                           )}
                         </div>
                       </td>
-                      <td className="py-3 px-2 text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <Button variant="ghost" size="icon-sm" onClick={() => openEdit(item)}>
+                      <td className="py-3.5 px-3 text-right">
+                        <div className="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            onClick={() => openEdit(item)}
+                            className="text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:text-blue-400 dark:hover:bg-blue-900/30 transition-colors"
+                          >
                             <Pencil className="w-4 h-4" />
                           </Button>
-                          <Button variant="ghost" size="icon-sm" onClick={() => handleDelete(item.id)}>
-                            <Trash2 className="w-4 h-4 text-red-500" />
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            onClick={() => handleDelete(item.id)}
+                            className="text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-400 dark:hover:bg-red-900/30 transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
                       </td>

@@ -19,13 +19,23 @@ const s3 = new S3Client({
 // POST: Upload foto profile
 export async function POST(request: Request) {
   const session = await auth();
-  if (!session?.user?.id_pegawai) {
+  if (!session?.user?.id_pegawai && !session?.user?.can_admin) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
     const formData = await request.formData();
     const file = formData.get("foto") as File | null;
+    const targetIdStr = formData.get("id_pegawai") as string | null;
+
+    let targetId = session.user.id_pegawai;
+    if (targetIdStr && session.user.can_admin) {
+      targetId = parseInt(targetIdStr);
+    }
+
+    if (!targetId) {
+      return NextResponse.json({ error: "ID Pegawai tidak ditemukan" }, { status: 400 });
+    }
 
     if (!file) {
       return NextResponse.json({ error: "File tidak ditemukan" }, { status: 400 });
@@ -44,7 +54,7 @@ export async function POST(request: Request) {
 
     const buffer = Buffer.from(await file.arrayBuffer());
     const ext = file.name.split(".").pop() || "jpg";
-    const fileName = `foto-${session.user.id_pegawai}-${Date.now()}.${ext}`;
+    const fileName = `foto-${targetId}-${Date.now()}.${ext}`;
     const key = `foto-profile/${fileName}`;
 
     // Upload ke Supabase Storage via S3 API
@@ -61,7 +71,7 @@ export async function POST(request: Request) {
     // Update database
     await db.update(pegawai)
       .set({ foto_profile: publicUrl })
-      .where(eq(pegawai.id, session.user.id_pegawai));
+      .where(eq(pegawai.id, targetId));
 
     return NextResponse.json({
       success: true,

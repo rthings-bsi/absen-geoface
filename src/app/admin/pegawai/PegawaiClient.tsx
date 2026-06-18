@@ -13,7 +13,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import {
-  Search, Plus, Pencil, Trash2, Users, UserPlus, ChevronRight,
+  Search, Plus, Pencil, Trash2, Users, UserPlus, ChevronRight, Camera,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -28,6 +28,7 @@ interface Pegawai {
   status: string;
   telepon?: string;
   alamat?: string;
+  foto_profile?: string | null;
 }
 
 export default function PegawaiPage() {
@@ -35,6 +36,7 @@ export default function PegawaiPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [photoDialogOpen, setPhotoDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Pegawai | null>(null);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
@@ -100,6 +102,44 @@ export default function PegawaiPage() {
     setDialogOpen(true);
   };
 
+  const openPhoto = (item: Pegawai) => {
+    setEditing(item);
+    setPhotoDialogOpen(true);
+  };
+
+  const handleUploadFoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || !e.target.files[0] || !editing) return;
+
+    const file = e.target.files[0];
+    const formData = new FormData();
+    formData.append("foto", file);
+    formData.append("id_pegawai", String(editing.id));
+
+    setSaving(true);
+    toast.info("Mengunggah foto...");
+    try {
+      const res = await fetch("/api/pegawai/upload-foto", {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        toast.error(errData.error || "Gagal mengunggah foto");
+        return;
+      }
+      toast.success("Foto profil berhasil diperbarui");
+      setPhotoDialogOpen(false);
+      fetchData();
+    } catch (err) {
+      console.error(err);
+      toast.error("Terjadi kesalahan saat mengunggah foto");
+    } finally {
+      setSaving(false);
+      // reset file input
+      e.target.value = "";
+    }
+  };
+
   const handleSave = async () => {
     if (!form.nip || !form.nama || !form.email) {
       toast.error("NIP, Nama, dan Email wajib diisi");
@@ -132,7 +172,8 @@ export default function PegawaiPage() {
       });
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || `Gagal menyimpan (${res.status})`);
+        toast.error(errData.error || `Gagal menyimpan (${res.status})`);
+        return;
       }
       toast.success(editing ? "Pegawai berhasil diperbarui" : "Pegawai berhasil ditambahkan");
       setDialogOpen(false);
@@ -205,8 +246,8 @@ export default function PegawaiPage() {
         </Button>
       </div>
 
-      <Card className="overflow-hidden">
-        <CardHeader className="pb-0">
+      <Card className="overflow-hidden border-white/40 dark:border-gray-800/50 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl shadow-sm">
+        <CardHeader className="pb-0 border-b border-transparent">
           <div className="flex flex-col sm:flex-row sm:items-center gap-3">
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
@@ -251,40 +292,59 @@ export default function PegawaiPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {filtered.map((item) => {
+                    {filtered.map((item, index) => {
                       const sc = statusConfig[item.status] || statusConfig.nonaktif;
                       return (
                         <tr
                           key={item.id}
-                          className="border-b border-gray-50 dark:border-gray-800/50 transition-colors hover:bg-blue-50/20 dark:hover:bg-blue-950/10 group"
+                          className="border-b border-gray-50 dark:border-gray-800/50 transition-colors hover:bg-blue-50/20 dark:hover:bg-blue-950/10 group animate-fade-slide-up"
+                          style={{ animationDelay: `${index * 50}ms` }}
                         >
                           <td className="py-3.5 px-3">
-                            <span className="font-mono text-xs text-gray-500 dark:text-gray-400">{item.nip}</span>
+                            <span className="font-mono text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 px-2 py-1 rounded-md">{item.nip}</span>
                           </td>
                           <td className="py-3.5 px-3">
-                            <span className="font-medium text-gray-900 dark:text-white">{item.nama}</span>
+                            <div className="flex items-center gap-3">
+                              {item.foto_profile ? (
+                                <img src={item.foto_profile} alt={item.nama} className="w-8 h-8 rounded-full object-cover shadow-sm ring-2 ring-white dark:ring-gray-900" />
+                              ) : (
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center flex-shrink-0 shadow-sm ring-2 ring-white dark:ring-gray-900">
+                                  <span className="text-white text-xs font-bold">{item.nama.charAt(0)}</span>
+                                </div>
+                              )}
+                              <span className="font-semibold text-gray-900 dark:text-white">{item.nama}</span>
+                            </div>
                           </td>
                           <td className="py-3.5 px-3 text-gray-500 dark:text-gray-400 text-xs">{item.email}</td>
                           <td className="py-3.5 px-3">
                             {item.jabatan?.nama ? (
-                              <span className="text-sm text-gray-600 dark:text-gray-300">{item.jabatan.nama}</span>
+                              <span className="text-sm font-medium text-gray-600 dark:text-gray-300">{item.jabatan.nama}</span>
                             ) : (
-                              <span className="text-xs text-gray-400 dark:text-gray-500">-</span>
+                              <span className="text-xs text-gray-400 dark:text-gray-500 italic">Belum ada</span>
                             )}
                           </td>
                           <td className="py-3.5 px-3">
-                            <div className="flex items-center gap-1.5">
+                            <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-800/50 w-fit px-2.5 py-1 rounded-full border border-gray-100 dark:border-gray-700/50">
                               <div className={cn("w-1.5 h-1.5 rounded-full bg-gradient-to-r", sc.gradient)} />
                               <span className="text-xs font-medium text-gray-600 dark:text-gray-300">{sc.label}</span>
                             </div>
                           </td>
                           <td className="py-3.5 px-3 text-right">
-                            <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                onClick={() => openPhoto(item)}
+                                className="text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/30 transition-colors"
+                                title="Update Foto"
+                              >
+                                <Camera className="w-4 h-4" />
+                              </Button>
                               <Button
                                 variant="ghost"
                                 size="icon-sm"
                                 onClick={() => openEdit(item)}
-                                className="text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/50"
+                                className="text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:text-blue-400 dark:hover:bg-blue-900/30 transition-colors"
                                 title="Edit"
                               >
                                 <Pencil className="w-4 h-4" />
@@ -293,7 +353,7 @@ export default function PegawaiPage() {
                                 variant="ghost"
                                 size="icon-sm"
                                 onClick={() => handleDelete(item.id)}
-                                className="text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/50"
+                                className="text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-400 dark:hover:bg-red-900/30 transition-colors"
                                 title="Hapus"
                               >
                                 <Trash2 className="w-4 h-4" />
@@ -315,22 +375,34 @@ export default function PegawaiPage() {
                       key={item.id}
                       className="group flex items-center gap-3 p-3 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-blue-100 dark:hover:border-blue-900/50 hover:shadow-sm transition-all"
                     >
-                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center flex-shrink-0 shadow-sm">
-                        <span className="text-white text-xs font-bold">{item.nama.charAt(0)}</span>
-                      </div>
+                      {item.foto_profile ? (
+                        <img src={item.foto_profile} alt={item.nama} className="w-9 h-9 rounded-full object-cover shadow-sm flex-shrink-0" />
+                      ) : (
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center flex-shrink-0 shadow-sm">
+                          <span className="text-white text-xs font-bold">{item.nama.charAt(0)}</span>
+                        </div>
+                      )}
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{item.nama}</p>
                         <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{item.nip} · {item.jabatan?.nama || "-"}</p>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <div className={cn("w-1.5 h-1.5 rounded-full bg-gradient-to-r", sc.gradient)} />
+                      <div className="flex items-center gap-1">
+                        <div className={cn("w-1.5 h-1.5 rounded-full bg-gradient-to-r mr-1", sc.gradient)} />
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => openPhoto(item)}
+                          className="text-gray-400"
+                        >
+                          <Camera className="w-4 h-4" />
+                        </Button>
                         <Button
                           variant="ghost"
                           size="icon-sm"
                           onClick={() => openEdit(item)}
                           className="text-gray-400"
                         >
-                          <ChevronRight className="w-4 h-4" />
+                          <Pencil className="w-4 h-4" />
                         </Button>
                       </div>
                     </div>
@@ -438,6 +510,49 @@ export default function PegawaiPage() {
             <Button onClick={handleSave} disabled={saving}>
               {saving ? "Menyimpan..." : "Simpan"}
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog Upload Foto */}
+      <Dialog open={photoDialogOpen} onOpenChange={setPhotoDialogOpen}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Update Foto Profil</DialogTitle>
+            <DialogDescription>
+              {editing && `Unggah foto untuk ${editing.nama}`}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col items-center gap-4 py-4">
+            {editing?.foto_profile && (
+              <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-border shadow-sm">
+                <img
+                  src={editing.foto_profile}
+                  alt="Preview"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-input rounded-xl cursor-pointer hover:border-primary/50 hover:bg-muted/30 transition-colors">
+              <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                <Camera className="w-8 h-8 text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground">
+                  <span className="font-medium text-primary">Klik untuk memilih</span>
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">JPG, PNG, WebP (max 5MB)</p>
+              </div>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                onChange={handleUploadFoto}
+                disabled={saving}
+              />
+            </label>
+            {saving && <p className="text-sm text-muted-foreground animate-pulse">Mengunggah...</p>}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPhotoDialogOpen(false)}>Tutup</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

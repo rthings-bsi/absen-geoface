@@ -47,6 +47,7 @@ export default function RekapPage() {
     page: 1, limit: 20, total: 0, totalPages: 0,
   });
   const [photoModal, setPhotoModal] = useState<{ src: string; label: string } | null>(null);
+  const [pdfPreviewModal, setPdfPreviewModal] = useState<{ url: string; date: string } | null>(null);
   const [deleteModal, setDeleteModal] = useState<{ id: number; label: string } | null>(null);
 
   const fetchData = useCallback(async () => {
@@ -106,7 +107,7 @@ export default function RekapPage() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `rekap-absensi-${date || "semua"}.xlsx`;
+      a.download = "rekap-absensi-${pdfPreviewModal.date}.pdf";
       a.click();
       URL.revokeObjectURL(url);
       toast.success("Export Excel berhasil");
@@ -115,24 +116,26 @@ export default function RekapPage() {
     }
   };
 
-  const handleExportPdf = async () => {
-    try {
-      const params = new URLSearchParams();
-      if (date) params.set("tanggal", date);
-      if (search) params.set("search", search);
-      const res = await fetch(`/api/admin/export/pdf?${params}`);
-      if (!res.ok) throw new Error("Gagal export");
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `rekap-absensi-${date || "semua"}.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
-      toast.success("Export PDF berhasil");
-    } catch {
-      toast.error("Gagal export PDF");
-    }
+  const handleExportPdf = () => {
+    const params = new URLSearchParams();
+    if (date) params.set("tanggal", date);
+    if (search) params.set("search", search);
+    
+    // Set URL untuk preview di iframe
+    const previewUrl = `/api/admin/export/pdf?${params}&download=false`;
+    setPdfPreviewModal({ url: previewUrl, date: date || "semua" });
+  };
+
+  const handleDownloadPdf = () => {
+    if (!pdfPreviewModal) return;
+    
+    // Gunakan elemen anchor untuk download
+    const a = document.createElement("a");
+    a.href = pdfPreviewModal.url.replace("&download=false", "&download=true");
+    a.download = "rekap-absensi-${pdfPreviewModal.date}.pdf";
+    a.click();
+    
+    toast.success("Mulai mengunduh PDF");
   };
 
   const handleDelete = async () => {
@@ -165,7 +168,7 @@ export default function RekapPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Rekap Absensi</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">Rekap Absensi</h1>
           <p className="text-muted-foreground">Rekapitulasi data absensi pegawai</p>
         </div>
         <Card>
@@ -178,6 +181,28 @@ export default function RekapPage() {
             </div>
           </CardContent>
         </Card>
+
+      {/* PDF Preview Modal */}
+      <Dialog open={!!pdfPreviewModal} onOpenChange={(open) => !open && setPdfPreviewModal(null)}>
+        <DialogContent className="max-w-4xl w-[90vw] h-[90vh] flex flex-col">
+          <DialogHeader className="flex flex-row items-center justify-between pb-2 border-b">
+            <DialogTitle>Preview Rekap Absensi PDF</DialogTitle>
+            <Button size="sm" onClick={handleDownloadPdf} className="ml-auto mr-4">
+              <FileText className="w-4 h-4 mr-2" />
+              Download PDF
+            </Button>
+          </DialogHeader>
+          <div className="flex-1 w-full bg-muted rounded-md overflow-hidden mt-2">
+            {pdfPreviewModal?.url && (
+              <iframe 
+                src={pdfPreviewModal.url} 
+                className="w-full h-full border-0" 
+                title="PDF Preview" 
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
       </div>
     );
   }
@@ -185,15 +210,14 @@ export default function RekapPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Rekap Absensi</h1>
+        <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">Rekap Absensi</h1>
         <p className="text-muted-foreground">Rekapitulasi data absensi pegawai</p>
       </div>
 
       <Card>
         <CardHeader>
           <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-            <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-muted-foreground" />
+            <div className="flex items-center">
               <Input
                 type="date"
                 value={date}
@@ -236,57 +260,67 @@ export default function RekapPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-border">
-                      <th className="text-left py-3 px-2 font-medium text-muted-foreground">Tanggal</th>
-                      <th className="text-left py-3 px-2 font-medium text-muted-foreground">NIP</th>
-                      <th className="text-left py-3 px-2 font-medium text-muted-foreground">Pegawai</th>
-                      <th className="text-left py-3 px-2 font-medium text-muted-foreground">Jam Masuk</th>
-                      <th className="text-left py-3 px-2 font-medium text-muted-foreground">Jam Keluar</th>
-                      <th className="text-left py-3 px-2 font-medium text-muted-foreground">Status</th>
-                      <th className="text-left py-3 px-2 font-medium text-muted-foreground">Keterangan</th>
-                      <th className="text-center py-3 px-2 font-medium text-muted-foreground w-16">Aksi</th>
+                    <tr className="border-b border-gray-100 dark:border-gray-800">
+                      <th className="text-left py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Tanggal</th>
+                      <th className="text-left py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">NIP</th>
+                      <th className="text-left py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Pegawai</th>
+                      <th className="text-left py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Jam Masuk</th>
+                      <th className="text-left py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Jam Keluar</th>
+                      <th className="text-left py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Status</th>
+                      <th className="text-left py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Keterangan</th>
+                      <th className="text-center py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider w-16">Aksi</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {data.map((item) => (
-                      <tr key={item.id} className="border-b border-border hover:bg-muted/50 transition-colors">
-                        <td className="py-3 px-2 text-muted-foreground">{item.tanggal}</td>
-                        <td className="py-3 px-2 font-mono text-xs">{item.nip}</td>
-                        <td className="py-3 px-2 font-medium">{item.pegawai}</td>
-                        <td className="py-3 px-2">
-                          <div className="flex items-center gap-1">
-                            <span>{item.jam_masuk || "-"}</span>
-                            <button
-                              onClick={() => setPhotoModal({ src: item.foto_masuk || "", label: "Foto Masuk" })}
-                              className="p-1 rounded hover:bg-muted transition-colors"
-                              title="Lihat foto masuk"
-                            >
-                              <Eye className="h-3.5 w-3.5 text-muted-foreground" />
-                            </button>
+                    {data.map((item, index) => (
+                      <tr
+                        key={item.id}
+                        className="border-b border-gray-50 dark:border-gray-800/50 hover:bg-blue-50/30 dark:hover:bg-blue-900/10 transition-colors group animate-fade-slide-up"
+                        style={{ animationDelay: `${index * 50}ms` }}
+                      >
+                        <td className="py-3.5 px-3 text-gray-600 dark:text-gray-400 font-medium">{item.tanggal}</td>
+                        <td className="py-3.5 px-3 font-mono text-xs text-gray-500 dark:text-gray-400">{item.nip}</td>
+                        <td className="py-3.5 px-3 font-semibold text-gray-800 dark:text-gray-200">{item.pegawai}</td>
+                        <td className="py-3.5 px-3">
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-mono text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/30 rounded-md py-1 px-2">{item.jam_masuk || "-"}</span>
+                            {item.jam_masuk && (
+                              <button
+                                onClick={() => setPhotoModal({ src: item.foto_masuk || "", label: "Foto Masuk" })}
+                                className="p-1 rounded-md hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/30 dark:hover:text-blue-400 text-gray-400 transition-colors"
+                                title="Lihat foto masuk"
+                              >
+                                <Eye className="h-4 w-4" />
+                              </button>
+                            )}
                           </div>
                         </td>
-                        <td className="py-3 px-2">
-                          <div className="flex items-center gap-1">
-                            <span>{item.jam_keluar || "-"}</span>
-                            <button
-                              onClick={() => setPhotoModal({ src: item.foto_pulang || "", label: "Foto Pulang" })}
-                              className="p-1 rounded hover:bg-muted transition-colors"
-                              title="Lihat foto pulang"
-                            >
-                              <Eye className="h-3.5 w-3.5 text-muted-foreground" />
-                            </button>
+                        <td className="py-3.5 px-3">
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-mono text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/30 rounded-md py-1 px-2">{item.jam_keluar || "-"}</span>
+                            {item.jam_keluar && (
+                              <button
+                                onClick={() => setPhotoModal({ src: item.foto_pulang || "", label: "Foto Pulang" })}
+                                className="p-1 rounded-md hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/30 dark:hover:text-blue-400 text-gray-400 transition-colors"
+                                title="Lihat foto pulang"
+                              >
+                                <Eye className="h-4 w-4" />
+                              </button>
+                            )}
                           </div>
                         </td>
-                        <td className="py-3 px-2">{statusBadge(item.status)}</td>
-                        <td className="py-3 px-2 text-muted-foreground text-xs">{item.keterangan || "-"}</td>
-                        <td className="py-3 px-2 text-center">
-                          <button
-                            onClick={() => setDeleteModal({ id: item.id, label: `${item.pegawai} (${item.tanggal})` })}
-                            className="p-1.5 rounded hover:bg-red-50 text-muted-foreground hover:text-red-600 transition-colors"
-                            title="Hapus data absensi"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
+                        <td className="py-3.5 px-3">{statusBadge(item.status)}</td>
+                        <td className="py-3.5 px-3 text-gray-500 dark:text-gray-400 text-xs italic">{item.keterangan || "-"}</td>
+                        <td className="py-3.5 px-3 text-center">
+                          <div className="flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={() => setDeleteModal({ id: item.id, label: `${item.pegawai} (${item.tanggal})` })}
+                              className="p-1.5 rounded-md hover:bg-red-50 text-gray-400 hover:text-red-600 dark:hover:bg-red-900/30 dark:hover:text-red-400 transition-colors"
+                              title="Hapus data absensi"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -326,6 +360,28 @@ export default function RekapPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* PDF Preview Modal */}
+      <Dialog open={!!pdfPreviewModal} onOpenChange={(open) => !open && setPdfPreviewModal(null)}>
+        <DialogContent className="max-w-4xl w-[90vw] h-[90vh] flex flex-col">
+          <DialogHeader className="flex flex-row items-center justify-between pb-2 border-b">
+            <DialogTitle>Preview Rekap Absensi PDF</DialogTitle>
+            <Button size="sm" onClick={handleDownloadPdf} className="ml-auto mr-4">
+              <FileText className="w-4 h-4 mr-2" />
+              Download PDF
+            </Button>
+          </DialogHeader>
+          <div className="flex-1 w-full bg-muted rounded-md overflow-hidden mt-2">
+            {pdfPreviewModal?.url && (
+              <iframe 
+                src={pdfPreviewModal.url} 
+                className="w-full h-full border-0" 
+                title="PDF Preview" 
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={!!photoModal} onOpenChange={(open) => !open && setPhotoModal(null)}>
         <DialogContent className="max-w-sm">
@@ -369,3 +425,7 @@ export default function RekapPage() {
     </div>
   );
 }
+
+
+
+

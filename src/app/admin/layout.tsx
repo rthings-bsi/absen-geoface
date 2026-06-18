@@ -50,10 +50,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 dark:from-gray-950 dark:to-gray-900">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0a0c10] relative overflow-x-hidden font-sans selection:bg-blue-500/30">
+      {/* Aesthetic Background Blobs */}
+      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-blue-400/20 dark:bg-blue-600/10 rounded-full blur-[120px] pointer-events-none mix-blend-multiply dark:mix-blend-screen" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-indigo-400/20 dark:bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none mix-blend-multiply dark:mix-blend-screen" />
+
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden transition-all"
           onClick={() => setMobileOpen(false)}
         />
       )}
@@ -61,13 +65,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <aside
         className={cn(
           "fixed top-0 left-0 bottom-0 z-50 flex flex-col",
-          "bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl",
-          "border-r border-gray-100/50 dark:border-gray-800/50",
-          "shadow-[0_0_40px_-12px_rgba(0,0,0,0.06)] dark:shadow-[0_0_40px_-12px_rgba(0,0,0,0.3)]",
-          "transition-all duration-300 ease-out",
+          "bg-white/70 dark:bg-gray-900/60 backdrop-blur-2xl",
+          "border-r border-white/20 dark:border-white/5",
+          "shadow-[10px_0_40px_-10px_rgba(0,0,0,0.03)] dark:shadow-[10px_0_40px_-10px_rgba(0,0,0,0.2)]",
+          "transition-all duration-300 cubic-bezier(0.4, 0, 0.2, 1)",
           collapsed ? "w-[72px] max-lg:w-[280px]" : "w-[280px]",
           mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
-          "lg:top-3 lg:bottom-3 lg:left-3 lg:rounded-2xl lg:h-[calc(100vh-24px)]"
+          "lg:top-4 lg:bottom-4 lg:left-4 lg:rounded-[24px] lg:h-[calc(100vh-32px)]"
         )}
       >
         <div
@@ -103,13 +107,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           )}
         </div>
 
-        <nav className="flex-1 overflow-y-auto px-3 py-2 space-y-5 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-700">
+        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-6 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-700">
           {menuGroups.map((group) => (
             <div key={group.label}>
-              <p className={cn("px-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-2", collapsed ? "lg:hidden" : "")}>
+              <p className={cn(
+                "px-3 text-[10px] font-bold uppercase tracking-wider text-gray-400/80 dark:text-gray-500/80 mb-2.5",
+                collapsed ? "lg:hidden" : ""
+              )}>
                 {group.label}
               </p>
-              <div className="space-y-0.5">
+              <div className="space-y-1">
                 {group.items.map((item) => {
                   const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
                   return (
@@ -118,24 +125,25 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                       href={item.href}
                       onClick={() => setMobileOpen(false)}
                       className={cn(
-                        "group relative flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-200",
+                        "group relative flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-300",
                         collapsed ? "lg:justify-center lg:px-2 px-3 py-2.5" : "px-3 py-2.5",
                         isActive
-                          ? "bg-gradient-to-r from-blue-50 to-indigo-50/40 dark:from-blue-950/50 dark:to-indigo-950/20 text-blue-700 dark:text-blue-300"
-                          : "text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/40 hover:text-gray-700 dark:hover:text-gray-200"
+                          ? "bg-white/60 dark:bg-gray-800/60 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] dark:shadow-none text-blue-700 dark:text-blue-300 border border-white/40 dark:border-white/5"
+                          : "text-gray-500 dark:text-gray-400 hover:bg-white/40 dark:hover:bg-gray-800/40 hover:text-gray-900 dark:hover:text-gray-100"
                       )}
                     >
                       {isActive && (
-                        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-full bg-gradient-to-b from-blue-500 to-indigo-500" />
+                        <span className="absolute left-[-2px] top-1/2 -translate-y-1/2 w-1 h-6 rounded-full bg-gradient-to-b from-blue-500 to-indigo-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
                       )}
-                      <item.icon
-                        className={cn(
-                          "w-5 h-5 flex-shrink-0 transition-all duration-200",
-                          isActive ? "text-blue-600 dark:text-blue-400" : "",
-                          "group-hover:scale-110"
-                        )}
-                      />
-                      <span className={cn(collapsed ? "lg:hidden" : "")}>{item.label}</span>
+                      <div className={cn(
+                        "flex items-center justify-center rounded-lg w-8 h-8 transition-all duration-300",
+                        isActive
+                          ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                          : "group-hover:bg-gray-100 dark:group-hover:bg-gray-800"
+                      )}>
+                        <item.icon className="w-[18px] h-[18px]" strokeWidth={isActive ? 2.5 : 2} />
+                      </div>
+                      <span className={cn(collapsed ? "lg:hidden" : "", "tracking-tight")}>{item.label}</span>
                     </Link>
                   );
                 })}
@@ -169,37 +177,43 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       <div
         className={cn(
-          "flex-1 flex flex-col min-h-screen transition-all duration-300 ease-out",
+          "flex-1 flex flex-col min-h-screen transition-all duration-300 ease-out z-10",
           collapsed ? "lg:ml-[88px]" : "lg:ml-[296px]"
         )}
       >
-        <header className="sticky top-3 z-30 mx-3 mt-3 rounded-2xl bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl shadow-sm shadow-black/5 dark:shadow-black/20 border border-gray-100/50 dark:border-gray-800/50">
+        <header className="sticky top-4 z-30 mx-4 mt-4 rounded-2xl bg-white/40 dark:bg-gray-900/40 backdrop-blur-2xl shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_-8px_rgba(0,0,0,0.4)] border border-white/50 dark:border-white/5">
           <div className="flex items-center justify-between h-14 px-4">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setMobileOpen(true)}
-                className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors lg:hidden"
+                className="p-2 rounded-xl hover:bg-gray-100/80 dark:hover:bg-gray-800/80 transition-colors lg:hidden"
               >
                 <Menu className="w-5 h-5" />
               </button>
-              <span className="text-sm text-gray-400 dark:text-gray-500 font-mono tracking-tight">
+              <div className="hidden sm:flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)] animate-pulse" />
+                <span className="text-xs font-medium text-gray-500 dark:text-gray-400 tracking-tight uppercase">Sistem Online</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-sm font-semibold text-gray-600 dark:text-gray-300 bg-gray-100/50 dark:bg-gray-800/50 px-3 py-1.5 rounded-lg border border-gray-200/50 dark:border-gray-700/50 hidden sm:block">
                 {currentTime.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" })} WIB
               </span>
-            </div>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400"
-              >
-                {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-              </button>
-              <button
-                onClick={() => toast.info("Fitur notifikasi akan segera tersedia")}
-                className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400 relative"
-                title="Notifikasi"
-              >
-                <Bell className="w-4 h-4" />
-              </button>
+              <div className="flex items-center gap-1 border-l border-gray-200 dark:border-gray-800 pl-4">
+                <button
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  className="p-2 rounded-xl hover:bg-white/60 dark:hover:bg-gray-800/60 transition-all text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+                >
+                  {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                </button>
+                <button
+                  onClick={() => toast.info("Fitur notifikasi akan segera tersedia")}
+                  className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400 relative"
+                  title="Notifikasi"
+                >
+                  <Bell className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
         </header>

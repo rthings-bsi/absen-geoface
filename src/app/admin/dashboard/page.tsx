@@ -53,7 +53,22 @@ export default function AdminDashboardPage() {
       fetch("/api/admin/dashboard/aktivitas").then((r) => r.json()),
     ])
       .then(([kpiData, trendData, aktivitasData]) => {
-        setKpi(kpiData);
+        const totalPegawai = kpiData.total_pegawai || 0;
+        const hadirHariIni = kpiData.hadir_hari_ini || 0;
+        const terlambatHariIni = kpiData.terlambat_hari_ini || 0;
+        const izinHariIni = kpiData.izin_hari_ini || 0;
+        const persenKehadiran = totalPegawai > 0
+          ? Math.round(((hadirHariIni + terlambatHariIni) / totalPegawai) * 100)
+          : 0;
+
+        setKpi({
+          totalPegawai,
+          hadirHariIni,
+          terlambatHariIni,
+          izinHariIni,
+          persenKehadiran,
+        });
+
         setTrend(Array.isArray(trendData) ? trendData : []);
         setAktivitas((Array.isArray(aktivitasData) ? aktivitasData : []).map((a: Record<string, unknown>) => ({
           id: (a as any).id ?? 0,
@@ -154,11 +169,11 @@ export default function AdminDashboardPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
             Dashboard
           </h1>
-          <p className="text-sm text-gray-400 dark:text-gray-500 mt-0.5">
-            Selamat pagi, {session?.user?.nama || "Admin"} — {new Date().toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 font-medium">
+            Selamat pagi, <span className="text-blue-600 dark:text-blue-400">{session?.user?.nama || "Admin"}</span> — {new Date().toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
           </p>
         </div>
       </div>
@@ -167,25 +182,27 @@ export default function AdminDashboardPage() {
         {kpiCards.map((card) => (
           <Card
             key={card.title}
-            className="overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+            className="overflow-hidden border-white/40 dark:border-gray-800/50 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] dark:hover:shadow-[0_8px_30px_rgb(0,0,0,0.2)] group"
           >
             <CardHeader className="flex flex-row items-center justify-between pb-3 space-y-0">
-              <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">{card.title}</CardTitle>
-              <div className={`p-2.5 rounded-xl bg-gradient-to-br ${card.gradient} shadow-sm`}>
+              <CardTitle className="text-sm font-semibold text-gray-500 dark:text-gray-400">{card.title}</CardTitle>
+              <div className={`p-2.5 rounded-xl bg-gradient-to-br ${card.gradient} shadow-md border border-white/20 dark:border-white/10 group-hover:scale-110 transition-transform duration-300`}>
                 <card.icon className="w-4 h-4 text-white" />
               </div>
             </CardHeader>
-            <CardContent className="pb-4">
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">{card.value}</div>
-              <div className="mt-2 h-1.5 w-full rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
+            <CardContent className="pb-5">
+              <div className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">{card.value}</div>
+              <div className="mt-3 h-2 w-full rounded-full bg-gray-100/80 dark:bg-gray-800/80 overflow-hidden shadow-inner">
                 <div
-                  className={`h-full rounded-full bg-gradient-to-r ${card.gradient} transition-all duration-500`}
+                  className={`h-full rounded-full bg-gradient-to-r ${card.gradient} transition-all duration-1000 ease-out relative`}
                   style={{
                     width: typeof card.value === "string"
                       ? `${parseInt(card.value)}%`
                       : `${Math.min((card.value as number) / (kpi?.totalPegawai || 1) * 100, 100)}%`,
                   }}
-                />
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent w-[200%] animate-shimmer" />
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -193,11 +210,14 @@ export default function AdminDashboardPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <Card className="overflow-hidden">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold text-gray-900 dark:text-white">Tren Kehadiran</CardTitle>
+        <Card className="overflow-hidden border-white/40 dark:border-gray-800/50 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl shadow-sm">
+          <CardHeader className="pb-3 border-b border-gray-100/50 dark:border-gray-800/50">
+            <CardTitle className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-blue-500" />
+              Tren Kehadiran
+            </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-4">
             {trend.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-72 text-gray-400 dark:text-gray-500">
                 <Activity className="w-10 h-10 mb-3 text-gray-300 dark:text-gray-600" />
@@ -242,11 +262,14 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="overflow-hidden">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold text-gray-900 dark:text-white">Distribusi Kehadiran</CardTitle>
+        <Card className="overflow-hidden border-white/40 dark:border-gray-800/50 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl shadow-sm">
+          <CardHeader className="pb-3 border-b border-gray-100/50 dark:border-gray-800/50">
+            <CardTitle className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <Activity className="w-4 h-4 text-emerald-500" />
+              Distribusi Kehadiran
+            </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-4">
             {donutData.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-72 text-gray-400 dark:text-gray-500">
                 <Activity className="w-10 h-10 mb-3 text-gray-300 dark:text-gray-600" />
@@ -301,11 +324,14 @@ export default function AdminDashboardPage() {
         </Card>
       </div>
 
-      <Card className="overflow-hidden">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-semibold text-gray-900 dark:text-white">Aktivitas Terbaru</CardTitle>
+      <Card className="overflow-hidden border-white/40 dark:border-gray-800/50 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl shadow-sm mt-4">
+        <CardHeader className="pb-3 border-b border-gray-100/50 dark:border-gray-800/50">
+          <CardTitle className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+            <CalendarClock className="w-4 h-4 text-purple-500" />
+            Aktivitas Terbaru
+          </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-4">
           {aktivitas.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-10 text-gray-400 dark:text-gray-500">
               <Activity className="w-10 h-10 mb-3 text-gray-300 dark:text-gray-600" />

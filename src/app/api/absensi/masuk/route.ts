@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { absensi, pegawai, jam_kerja, notifikasi } from "@/db/schema";
 import { eq, and, sql } from "drizzle-orm";
+import { verifyFaceMatch } from "@/lib/face";
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -61,7 +62,41 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { latitude, longitude, confidence, foto } = body;
+  const { latitude, longitude, confidence, foto, face_descriptor } = body;
+
+  // --- Face Verification ---
+  let is_face_verified = false;
+  let face_verify_error: string | null = null;
+
+  if (pegawaiData.face_data && Array.isArray(face_descriptor) && face_descriptor.length === 128) {
+    try {
+      const storedDescriptor: number[] = JSON.parse(pegawaiData.face_data);
+      if (Array.isArray(storedDescriptor) && storedDescriptor.length === 128) {
+        is_face_verified = verifyFaceMatch(face_descriptor, storedDescriptor);
+      } else {
+        face_verify_error = "Data wajah tersimpan tidak valid";
+      }
+    } catch {
+      face_verify_error = "Gagal memproses data wajah";
+    }
+  } else {
+    face_verify_error = "Data wajah tidak lengkap";
+  }
+
+  // If face verification fails, reject
+  if (!is_face_verified) {
+    // Increment failed attempts
+    await db.update(pegawai)
+      .set({
+        failed_attempts: sql`COALESCE(failed_attempts, 0) + 1`,
+        last_absen_attempt: sql`(now() at time zone 'Asia/Jakarta')`,
+      })
+      .where(eq(pegawai.id, id_pegawai));
+
+    return NextResponse.json({
+      error: face_verify_error || "Wajah tidak cocok dengan data terdaftar",
+    }, { status: 403 });
+  }
 
   // Determine status (Hadir or Terlambat)
   let status_masuk: "Hadir" | "Terlambat" = "Hadir";
@@ -93,7 +128,7 @@ export async function POST(request: Request) {
     verification_method: "face",
     ip_address: ip,
     lokasi_masuk: latitude && longitude ? JSON.stringify({ lat: latitude, lng: longitude }) : null,
-    is_face_verified: true,
+    is_face_verified: is_face_verified,
   }).returning() as any[];
   const newAbsensi = absensiResult[0];
 

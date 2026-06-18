@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { absensi, pegawai, jam_kerja, notifikasi } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
+import { verifyFaceMatch } from "@/lib/face";
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -36,15 +37,41 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { latitude, longitude, confidence, foto } = body;
+  const { latitude, longitude, confidence, foto, face_descriptor } = body;
+
+  // --- Face Verification ---
+  let is_face_verified = false;
+  let face_verify_error: string | null = null;
+
+  const pegawaiData = await db.query.pegawai.findFirst({
+    where: eq(pegawai.id, id_pegawai),
+  });
+
+  if (pegawaiData?.face_data && Array.isArray(face_descriptor) && face_descriptor.length === 128) {
+    try {
+      const storedDescriptor: number[] = JSON.parse(pegawaiData.face_data);
+      if (Array.isArray(storedDescriptor) && storedDescriptor.length === 128) {
+        is_face_verified = verifyFaceMatch(face_descriptor, storedDescriptor);
+      } else {
+        face_verify_error = "Data wajah tersimpan tidak valid";
+      }
+    } catch {
+      face_verify_error = "Gagal memproses data wajah";
+    }
+  } else {
+    face_verify_error = "Data wajah tidak lengkap";
+  }
+
+  if (!is_face_verified) {
+    return NextResponse.json({
+      error: face_verify_error || "Wajah tidak cocok dengan data terdaftar",
+    }, { status: 403 });
+  }
 
   // Determine status (Pulang or CepatPulang)
   let status_pulang: "Hadir" | "CepatPulang" = "Hadir";
-  if (session.user.id_role) {
-    const pegawaiData = await db.query.pegawai.findFirst({
-      where: eq(pegawai.id, id_pegawai),
-    });
-    if (pegawaiData?.id_jam_kerja) {
+  if (session.user.id_role && pegawaiData) {
+    if (pegawaiData.id_jam_kerja) {
       const jk = await db.query.jam_kerja.findFirst({
         where: eq(jam_kerja.id, pegawaiData.id_jam_kerja),
       });

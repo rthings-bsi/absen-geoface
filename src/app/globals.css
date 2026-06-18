@@ -58,6 +58,13 @@
   --color-warning-foreground: hsl(48 96% 89%);
   --color-info: hsl(221.2 83.2% 53.3%);
   --color-info-foreground: hsl(210 40% 98%);
+
+  --animate-shimmer: shimmer-x 2s infinite linear;
+}
+
+@keyframes shimmer-x {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 * {

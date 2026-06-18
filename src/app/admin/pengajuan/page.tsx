@@ -97,7 +97,8 @@ export default function PengajuanPage() {
       });
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || "Gagal approve");
+        toast.error(errData.error || "Gagal approve");
+        return;
       }
       toast.success("Pengajuan disetujui");
       fetchData();
@@ -123,7 +124,8 @@ export default function PengajuanPage() {
       });
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || "Gagal reject");
+        toast.error(errData.error || "Gagal reject");
+        return;
       }
       toast.success("Pengajuan ditolak");
       setRejectOpen(false);
@@ -155,10 +157,10 @@ export default function PengajuanPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Pengajuan</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">Pengajuan</h1>
           <p className="text-muted-foreground">Kelola pengajuan izin, sakit, cuti</p>
         </div>
-        <Card>
+        <Card className="border-white/40 dark:border-gray-800/50 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl shadow-sm">
           <CardHeader><Skeleton className="h-10 w-64" /></CardHeader>
           <CardContent className="space-y-3">
             {Array.from({ length: 4 }).map((_, i) => (
@@ -173,11 +175,11 @@ export default function PengajuanPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Pengajuan</h1>
+        <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">Pengajuan</h1>
         <p className="text-muted-foreground">Kelola pengajuan izin, sakit, cuti</p>
       </div>
 
-      <Card>
+      <Card className="border-white/40 dark:border-gray-800/50 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl shadow-sm">
         <CardHeader className="pb-0">
           <div className="flex flex-col sm:flex-row sm:items-center gap-4">
             <div className="flex items-center gap-1 bg-muted rounded-xl p-1">
@@ -219,57 +221,72 @@ export default function PengajuanPage() {
             </div>
           ) : (
             <div className="space-y-3">
-              {filtered.map((item) => (
+              {filtered.map((item, index) => (
                 <div
                   key={item.id}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border border-border bg-card hover:bg-muted/50 transition-colors gap-3"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-gray-900/50 hover:bg-blue-50/40 dark:hover:bg-blue-900/20 hover:border-blue-100 dark:hover:border-blue-800/50 transition-all duration-300 gap-3 group animate-fade-slide-up"
+                  style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <div className="flex items-start gap-3 flex-1 min-w-0">
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 shadow-[0_2px_10px_-2px_rgba(59,130,246,0.5)] flex items-center justify-center flex-shrink-0 ring-2 ring-white dark:ring-gray-900">
                       <span className="text-white text-xs font-bold">
                         {item.pegawai?.charAt(0) || "?"}
                       </span>
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <p className="text-sm font-medium">{item.pegawai}</p>
-                        <Badge variant="secondary" className="text-[10px]">{jenisLabel[item.jenis?.toLowerCase()] || item.jenis}</Badge>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">{item.pegawai}</p>
+                        <Badge variant="outline" className="text-[10px] bg-white/60 dark:bg-gray-800/60 font-medium">
+                          {jenisLabel[item.jenis?.toLowerCase()] || item.jenis}
+                        </Badge>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{item.alasan}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {item.tanggal_mulai} - {item.tanggal_selesai}
-                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-1">{item.alasan}</p>
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <div className="w-1.5 h-1.5 rounded-full bg-gray-300 dark:bg-gray-600" />
+                        <p className="text-[11px] font-medium text-gray-400 dark:text-gray-500">
+                          {item.tanggal_mulai} <span className="mx-0.5">&rarr;</span> {item.tanggal_selesai}
+                        </p>
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    {statusBadge(item.status)}
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      onClick={() => { setSelected(item); setDetailOpen(true); }}
-                    >
-                      <Eye className="w-4 h-4" />
-                    </Button>
-                    {item.status === "pending" && (
-                      <>
-                        <Button
-                          variant="ghost"
-                          size="icon-sm"
-                          onClick={() => handleApprove(item.id)}
-                          className="text-emerald-600"
-                        >
-                          <CheckCircle className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon-sm"
-                          onClick={() => openReject(item.id)}
-                          className="text-red-500"
-                        >
-                          <XCircle className="w-4 h-4" />
-                        </Button>
-                      </>
-                    )}
+                    <div className="mr-2">
+                      {statusBadge(item.status)}
+                    </div>
+                    <div className="flex items-center opacity-80 group-hover:opacity-100 transition-opacity bg-gray-50 dark:bg-gray-800/50 rounded-lg p-0.5 border border-gray-100 dark:border-gray-800">
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={() => { setSelected(item); setDetailOpen(true); }}
+                        className="text-gray-400 hover:text-blue-600 hover:bg-blue-100/50 dark:hover:text-blue-400 dark:hover:bg-blue-900/50 rounded-md"
+                        title="Detail"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                      {item.status === "pending" && (
+                        <>
+                          <div className="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1" />
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            onClick={() => handleApprove(item.id)}
+                            className="text-emerald-500 hover:text-emerald-600 hover:bg-emerald-100/50 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/50 rounded-md"
+                            title="Setujui"
+                          >
+                            <CheckCircle className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            onClick={() => openReject(item.id)}
+                            className="text-red-400 hover:text-red-500 hover:bg-red-100/50 dark:hover:text-red-400 dark:hover:bg-red-900/50 rounded-md"
+                            title="Tolak"
+                          >
+                            <XCircle className="w-4 h-4" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}

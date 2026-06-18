@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { getInitials } from "@/lib/utils";
 import Link from "next/link";
+import { useFaceRecognition } from "@/hooks/use-face-recognition";
 
 type ProfilPegawai = {
   id: string;
@@ -51,6 +52,8 @@ export default function ProfilPage() {
   const [confidence, setConfidence] = useState(0);
   const [registering, setRegistering] = useState(false);
   const [faceLoading, setFaceLoading] = useState(true);
+  const [faceDescriptor, setFaceDescriptor] = useState<number[] | null>(null);
+  const { modelsLoaded, modelError, registerFace, detectFace } = useFaceRecognition();
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -79,19 +82,22 @@ export default function ProfilPage() {
     if (registering) return;
     setRegistering(true);
     try {
-      const dummyData = Array.from({ length: 128 }, () => Math.random());
+      if (!faceDescriptor) {
+        throw new Error("Data wajah belum terdeteksi. Pastikan wajah terlihat jelas.");
+      }
       const res = await fetch("/api/pegawai/face-registration", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ face_data: dummyData }),
+        body: JSON.stringify({ face_data: faceDescriptor }),
       });
       if (!res.ok) throw new Error("Gagal menyimpan data wajah");
       setFaceRegistered(true);
       setFaceStatus("idle");
       stopCamera();
       toast.success("Registrasi wajah berhasil");
-    } catch {
-      toast.error("Gagal melakukan registrasi wajah");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Gagal melakukan registrasi wajah";
+      toast.error(message);
     } finally {
       setRegistering(false);
     }
@@ -115,14 +121,24 @@ export default function ProfilPage() {
     return () => { stopCamera(); };
   }, [stopCamera]);
 
-  const handleVideoReady = useCallback(() => {
+  const handleVideoReady = useCallback(async () => {
+    if (!videoRef.current) return;
     setFaceStatus("detecting");
-    setTimeout(() => {
-      const fakeConfidence = 85 + Math.random() * 15;
-      setConfidence(fakeConfidence);
-      setFaceStatus(fakeConfidence >= 70 ? "verified" : "failed");
-    }, 2000);
-  }, []);
+    try {
+      const result = await registerFace(videoRef.current);
+      if (result) {
+        setFaceDescriptor(result.descriptor);
+        setConfidence(result.confidence);
+        setFaceStatus(result.confidence >= 70 ? "verified" : "failed");
+      } else {
+        setConfidence(0);
+        setFaceStatus("failed");
+      }
+    } catch {
+      setConfidence(0);
+      setFaceStatus("failed");
+    }
+  }, [registerFace]);
 
   useEffect(() => {
     if (!cameraActive || !videoRef.current || !streamRef.current) return;
@@ -386,6 +402,12 @@ export default function ProfilPage() {
             </Badge>
           )}
         </div>
+        {!faceLoading && !faceRegistered && modelError && (
+          <div className="p-3 rounded-xl bg-red-50/80 border border-red-200/60">
+            <p className="text-xs font-medium text-red-700">Gagal memuat model wajah</p>
+            <p className="text-[10px] text-red-500 mt-0.5">{modelError}</p>
+          </div>
+        )}
         {!faceLoading && !faceRegistered && cameraActive && (
           <div className="relative rounded-xl overflow-hidden bg-black shadow-lg">
             <video ref={videoRef} autoPlay playsInline muted className="w-full h-48 object-cover" />
