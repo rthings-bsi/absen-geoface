@@ -53,7 +53,7 @@ export default function ProfilPage() {
   const [registering, setRegistering] = useState(false);
   const [faceLoading, setFaceLoading] = useState(true);
   const [faceDescriptor, setFaceDescriptor] = useState<number[] | null>(null);
-  const { modelsLoaded, modelError, registerFace, detectFace } = useFaceRecognition();
+  const { modelsLoaded, modelError, usingFallback, loadingProgress, loadModels, registerFace, detectFace } = useFaceRecognition();
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -402,10 +402,27 @@ export default function ProfilPage() {
             </Badge>
           )}
         </div>
+        {loadingProgress && (
+          <div className="flex items-center gap-2 p-3 rounded-xl bg-sky-50/80 dark:bg-sky-900/40 border border-sky-200/60 dark:border-sky-800/50">
+            <Loader2 className="h-4 w-4 animate-spin text-sky-500 dark:text-sky-400 shrink-0" />
+            <p className="text-xs text-sky-700 dark:text-sky-300">{loadingProgress}</p>
+          </div>
+        )}
+        {usingFallback && !faceLoading && !faceRegistered && (
+          <div className="flex items-center gap-2 p-2 rounded-lg bg-amber-50/80 dark:bg-amber-900/30 border border-amber-200/60 dark:border-amber-700/50">
+            <span className="text-[10px] text-amber-700 dark:text-amber-300">📱 Mode HP — menggunakan deteksi ringan</span>
+          </div>
+        )}
         {!faceLoading && !faceRegistered && modelError && (
           <div className="p-3 rounded-xl bg-red-50/80 border border-red-200/60 dark:bg-red-900/30 dark:border-red-800/50">
             <p className="text-xs font-medium text-red-700 dark:text-red-300">Gagal memuat model wajah</p>
             <p className="text-[10px] text-red-500 dark:text-red-400 mt-0.5">{modelError}</p>
+            <button
+              onClick={loadModels}
+              className="mt-2 text-xs font-semibold text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 underline"
+            >
+              Coba Lagi
+            </button>
           </div>
         )}
         {!faceLoading && !faceRegistered && cameraActive && (

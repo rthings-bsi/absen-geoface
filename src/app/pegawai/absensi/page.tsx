@@ -79,7 +79,7 @@ export default function AbsensiPage() {
   const [gpsSkipped, setGpsSkipped] = useState(false);
   const [faceRetryCount, setFaceRetryCount] = useState(0);
   const [faceDescriptor, setFaceDescriptor] = useState<number[] | null>(null);
-  const { modelsLoaded, modelError, detectFace } = useFaceRecognition();
+  const { modelsLoaded, modelError, usingFallback, loadingProgress, loadModels, detectFace } = useFaceRecognition();
 
   const fetchOfficeLocation = useCallback(async () => {
     try {
@@ -534,6 +534,35 @@ export default function AbsensiPage() {
           >
             {cameraActive ? <><XCircle className="h-4 w-4 mr-2" /> Matikan Kamera</> : <><Camera className="h-4 w-4 mr-2" /> Aktifkan Kamera</>}
           </Button>
+
+          {/* Face loading progress */}
+          {loadingProgress && (
+            <div className="flex items-center gap-2 p-2.5 rounded-xl bg-sky-50/80 dark:bg-sky-900/40 border border-sky-200/60 dark:border-sky-800/50">
+              <Loader2 className="h-3.5 w-3.5 animate-spin text-sky-500 dark:text-sky-400 shrink-0" />
+              <p className="text-xs text-sky-700 dark:text-sky-300">{loadingProgress}</p>
+            </div>
+          )}
+
+          {/* Model error + retry */}
+          {modelError && (
+            <div className="p-3 rounded-xl bg-red-50/80 dark:bg-red-900/30 border border-red-200/60 dark:border-red-800/50">
+              <p className="text-xs font-medium text-red-700 dark:text-red-300">Gagal memuat model wajah</p>
+              <p className="text-[10px] text-red-500 dark:text-red-400 mt-0.5">{modelError}</p>
+              <button
+                onClick={loadModels}
+                className="mt-2 text-xs font-semibold text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 underline"
+              >
+                Coba Lagi
+              </button>
+            </div>
+          )}
+
+          {/* Mobile mode indicator */}
+          {usingFallback && (
+            <div className="flex items-center gap-2 p-2 rounded-lg bg-amber-50/80 dark:bg-amber-900/30 border border-amber-200/60 dark:border-amber-700/50">
+              <span className="text-[10px] text-amber-700 dark:text-amber-300">📱 Mode HP — deteksi wajah ringan</span>
+            </div>
+          )}
 
           {/* Desktop: face status indicator */}
           {cameraActive && (
