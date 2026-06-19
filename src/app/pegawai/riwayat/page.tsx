@@ -27,12 +27,12 @@ const STATUS_MAP: Record<string, { label: string; variant: "default" | "secondar
 };
 
 const REKAP_ITEMS: { key: keyof RekapAbsensi; label: string; color: string; border: string; glow: string; textClass: string }[] = [
-  { key: "hadir", label: "Tepat Waktu", color: "from-emerald-500 to-teal-500", border: "hover:border-emerald-200", glow: "group-hover:shadow-emerald-500/10", textClass: "text-emerald-600" },
-  { key: "terlambat", label: "Terlambat", color: "from-amber-400 to-orange-500", border: "hover:border-amber-200", glow: "group-hover:shadow-amber-500/10", textClass: "text-amber-500" },
-  { key: "izin", label: "Izin", color: "from-blue-500 to-indigo-600", border: "hover:border-blue-200", glow: "group-hover:shadow-blue-500/10", textClass: "text-blue-500" },
-  { key: "sakit", label: "Sakit", color: "from-rose-500 to-pink-500", border: "hover:border-rose-200", glow: "group-hover:shadow-rose-500/10", textClass: "text-rose-500" },
-  { key: "cuti", label: "Cuti", color: "from-teal-400 to-cyan-500", border: "hover:border-teal-200", glow: "group-hover:shadow-teal-500/10", textClass: "text-teal-600" },
-  { key: "alpa", label: "Alpa", color: "from-slate-400 to-slate-600", border: "hover:border-slate-300", glow: "group-hover:shadow-slate-500/10", textClass: "text-slate-600" },
+  { key: "hadir", label: "Tepat Waktu", color: "from-emerald-500 to-teal-500", border: "hover:border-emerald-200", glow: "group-hover:shadow-emerald-500/10", textClass: "text-emerald-600 dark:text-emerald-400" },
+  { key: "terlambat", label: "Terlambat", color: "from-amber-400 to-orange-500", border: "hover:border-amber-200", glow: "group-hover:shadow-amber-500/10", textClass: "text-amber-500 dark:text-amber-400" },
+  { key: "izin", label: "Izin", color: "from-blue-500 to-indigo-600", border: "hover:border-blue-200", glow: "group-hover:shadow-blue-500/10", textClass: "text-blue-500 dark:text-blue-400" },
+  { key: "sakit", label: "Sakit", color: "from-rose-500 to-pink-500", border: "hover:border-rose-200", glow: "group-hover:shadow-rose-500/10", textClass: "text-rose-500 dark:text-rose-400" },
+  { key: "cuti", label: "Cuti", color: "from-teal-400 to-cyan-500", border: "hover:border-teal-200", glow: "group-hover:shadow-teal-500/10", textClass: "text-teal-600 dark:text-teal-400" },
+  { key: "alpa", label: "Alpa", color: "from-slate-400 to-slate-600", border: "hover:border-slate-300", glow: "group-hover:shadow-slate-500/10", textClass: "text-slate-600 dark:text-gray-400" },
 ];
 
 export default function RiwayatPage() {
@@ -84,49 +84,49 @@ export default function RiwayatPage() {
       <div className="md:hidden p-4 max-w-lg mx-auto space-y-4 pb-24">
         {/* Header */}
         <div className="flex items-center gap-2 mb-2">
-          <Link href="/pegawai" className="p-2 rounded-xl hover:bg-slate-100 transition">
-            <ChevronLeft className="h-5 w-5 text-slate-600" />
+          <Link href="/pegawai" className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-700 transition">
+            <ChevronLeft className="h-5 w-5 text-slate-600 dark:text-gray-400" />
           </Link>
           <div>
-            <h1 className="text-lg font-bold text-slate-900">Riwayat Absensi</h1>
-            <p className="text-xs text-slate-500">Log kehadiran bulanan Anda</p>
+            <h1 className="text-lg font-bold text-slate-900 dark:text-gray-100">Riwayat Absensi</h1>
+            <p className="text-xs text-slate-500 dark:text-gray-400">Log kehadiran bulanan Anda</p>
           </div>
         </div>
 
         {/* Month nav */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-2 flex items-center justify-between shadow-sm">
-          <button onClick={() => navigateMonth("prev")} className="p-2 rounded-xl hover:bg-slate-50 transition text-slate-600"><ChevronLeft className="h-5 w-5" /></button>
-          <div className="flex items-center gap-2 font-bold text-sm text-slate-800">
-            <CalendarDays className="h-4 w-4 text-sky-600" />
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-slate-200 dark:border-gray-700 p-2 flex items-center justify-between shadow-sm dark:shadow-gray-900/30">
+          <button onClick={() => navigateMonth("prev")} className="p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-gray-700 transition text-slate-600 dark:text-gray-400"><ChevronLeft className="h-5 w-5" /></button>
+          <div className="flex items-center gap-2 font-bold text-sm text-slate-800 dark:text-gray-200">
+            <CalendarDays className="h-4 w-4 text-sky-600 dark:text-sky-400" />
             {monthNames[month - 1]} {year}
           </div>
-          <button onClick={() => navigateMonth("next")} disabled={!canGoNext} className="p-2 rounded-xl hover:bg-slate-50 transition disabled:opacity-30 disabled:cursor-not-allowed text-slate-600"><ChevronRight className="h-5 w-5" /></button>
+          <button onClick={() => navigateMonth("next")} disabled={!canGoNext} className="p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-gray-700 transition disabled:opacity-30 disabled:cursor-not-allowed text-slate-600 dark:text-gray-400"><ChevronRight className="h-5 w-5" /></button>
         </div>
 
         {loading ? (
           <div className="space-y-3">
             <div className="grid grid-cols-3 gap-2">
-              {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl bg-slate-100/60" />)}
+              {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl bg-slate-100/60 dark:bg-gray-700/50" />)}
             </div>
-            {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl bg-slate-100/60" />)}
+            {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl bg-slate-100/60 dark:bg-gray-700/50" />)}
           </div>
         ) : (
           <>
             {rekap && (
               <div className="grid grid-cols-3 gap-2">
                 {REKAP_ITEMS.map(({ key, label, textClass }) => (
-                  <div key={key} className="bg-white rounded-xl border border-slate-200 p-3 text-center shadow-xs">
+                  <div key={key} className="bg-white dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 p-3 text-center shadow-xs">
                     <p className={cn("text-xl font-bold tabular-nums", textClass)}>{rekap[key]}</p>
-                    <p className="text-[10px] font-semibold text-slate-400 mt-0.5">{label}</p>
+                    <p className="text-[10px] font-semibold text-slate-400 dark:text-gray-500 mt-0.5">{label}</p>
                   </div>
                 ))}
               </div>
             )}
             {riwayat.length === 0 ? (
-              <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
-                <Clock className="h-8 w-8 text-slate-300 mx-auto mb-3" />
-                <p className="text-sm font-semibold text-slate-600">Belum ada data absensi</p>
-                <p className="text-xs text-slate-400 mt-1">untuk bulan ini</p>
+              <div className="bg-white dark:bg-gray-800 rounded-2xl border border-slate-200 dark:border-gray-700 p-12 text-center">
+                <Clock className="h-8 w-8 text-slate-300 dark:text-gray-600 mx-auto mb-3" />
+                <p className="text-sm font-semibold text-slate-600 dark:text-gray-400">Belum ada data absensi</p>
+                <p className="text-xs text-slate-400 dark:text-gray-500 mt-1">untuk bulan ini</p>
               </div>
             ) : (
               <div className="space-y-2">
@@ -134,18 +134,18 @@ export default function RiwayatPage() {
                   const sv = item.status_masuk || "Alpa";
                   const sc = STATUS_MAP[sv] ?? { label: sv, variant: "outline" as const };
                   return (
-                    <div key={item.id} className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs">
+                    <div key={item.id} className="bg-white dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 p-4 shadow-xs">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="font-bold text-sm text-slate-800">{formatDate(item.tanggal)}</p>
-                          <div className="flex items-center gap-3 mt-1 text-xs text-slate-500">
+                          <p className="font-bold text-sm text-slate-800 dark:text-gray-200">{formatDate(item.tanggal)}</p>
+                          <div className="flex items-center gap-3 mt-1 text-xs text-slate-500 dark:text-gray-400">
                             <span>Masuk: {item.jam_masuk?.slice(0,5) || "--:--"}</span>
                             <span>Pulang: {item.jam_pulang?.slice(0,5) || "--:--"}</span>
                           </div>
                         </div>
                         <Badge className={cn(
                           "text-[10px] font-semibold px-2.5 py-0.5 border rounded-full",
-                          sc.variant === "default" ? "bg-emerald-50 text-emerald-700 border-emerald-100" : "bg-red-50 text-red-700 border-red-100"
+                          sc.variant === "default" ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-100 dark:border-emerald-800" : "bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-100 dark:border-red-800"
                         )}>
                           {sc.label}
                         </Badge>
@@ -165,43 +165,43 @@ export default function RiwayatPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <div className="flex items-center gap-3 mb-1.5">
-              <div className="w-10 h-10 rounded-2xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 shadow-sm shadow-sky-100/10 active:scale-95 transition-transform duration-150">
+              <div className="w-10 h-10 rounded-2xl bg-sky-50 dark:bg-gray-800 border border-sky-100 dark:border-gray-700 flex items-center justify-center text-sky-600 dark:text-sky-400 shadow-sm shadow-sky-100/10 dark:shadow-gray-900/30 active:scale-95 transition-transform duration-150">
                 <Calendar className="w-5 h-5" />
               </div>
               <div>
-                <h1 className="text-2xl font-black text-sky-950 tracking-tight flex items-center gap-2">
+                <h1 className="text-2xl font-black text-sky-950 dark:text-gray-100 tracking-tight flex items-center gap-2">
                   Riwayat Absensi
-                  <span className="text-[11px] font-bold text-sky-700 bg-sky-50 px-3 py-1 rounded-full">{riwayat.length} Hari Kerja</span>
+                  <span className="text-[11px] font-bold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-gray-800 px-3 py-1 rounded-full">{riwayat.length} Hari Kerja</span>
                 </h1>
-                <p className="text-xs text-sky-500 font-medium">Monitoring log kehadiran bulanan anda secara real-time</p>
+                <p className="text-xs text-sky-500 dark:text-sky-400 font-medium">Monitoring log kehadiran bulanan anda secara real-time</p>
               </div>
             </div>
           </div>
 
           {/* Month navigator (Gen Z Pill in Sky) */}
-          <div className="flex items-center gap-2 bg-white border border-sky-200 p-1.5 shadow-lg shadow-sky-100/50">
-            <button onClick={() => navigateMonth("prev")} className="p-2 rounded-xl hover:bg-sky-50 active:scale-90 transition-all text-sky-600"><ChevronLeft className="w-4 h-4" /></button>
-            <div className="flex items-center gap-2.5 px-4 font-extrabold text-xs tracking-wider uppercase tracking-widest min-w-[150px] justify-center text-sky-950">
-              <CalendarDays className="w-4 h-4 text-sky-500" />
+          <div className="flex items-center gap-2 bg-white dark:bg-gray-800 border border-sky-200 dark:border-gray-700 p-1.5 shadow-lg shadow-sky-100/50 dark:shadow-gray-900/40">
+            <button onClick={() => navigateMonth("prev")} className="p-2 rounded-xl hover:bg-sky-50 dark:hover:bg-gray-700 active:scale-90 transition-all text-sky-600 dark:text-sky-400"><ChevronLeft className="w-4 h-4" /></button>
+            <div className="flex items-center gap-2.5 px-4 font-extrabold text-xs tracking-wider uppercase tracking-widest min-w-[150px] justify-center text-sky-950 dark:text-gray-200">
+              <CalendarDays className="w-4 h-4 text-sky-500 dark:text-sky-400" />
               <span>{monthNames[month - 1].slice(0, 3)} · {year}</span>
             </div>
-            <button onClick={() => navigateMonth("next")} disabled={!canGoNext} className="p-2 rounded-xl hover:bg-sky-50 active:scale-90 transition-all disabled:opacity-20 text-sky-600"><ChevronRight className="w-4 h-4" /></button>
+            <button onClick={() => navigateMonth("next")} disabled={!canGoNext} className="p-2 rounded-xl hover:bg-sky-50 dark:hover:bg-gray-700 active:scale-90 transition-all disabled:opacity-20 text-sky-600 dark:text-sky-400"><ChevronRight className="w-4 h-4" /></button>
           </div>
         </div>
 
         {loading ? (
           <div className="space-y-6">
             <div className="grid grid-cols-7 gap-3">
-              {Array.from({ length: 7 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-3xl bg-slate-100" />)}
+              {Array.from({ length: 7 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-3xl bg-slate-100 dark:bg-gray-700" />)}
             </div>
-            <Skeleton className="h-64 rounded-3xl bg-slate-100" />
+            <Skeleton className="h-64 rounded-3xl bg-slate-100 dark:bg-gray-700" />
           </div>
         ) : (
           <div className="space-y-6">
             {/* ── Rekap Bento Grid ── */}
             <div className="grid grid-cols-7 gap-3">
               {/* Circular KPI - Sky & White */}
-              <div className="col-span-1 bg-white border border-sky-200 rounded-3xl p-5 flex flex-col items-center justify-center shadow-lg shadow-sky-100/30 hover:-translate-y-0.5 transition-transform duration-300">
+              <div className="col-span-1 bg-white dark:bg-gray-800 border border-sky-200 dark:border-gray-700 rounded-3xl p-5 flex flex-col items-center justify-center shadow-lg shadow-sky-100/30 dark:shadow-gray-900/40 hover:-translate-y-0.5 transition-transform duration-300">
                 <div className="relative w-16 h-16 mb-2">
                   <svg width="64" height="64" className="-rotate-90">
                     <circle cx="32" cy="32" r="26" fill="none" stroke="#f0f9ff" strokeWidth={5.5} />
@@ -213,22 +213,22 @@ export default function RiwayatPage() {
                     />
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-sm font-black text-sky-950 tabular-nums">{pct}%</span>
+                    <span className="text-sm font-black text-sky-950 dark:text-gray-200 tabular-nums">{pct}%</span>
                   </div>
                 </div>
-                <p className="text-[9px] text-sky-600 font-extrabold uppercase tracking-widest leading-none">Rasio</p>
+                <p className="text-[9px] text-sky-600 dark:text-sky-400 font-extrabold uppercase tracking-widest leading-none">Rasio</p>
               </div>
 
               {/* Items */}
               {REKAP_ITEMS.map(({ key, label, color, border, glow, textClass }) => (
                 <div key={key} className={cn(
-                  "bg-white rounded-3xl border border-slate-200/80 p-5 flex flex-col justify-between group",
-                  "hover:bg-slate-50 hover:shadow-xl hover:shadow-slate-100/50",
+                  "bg-white dark:bg-gray-800 rounded-3xl border border-slate-200/80 dark:border-gray-700 p-5 flex flex-col justify-between group",
+                  "hover:bg-slate-50 dark:hover:bg-gray-700 hover:shadow-xl hover:shadow-slate-100/50 dark:hover:shadow-gray-900/40",
                   "transition-all duration-300",
                   border
                 )}>
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest leading-none">{label}</span>
+                    <span className="text-[10px] text-slate-400 dark:text-gray-500 font-extrabold uppercase tracking-widest leading-none">{label}</span>
                     <div className={cn("w-2 h-2 rounded-full bg-gradient-to-r", color)} />
                   </div>
                   <p className={cn("text-3xl font-black tabular-nums mt-4 leading-none tracking-tight", textClass)}>
@@ -240,23 +240,23 @@ export default function RiwayatPage() {
 
             {/* ── Table Layout ── */}
             {riwayat.length === 0 ? (
-              <div className="bg-white rounded-3xl border border-slate-200 p-14 text-center">
-                <CalendarDays className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-                <p className="text-sm font-semibold text-slate-500">Belum ada data absensi</p>
-                <p className="text-xs text-slate-400 mt-0.5">Log absensi untuk bulan ini masih kosong</p>
+              <div className="bg-white dark:bg-gray-800 rounded-3xl border border-slate-200 dark:border-gray-700 p-14 text-center">
+                <CalendarDays className="w-10 h-10 text-slate-300 dark:text-gray-600 mx-auto mb-3" />
+                <p className="text-sm font-semibold text-slate-500 dark:text-gray-400">Belum ada data absensi</p>
+                <p className="text-xs text-slate-400 dark:text-gray-500 mt-0.5">Log absensi untuk bulan ini masih kosong</p>
               </div>
             ) : (
-              <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+              <div className="bg-white dark:bg-gray-800 rounded-3xl border border-slate-200 dark:border-gray-700 overflow-hidden shadow-sm">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="bg-sky-50 border-b border-sky-100">
-                      <th className="px-6 py-4 text-[10px] font-extrabold text-sky-950 uppercase tracking-widest">Tanggal</th>
-                      <th className="px-6 py-4 text-[10px] font-extrabold text-sky-950 uppercase tracking-widest">Jam Masuk</th>
-                      <th className="px-6 py-4 text-[10px] font-extrabold text-sky-950 uppercase tracking-widest">Jam Pulang</th>
-                      <th className="px-6 py-4 text-[10px] font-extrabold text-sky-950 uppercase tracking-widest text-right">Status</th>
+                    <tr className="bg-sky-50 dark:bg-gray-800/80 border-b border-sky-100 dark:border-gray-700">
+                      <th className="px-6 py-4 text-[10px] font-extrabold text-sky-950 dark:text-gray-200 uppercase tracking-widest">Tanggal</th>
+                      <th className="px-6 py-4 text-[10px] font-extrabold text-sky-950 dark:text-gray-200 uppercase tracking-widest">Jam Masuk</th>
+                      <th className="px-6 py-4 text-[10px] font-extrabold text-sky-950 dark:text-gray-200 uppercase tracking-widest">Jam Pulang</th>
+                      <th className="px-6 py-4 text-[10px] font-extrabold text-sky-950 dark:text-gray-200 uppercase tracking-widest text-right">Status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-slate-100 dark:divide-gray-700">
                     {riwayat.map((item) => {
                       const sv = item.status_masuk || "Alpa";
                       const sc = STATUS_MAP[sv] ?? { label: sv, variant: "outline" as const, icon: XCircle };
@@ -265,43 +265,43 @@ export default function RiwayatPage() {
                       const isWeekend = dateObj.getDay() === 0 || dateObj.getDay() === 6;
 
                       return (
-                        <tr key={item.id} className="hover:bg-slate-50/50 transition-colors group">
+                        <tr key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-gray-700/30 transition-colors group">
                           <td className="px-6 py-4.5">
                             <div className="flex items-center gap-3">
                               <div className={cn(
                                 "w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border transition-all duration-300 group-hover:scale-110",
                                 isTerlambat
-                                  ? "bg-amber-50 border-amber-100 text-amber-500 shadow-sm shadow-amber-500/5"
-                                  : "bg-emerald-50 border-emerald-100 text-emerald-500 shadow-sm shadow-emerald-500/5"
+                                  ? "bg-amber-50 dark:bg-amber-900/20 border-amber-100 dark:border-amber-800 text-amber-500 dark:text-amber-400 shadow-sm shadow-amber-500/5 dark:shadow-amber-900/20"
+                                  : "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800 text-emerald-500 dark:text-emerald-400 shadow-sm shadow-emerald-500/5 dark:shadow-emerald-900/20"
                               )}>
                                 {isTerlambat ? <AlertTriangle className="w-4 h-4" /> : <Check className="w-4 h-4" />}
                               </div>
                               <div className="min-w-0">
-                                <span className="text-xs font-bold text-slate-800 leading-none">
+                                <span className="text-xs font-bold text-slate-800 dark:text-gray-200 leading-none">
                                   {dateObj.toLocaleDateString("id-ID", { weekday: "long" })}
                                 </span>
-                                <p className="text-[10px] text-slate-400 font-bold mt-0.5">
+                                <p className="text-[10px] text-slate-400 dark:text-gray-500 font-bold mt-0.5">
                                   {dateObj.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
                                 </p>
                               </div>
                             </div>
                           </td>
                           <td className="px-6 py-4.5">
-                            <span className="text-xs text-slate-800 font-bold tabular-nums">
-                              {item.jam_masuk?.slice(0,5) || <span className="text-slate-300 font-normal">--:--</span>}
+                            <span className="text-xs text-slate-800 dark:text-gray-200 font-bold tabular-nums">
+                              {item.jam_masuk?.slice(0,5) || <span className="text-slate-300 dark:text-gray-600 font-normal">--:--</span>}
                             </span>
                           </td>
                           <td className="px-6 py-4.5">
-                            <span className="text-xs text-slate-800 font-bold tabular-nums">
-                              {item.jam_pulang?.slice(0,5) || <span className="text-slate-300 font-normal">--:--</span>}
+                            <span className="text-xs text-slate-800 dark:text-gray-200 font-bold tabular-nums">
+                              {item.jam_pulang?.slice(0,5) || <span className="text-slate-300 dark:text-gray-600 font-normal">--:--</span>}
                             </span>
                           </td>
                           <td className="px-6 py-4.5 text-right">
                             <Badge className={cn(
                               "text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border shadow-sm",
                               isTerlambat
-                                ? "bg-amber-50 text-amber-600 border-amber-100"
-                                : "bg-emerald-50 text-emerald-600 border-emerald-100"
+                                ? "bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-100 dark:border-amber-800"
+                                : "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800"
                             )}>
                               {sc.label}
                             </Badge>
@@ -316,9 +316,9 @@ export default function RiwayatPage() {
 
             {/* Footer Summary */}
             {riwayat.length > 0 && (
-              <div className="flex items-center justify-between text-[10px] font-extrabold uppercase tracking-wider text-slate-400 bg-white border border-slate-200 rounded-2xl px-6 py-4.5 shadow-sm">
+              <div className="flex items-center justify-between text-[10px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-gray-500 bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-2xl px-6 py-4.5 shadow-sm">
                 <span>Terdata {riwayat.length} Hari Kerja</span>
-                <span className="text-slate-500">{totalHadir} Hadir · {totalAbsen - totalHadir} Mangkir/Izin</span>
+                <span className="text-slate-500 dark:text-gray-400">{totalHadir} Hadir · {totalAbsen - totalHadir} Mangkir/Izin</span>
               </div>
             )}
           </div>

@@ -17,6 +17,7 @@ import Card, { CardContent } from "@/components/ui/card";
 import { Badge, Button } from "@/components/ui";
 import Link from "next/link";
 import { useFaceRecognition } from "@/hooks/use-face-recognition";
+import { playAbsensiSuccess } from "@/lib/sound";
 
 type GPSPosition = {
   lat: number;
@@ -323,6 +324,7 @@ export default function AbsensiPage() {
           ? "Absen masuk berhasil dicatat"
           : "Absen pulang berhasil dicatat"
       );
+      playAbsensiSuccess();
       await fetchTodayStatus();
       stopCamera();
       setFaceStatus("idle");
@@ -342,7 +344,7 @@ export default function AbsensiPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="h-8 w-8 animate-spin text-sky-500" />
+        <Loader2 className="h-8 w-8 animate-spin text-sky-500 dark:text-sky-400" />
       </div>
     );
   }
@@ -351,20 +353,20 @@ export default function AbsensiPage() {
     return (
       <div className="p-4 max-w-lg mx-auto space-y-4">
         <div className="flex items-center gap-2 mb-4">
-          <Link href="/pegawai" className="p-2 rounded-xl hover:bg-sky-50 transition">
-            <ChevronLeft className="h-5 w-5 text-sky-500" />
+          <Link href="/pegawai" className="p-2 rounded-xl hover:bg-sky-50 dark:hover:bg-sky-950/30 transition">
+            <ChevronLeft className="h-5 w-5 text-sky-500 dark:text-sky-400" />
           </Link>
-          <h1 className="text-lg font-bold text-sky-950">Absensi</h1>
+          <h1 className="text-lg font-bold text-sky-950 dark:text-sky-100">Absensi</h1>
         </div>
 
-        <div className="bg-white/70 backdrop-blur-xl rounded-2xl border border-sky-200/50 shadow-xl shadow-sky-200/20 p-6 text-center space-y-4">
-          <AlertTriangle className="h-12 w-12 text-amber-500 mx-auto" />
+        <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-2xl border border-sky-200/50 dark:border-slate-700/50 shadow-xl shadow-sky-200/20 dark:shadow-slate-900/30 p-6 text-center space-y-4">
+          <AlertTriangle className="h-12 w-12 text-amber-500 dark:text-amber-400 mx-auto" />
           <div>
-            <h2 className="text-lg font-bold text-sky-950">Registrasi Wajah Diperlukan</h2>
-            <p className="text-sm text-sky-600 mt-1">Anda belum merekam data wajah. Silakan registrasi wajah terlebih dahulu.</p>
+            <h2 className="text-lg font-bold text-sky-950 dark:text-sky-100">Registrasi Wajah Diperlukan</h2>
+            <p className="text-sm text-sky-600 dark:text-sky-400 mt-1">Anda belum merekam data wajah. Silakan registrasi wajah terlebih dahulu.</p>
           </div>
           <Link href="/pegawai/profil">
-            <Button className="w-full bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 text-white shadow-lg shadow-sky-200/50">Registrasi Wajah</Button>
+            <Button className="w-full bg-gradient-to-r from-sky-500 to-sky-600 dark:from-sky-600 dark:to-sky-700 hover:from-sky-600 hover:to-sky-700 dark:hover:from-sky-500 dark:hover:to-sky-600 text-white shadow-lg shadow-sky-200/50 dark:shadow-sky-900/50">Registrasi Wajah</Button>
           </Link>
         </div>
       </div>
@@ -375,27 +377,27 @@ export default function AbsensiPage() {
     <div className="p-4 lg:p-6 space-y-4 lg:space-y-6 pb-24 lg:pb-6">
       {/* Header */}
       <div className={`flex items-center gap-2 mb-2 transition-all duration-500 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
-        <Link href="/pegawai" className="p-2 rounded-xl hover:bg-sky-50 transition">
-          <ChevronLeft className="h-5 w-5 text-sky-500" />
+        <Link href="/pegawai" className="p-2 rounded-xl hover:bg-sky-50 dark:hover:bg-sky-950/30 transition">
+          <ChevronLeft className="h-5 w-5 text-sky-500 dark:text-sky-400" />
         </Link>
         <div className="flex-1">
-          <h1 className="text-lg font-bold text-sky-950">Absensi</h1>
-          <p className="text-xs text-sky-500 hidden lg:block">Verifikasi wajah & lokasi untuk melakukan absensi</p>
-          <p className="text-xs text-sky-500 lg:hidden">Verifikasi wajah & lokasi</p>
+          <h1 className="text-lg font-bold text-sky-950 dark:text-sky-100">Absensi</h1>
+          <p className="text-xs text-sky-500 dark:text-sky-400 hidden lg:block">Verifikasi wajah & lokasi untuk melakukan absensi</p>
+          <p className="text-xs text-sky-500 dark:text-sky-400 lg:hidden">Verifikasi wajah & lokasi</p>
         </div>
         {/* Desktop: status badge */}
         {todayStatus && (
           <div className="hidden lg:flex items-center gap-3">
             <div className="text-right">
-              <p className="text-xs text-sky-500">Status Hari Ini</p>
-              <p className="text-sm font-bold text-sky-900">
+              <p className="text-xs text-sky-500 dark:text-sky-400">Status Hari Ini</p>
+              <p className="text-sm font-bold text-sky-900 dark:text-sky-100">
                 {todayStatus.masuk ? `${todayStatus.masuk?.slice(0,5)}` : "--:--"} / {todayStatus.pulang ? `${todayStatus.pulang?.slice(0,5)}` : "--:--"}
               </p>
             </div>
             <Badge className={
-              todayStatus.status === "hadir" ? "bg-sky-100 text-sky-700 border-sky-200" :
-              todayStatus.status === "izin" || todayStatus.status === "sakit" ? "bg-amber-50 text-amber-700 border-amber-200" :
-              "bg-red-50 text-red-700 border-red-200"
+              todayStatus.status === "hadir" ? "bg-sky-100 text-sky-700 border-sky-200 dark:bg-sky-900/50 dark:text-sky-300 dark:border-sky-700" :
+              todayStatus.status === "izin" || todayStatus.status === "sakit" ? "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-700" :
+              "bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-700"
             }>
               {todayStatus.status || "Belum Absen"}
             </Badge>
@@ -405,30 +407,30 @@ export default function AbsensiPage() {
 
       {/* Status Hari Ini - Mobile only */}
       {todayStatus && (
-        <div className={`lg:hidden bg-white/70 backdrop-blur-xl rounded-2xl border border-sky-200/50 shadow-lg shadow-sky-200/20 p-4 transition-all duration-500 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
+        <div className={`lg:hidden bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-2xl border border-sky-200/50 dark:border-slate-700/50 shadow-lg shadow-sky-200/20 dark:shadow-slate-900/30 p-4 transition-all duration-500 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-sky-400 to-sky-600 shadow-md flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-sky-400 to-sky-600 dark:from-sky-600 dark:to-sky-700 shadow-md flex items-center justify-center">
                 <Clock className="h-4 w-4 text-white" />
               </div>
-              <span className="text-sm font-bold text-sky-900">Status Hari Ini</span>
+              <span className="text-sm font-bold text-sky-900 dark:text-sky-100">Status Hari Ini</span>
             </div>
             <Badge className={
-              todayStatus.status === "hadir" ? "bg-sky-100 text-sky-700 border-sky-200" :
-              todayStatus.status === "izin" || todayStatus.status === "sakit" ? "bg-amber-50 text-amber-700 border-amber-200" :
-              "bg-red-50 text-red-700 border-red-200"
+              todayStatus.status === "hadir" ? "bg-sky-100 text-sky-700 border-sky-200 dark:bg-sky-900/50 dark:text-sky-300 dark:border-sky-700" :
+              todayStatus.status === "izin" || todayStatus.status === "sakit" ? "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-700" :
+              "bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-700"
             }>
               {todayStatus.status || "Belum Absen"}
             </Badge>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <div className="bg-sky-50/50 rounded-xl p-3">
-              <p className="text-[10px] text-sky-500 font-medium uppercase tracking-wider">Masuk</p>
-              <p className="text-lg font-bold text-sky-900 mt-0.5">{todayStatus.masuk || "--:--"}</p>
+            <div className="bg-sky-50/50 dark:bg-slate-800/50 rounded-xl p-3">
+              <p className="text-[10px] text-sky-500 dark:text-sky-400 font-medium uppercase tracking-wider">Masuk</p>
+              <p className="text-lg font-bold text-sky-900 dark:text-sky-100 mt-0.5">{todayStatus.masuk || "--:--"}</p>
             </div>
-            <div className="bg-sky-50/50 rounded-xl p-3">
-              <p className="text-[10px] text-sky-500 font-medium uppercase tracking-wider">Pulang</p>
-              <p className="text-lg font-bold text-sky-900 mt-0.5">{todayStatus.pulang || "--:--"}</p>
+            <div className="bg-sky-50/50 dark:bg-slate-800/50 rounded-xl p-3">
+              <p className="text-[10px] text-sky-500 dark:text-sky-400 font-medium uppercase tracking-wider">Pulang</p>
+              <p className="text-lg font-bold text-sky-900 dark:text-sky-100 mt-0.5">{todayStatus.pulang || "--:--"}</p>
             </div>
           </div>
         </div>
@@ -436,10 +438,10 @@ export default function AbsensiPage() {
 
       {/* Error */}
       {error && (
-        <div className="flex items-center gap-2 p-3 rounded-xl bg-red-50/80 border border-red-200/60 text-sm text-red-700 backdrop-blur-sm animate-in slide-in-from-top-2">
+        <div className="flex items-center gap-2 p-3 rounded-xl bg-red-50/80 dark:bg-red-900/40 border border-red-200/60 dark:border-red-700/60 text-sm text-red-700 dark:text-red-300 backdrop-blur-sm animate-in slide-in-from-top-2">
           <AlertTriangle className="h-4 w-4 shrink-0" />
           <span className="flex-1">{error}</span>
-          <button onClick={() => setError(null)} className="text-red-500 hover:text-red-700 flex-shrink-0">
+          <button onClick={() => setError(null)} className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 flex-shrink-0">
             <XCircle className="h-4 w-4" />
           </button>
         </div>
@@ -449,32 +451,32 @@ export default function AbsensiPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
 
         {/* LEFT COLUMN: Verifikasi Wajah */}
-        <div className={`bg-white/70 backdrop-blur-xl rounded-2xl border border-sky-200/50 shadow-lg shadow-sky-200/20 p-4 lg:p-6 space-y-4 transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+        <div className={`bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-2xl border border-sky-200/50 dark:border-slate-700/50 shadow-lg shadow-sky-200/20 dark:shadow-slate-900/30 p-4 lg:p-6 space-y-4 transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 shadow-lg shadow-sky-200/40 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 dark:from-sky-600 dark:to-sky-700 shadow-lg shadow-sky-200/40 dark:shadow-slate-900/40 flex items-center justify-center">
                 <Camera className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h2 className="text-sm font-bold text-sky-900">Verifikasi Wajah</h2>
-                <p className="text-[10px] text-sky-500">Pastikan wajah terlihat jelas</p>
+                <h2 className="text-sm font-bold text-sky-900 dark:text-sky-100">Verifikasi Wajah</h2>
+                <p className="text-[10px] text-sky-500 dark:text-sky-400">Pastikan wajah terlihat jelas</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               {faceStatus === "verified" && (
-                <Badge className="bg-sky-100 text-sky-700 border-sky-200 animate-in fade-in">
+                <Badge className="bg-sky-100 text-sky-700 border-sky-200 dark:bg-sky-900/50 dark:text-sky-300 dark:border-sky-700 animate-in fade-in">
                   <CheckCircle2 className="h-3 w-3 mr-1" />
                   Terverifikasi
                 </Badge>
               )}
               {faceStatus === "failed" && (
-                <Badge className="bg-red-50 text-red-700 border-red-200">
+                <Badge className="bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-700">
                   <XCircle className="h-3 w-3 mr-1" />
                   Gagal
                 </Badge>
               )}
               {faceStatus === "detecting" && (
-                <Badge className="bg-amber-50 text-amber-700 border-amber-200">
+                <Badge className="bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-700">
                   <Loader2 className="h-3 w-3 mr-1 animate-spin" />
                   Deteksi
                 </Badge>
@@ -483,7 +485,7 @@ export default function AbsensiPage() {
           </div>
 
           {cameraActive ? (
-            <div className="relative rounded-xl overflow-hidden bg-black shadow-lg aspect-[4/3] lg:aspect-video">
+            <div className="relative rounded-xl overflow-hidden bg-black dark:bg-black shadow-lg aspect-[4/3] lg:aspect-video">
               <canvas ref={canvasRef} className="hidden" />
               <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
               {faceStatus === "detecting" && (
@@ -495,13 +497,13 @@ export default function AbsensiPage() {
                 </div>
               )}
               {faceStatus === "verified" && (
-                <div className="absolute top-3 right-3 bg-sky-500/90 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm">
+                <div className="absolute top-3 right-3 bg-sky-500/90 dark:bg-sky-600/90 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm">
                   <CheckCircle2 className="w-3 h-3 inline mr-1" />
                   {Math.round(confidence)}%
                 </div>
               )}
               {faceStatus === "failed" && (
-                <div className="absolute top-3 right-3 bg-red-500/90 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm">
+                <div className="absolute top-3 right-3 bg-red-500/90 dark:bg-red-600/90 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm">
                   <XCircle className="w-3 h-3 inline mr-1" />
                   Gagal
                 </div>
@@ -510,13 +512,13 @@ export default function AbsensiPage() {
               <div className="absolute inset-0 border-2 border-dashed border-white/10 rounded-xl pointer-events-none m-8 lg:m-12" />
             </div>
           ) : (
-            <div className="flex items-center justify-center h-48 lg:h-64 rounded-xl bg-gradient-to-br from-sky-50/80 to-white border-2 border-dashed border-sky-200/60">
+            <div className="flex items-center justify-center h-48 lg:h-64 rounded-xl bg-gradient-to-br from-sky-50/80 to-white dark:from-sky-950/40 dark:to-slate-800 border-2 border-dashed border-sky-200/60 dark:border-slate-600/60">
               <div className="text-center">
-                <div className="w-14 h-14 rounded-2xl bg-sky-50 flex items-center justify-center mx-auto mb-3">
-                  <Camera className="h-7 w-7 text-sky-300" />
+                <div className="w-14 h-14 rounded-2xl bg-sky-50 dark:bg-slate-800 flex items-center justify-center mx-auto mb-3">
+                  <Camera className="h-7 w-7 text-sky-300 dark:text-sky-600" />
                 </div>
-                <p className="text-sm font-medium text-sky-600">Kamera tidak aktif</p>
-                <p className="text-xs text-sky-400 mt-1">Aktifkan kamera untuk verifikasi wajah</p>
+                <p className="text-sm font-medium text-sky-600 dark:text-sky-400">Kamera tidak aktif</p>
+                <p className="text-xs text-sky-400 dark:text-sky-500 mt-1">Aktifkan kamera untuk verifikasi wajah</p>
               </div>
             </div>
           )}
@@ -526,8 +528,8 @@ export default function AbsensiPage() {
             variant={cameraActive ? "outline" : "default"}
             className={`w-full ${
               cameraActive
-                ? "border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
-                : "bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 text-white shadow-lg shadow-sky-200/50"
+                ? "border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/30 dark:hover:text-red-300"
+                : "bg-gradient-to-r from-sky-500 to-sky-600 dark:from-sky-600 dark:to-sky-700 hover:from-sky-600 hover:to-sky-700 dark:hover:from-sky-500 dark:hover:to-sky-600 text-white shadow-lg shadow-sky-200/50 dark:shadow-sky-900/50"
             }`}
           >
             {cameraActive ? <><XCircle className="h-4 w-4 mr-2" /> Matikan Kamera</> : <><Camera className="h-4 w-4 mr-2" /> Aktifkan Kamera</>}
@@ -535,18 +537,18 @@ export default function AbsensiPage() {
 
           {/* Desktop: face status indicator */}
           {cameraActive && (
-            <div className="flex items-center gap-2 text-xs text-sky-500">
+            <div className="flex items-center gap-2 text-xs text-sky-500 dark:text-sky-400">
               <div className={`w-2 h-2 rounded-full ${
-                faceStatus === "verified" ? "bg-emerald-500" :
-                faceStatus === "failed" ? "bg-red-500" :
-                faceStatus === "detecting" ? "bg-amber-500 animate-pulse" : "bg-sky-300"
+                faceStatus === "verified" ? "bg-emerald-500 dark:bg-emerald-400" :
+                faceStatus === "failed" ? "bg-red-500 dark:bg-red-400" :
+                faceStatus === "detecting" ? "bg-amber-500 dark:bg-amber-400 animate-pulse" : "bg-sky-300 dark:bg-sky-600"
               }`} />
               {faceStatus === "verified" ? "Wajah terverifikasi — siap absen" :
                faceStatus === "failed" ? "Verifikasi gagal" :
                faceStatus === "detecting" ? "Mendeteksi wajah..." :
                "Menunggu kamera"}
               {faceStatus === "failed" && (
-                <button onClick={() => { setFaceStatus("idle"); runFaceDetection(); }} className="ml-2 text-xs font-semibold text-sky-600 hover:text-sky-800 underline">
+                <button onClick={() => { setFaceStatus("idle"); runFaceDetection(); }} className="ml-2 text-xs font-semibold text-sky-600 dark:text-sky-400 hover:text-sky-800 dark:hover:text-sky-300 underline">
                   Coba Lagi
                 </button>
               )}
@@ -558,48 +560,48 @@ export default function AbsensiPage() {
         <div className="space-y-4 lg:space-y-5">
 
           {/* Action Buttons */}
-          <div className={`bg-white/70 backdrop-blur-xl rounded-2xl border border-sky-200/50 shadow-lg shadow-sky-200/20 p-4 lg:p-5 space-y-4 transition-all duration-500 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
+          <div className={`bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-2xl border border-sky-200/50 dark:border-slate-700/50 shadow-lg shadow-sky-200/20 dark:shadow-slate-900/30 p-4 lg:p-5 space-y-4 transition-all duration-500 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
             {/* GPS Status (inline, when available) */}
             {gpsPosition && distance !== null && (
-              <div className="flex items-center gap-2 pb-2 border-b border-sky-100">
-                <div className="flex-1 h-1.5 rounded-full bg-sky-100 overflow-hidden">
+              <div className="flex items-center gap-2 pb-2 border-b border-sky-100 dark:border-slate-700">
+                <div className="flex-1 h-1.5 rounded-full bg-sky-100 dark:bg-slate-700 overflow-hidden">
                   <div className={`h-full rounded-full transition-all duration-500 ${
-                    distance <= maxDistance ? "bg-emerald-400" : "bg-red-400"
+                    distance <= maxDistance ? "bg-emerald-400 dark:bg-emerald-500" : "bg-red-400 dark:bg-red-500"
                   }`} style={{ width: `${Math.min((distance / maxDistance) * 100, 100)}%` }} />
                 </div>
                 <span className={`text-xs font-semibold whitespace-nowrap ${
-                  distance <= maxDistance ? "text-emerald-600" : "text-red-600"
+                  distance <= maxDistance ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"
                 }`}>
                   {Math.round(distance)}m / {maxDistance}m
                 </span>
               </div>
             )}
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-lg shadow-emerald-200/40 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 dark:from-emerald-600 dark:to-emerald-700 shadow-lg shadow-emerald-200/40 dark:shadow-emerald-900/40 flex items-center justify-center">
                 <Clock className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-sky-900">Aksi Absensi</h3>
-                <p className="text-[10px] text-sky-500">Verifikasi wajah & lokasi selesai? Langsung absen</p>
+                <h3 className="text-sm font-bold text-sky-900 dark:text-sky-100">Aksi Absensi</h3>
+                <p className="text-[10px] text-sky-500 dark:text-sky-400">Verifikasi wajah & lokasi selesai? Langsung absen</p>
               </div>
             </div>
 
             {/* GPS Error - Skip option */}
             {gpsStatus === "error" && !gpsSkipped && (
-              <div className="flex items-center justify-between p-3 rounded-xl bg-amber-50/80 border border-amber-200/60">
+              <div className="flex items-center justify-between p-3 rounded-xl bg-amber-50/80 dark:bg-amber-900/40 border border-amber-200/60 dark:border-amber-700/60">
                 <div className="flex-1">
-                  <p className="text-xs font-medium text-amber-800">Lokasi tidak tersedia</p>
-                  <p className="text-[10px] text-amber-600/80">GPS gagal, Anda bisa tetap absen</p>
+                  <p className="text-xs font-medium text-amber-800 dark:text-amber-300">Lokasi tidak tersedia</p>
+                  <p className="text-[10px] text-amber-600/80 dark:text-amber-400/80">GPS gagal, Anda bisa tetap absen</p>
                 </div>
-                <button onClick={skipGps} className="text-xs font-semibold text-amber-700 hover:text-amber-900 underline px-2 py-1">
+                <button onClick={skipGps} className="text-xs font-semibold text-amber-700 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-300 underline px-2 py-1">
                   Lanjutkan
                 </button>
               </div>
             )}
             {gpsSkipped && (
-              <div className="flex items-center gap-2 p-2 rounded-lg bg-sky-50 border border-sky-200">
-                <MapPin className="w-3 h-3 text-sky-500" />
-                <span className="text-[10px] text-sky-600">Lokasi dilewati</span>
+              <div className="flex items-center gap-2 p-2 rounded-lg bg-sky-50 dark:bg-slate-800 border border-sky-200 dark:border-slate-600">
+                <MapPin className="w-3 h-3 text-sky-500 dark:text-sky-400" />
+                <span className="text-[10px] text-sky-600 dark:text-sky-400">Lokasi dilewati</span>
               </div>
             )}
 
@@ -607,7 +609,7 @@ export default function AbsensiPage() {
               <Button
                 onClick={() => handleAbsen("masuk")}
                 disabled={isProcessing || (todayStatus?.masuk !== null && todayStatus?.masuk !== undefined) || faceStatus !== "verified"}
-                className="h-14 lg:h-16 text-base font-bold bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg shadow-emerald-200/50 hover:shadow-xl hover:shadow-emerald-300/50 transition-all duration-200 disabled:opacity-40"
+                className="h-14 lg:h-16 text-base font-bold bg-gradient-to-r from-emerald-500 to-emerald-600 dark:from-emerald-600 dark:to-emerald-700 hover:from-emerald-600 hover:to-emerald-700 dark:hover:from-emerald-500 dark:hover:to-emerald-600 text-white shadow-lg shadow-emerald-200/50 dark:shadow-emerald-900/50 hover:shadow-xl hover:shadow-emerald-300/50 dark:hover:shadow-emerald-900/50 transition-all duration-200 disabled:opacity-40"
               >
                 {isProcessing ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Clock className="h-5 w-5 mr-2" />}
                 <div className="text-left">
@@ -619,7 +621,7 @@ export default function AbsensiPage() {
               <Button
                 onClick={() => handleAbsen("pulang")}
                 disabled={isProcessing || !todayStatus?.masuk || todayStatus?.pulang !== null || faceStatus !== "verified"}
-                className="h-14 lg:h-16 text-base font-bold bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 text-white shadow-lg shadow-sky-200/50 hover:shadow-xl hover:shadow-sky-300/50 transition-all duration-200 disabled:opacity-40"
+                className="h-14 lg:h-16 text-base font-bold bg-gradient-to-r from-sky-500 to-sky-600 dark:from-sky-600 dark:to-sky-700 hover:from-sky-600 hover:to-sky-700 dark:hover:from-sky-500 dark:hover:to-sky-600 text-white shadow-lg shadow-sky-200/50 dark:shadow-sky-900/50 hover:shadow-xl hover:shadow-sky-300/50 dark:hover:shadow-sky-900/50 transition-all duration-200 disabled:opacity-40"
               >
                 {isProcessing ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Clock className="h-5 w-5 mr-2" />}
                 <div className="text-left">
@@ -630,18 +632,18 @@ export default function AbsensiPage() {
             </div>
 
             {/* Desktop: checklist status */}
-            <div className="hidden lg:grid grid-cols-3 gap-2 pt-2 border-t border-sky-100">
+            <div className="hidden lg:grid grid-cols-3 gap-2 pt-2 border-t border-sky-100 dark:border-slate-700">
               <div className="flex items-center gap-2 text-xs">
-                <div className={`w-2 h-2 rounded-full ${faceStatus === "verified" ? "bg-emerald-500" : "bg-sky-200"}`} />
-                <span className={faceStatus === "verified" ? "text-emerald-700 font-medium" : "text-sky-400"}>Wajah</span>
+                <div className={`w-2 h-2 rounded-full ${faceStatus === "verified" ? "bg-emerald-500 dark:bg-emerald-400" : "bg-sky-200 dark:bg-slate-600"}`} />
+                <span className={faceStatus === "verified" ? "text-emerald-700 dark:text-emerald-400 font-medium" : "text-sky-400 dark:text-sky-500"}>Wajah</span>
               </div>
               <div className="flex items-center gap-2 text-xs">
-                <div className={`w-2 h-2 rounded-full ${gpsStatus === "success" ? "bg-emerald-500" : "bg-sky-200"}`} />
-                <span className={gpsStatus === "success" ? "text-emerald-700 font-medium" : "text-sky-400"}>Lokasi</span>
+                <div className={`w-2 h-2 rounded-full ${gpsStatus === "success" ? "bg-emerald-500 dark:bg-emerald-400" : "bg-sky-200 dark:bg-slate-600"}`} />
+                <span className={gpsStatus === "success" ? "text-emerald-700 dark:text-emerald-400 font-medium" : "text-sky-400 dark:text-sky-500"}>Lokasi</span>
               </div>
               <div className="flex items-center gap-2 text-xs">
-                <div className={`w-2 h-2 rounded-full ${faceStatus === "verified" && gpsStatus === "success" ? "bg-emerald-500" : "bg-sky-200"}`} />
-                <span className={faceStatus === "verified" && gpsStatus === "success" ? "text-emerald-700 font-medium" : "text-sky-400"}>Siap</span>
+                <div className={`w-2 h-2 rounded-full ${faceStatus === "verified" && gpsStatus === "success" ? "bg-emerald-500 dark:bg-emerald-400" : "bg-sky-200 dark:bg-slate-600"}`} />
+                <span className={faceStatus === "verified" && gpsStatus === "success" ? "text-emerald-700 dark:text-emerald-400 font-medium" : "text-sky-400 dark:text-sky-500"}>Siap</span>
               </div>
             </div>
           </div>

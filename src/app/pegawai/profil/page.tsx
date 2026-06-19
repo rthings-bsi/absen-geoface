@@ -234,24 +234,24 @@ export default function ProfilPage() {
   if (loading) {
     return (
       <div className="p-4 max-w-lg mx-auto space-y-4 pb-24">
-        <Skeleton className="h-8 w-32 bg-sky-100/50" />
+        <Skeleton className="h-8 w-32 bg-sky-100/50 dark:bg-slate-700/50" />
         <div className="flex flex-col items-center gap-3 py-6">
-          <Skeleton className="h-20 w-20 rounded-full bg-sky-100/50" />
-          <Skeleton className="h-5 w-40 bg-sky-100/50" />
-          <Skeleton className="h-4 w-28 bg-sky-100/50" />
+          <Skeleton className="h-20 w-20 rounded-full bg-sky-100/50 dark:bg-slate-700/50" />
+          <Skeleton className="h-5 w-40 bg-sky-100/50 dark:bg-slate-700/50" />
+          <Skeleton className="h-4 w-28 bg-sky-100/50 dark:bg-slate-700/50" />
         </div>
-        <Skeleton className="h-40 rounded-xl bg-sky-100/50" />
-        <Skeleton className="h-12 rounded-xl bg-sky-100/50" />
+        <Skeleton className="h-40 rounded-xl bg-sky-100/50 dark:bg-slate-700/50" />
+        <Skeleton className="h-12 rounded-xl bg-sky-100/50 dark:bg-slate-700/50" />
       </div>
     );
   }
 
   if (!profil) {
     return (
-      <div className="p-4 max-w-lg mx-auto text-center py-12 pb-24 text-sky-500">
+      <div className="p-4 max-w-lg mx-auto text-center py-12 pb-24 text-sky-500 dark:text-slate-400">
         <User className="h-12 w-12 mx-auto mb-3 opacity-50" />
         <p>Gagal memuat profil</p>
-        <Button onClick={fetchProfil} variant="outline" size="sm" className="mt-3 border-sky-200 text-sky-700">Muat Ulang</Button>
+        <Button onClick={fetchProfil} variant="outline" size="sm" className="mt-3 border-sky-200 text-sky-700 dark:border-slate-600 dark:text-slate-300">Muat Ulang</Button>
       </div>
     );
   }
@@ -259,19 +259,19 @@ export default function ProfilPage() {
   return (
     <div className="p-4 max-w-lg mx-auto space-y-4 pb-24">
       <div className={`flex items-center gap-2 mb-2 transition-all duration-500 ${mounted ? "opacity-100" : "opacity-0"}`}>
-        <Link href="/pegawai" className="p-2 rounded-xl hover:bg-sky-50 transition">
-          <ChevronLeft className="h-5 w-5 text-sky-500" />
+        <Link href="/pegawai" className="p-2 rounded-xl hover:bg-sky-50 dark:hover:bg-slate-800 transition">
+          <ChevronLeft className="h-5 w-5 text-sky-500 dark:text-slate-400" />
         </Link>
         <div>
-          <h1 className="text-lg font-bold text-sky-950">Profil</h1>
-          <p className="text-xs text-sky-500">Informasi pribadi Anda</p>
+          <h1 className="text-lg font-bold text-sky-950 dark:text-slate-100">Profil</h1>
+          <p className="text-xs text-sky-500 dark:text-slate-400">Informasi pribadi Anda</p>
         </div>
       </div>
 
-      <div className={`bg-white/70 backdrop-blur-xl rounded-2xl border border-sky-200/50 shadow-xl shadow-sky-200/20 p-6 transition-all duration-500 ${mounted ? "opacity-100" : "opacity-0"}`}>
+      <div className={`bg-white/70 backdrop-blur-xl rounded-2xl border border-sky-200/50 shadow-xl shadow-sky-200/20 p-6 transition-all duration-500 dark:bg-slate-800/70 dark:border-slate-700/50 dark:shadow-slate-900/30 ${mounted ? "opacity-100" : "opacity-0"}`}>
         <div className="flex flex-col items-center text-center">
           <div className="relative mb-3 group">
-            <Avatar className="h-20 w-20 ring-4 ring-sky-100 shadow-xl">
+            <Avatar className="h-20 w-20 ring-4 ring-sky-100 shadow-xl dark:ring-slate-700">
               {profil.foto ? (
                 <AvatarImage src={profil.foto} alt={profil.nama} />
               ) : (
@@ -314,54 +314,54 @@ export default function ProfilPage() {
               />
             </label>
 
-            <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-white" />
+            <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-800" />
           </div>
-          <h2 className="text-lg font-bold text-sky-950">{profil.nama}</h2>
-          <p className="text-sm text-sky-500">{profil.nip}</p>
-          <Badge className="mt-2 bg-sky-50 text-sky-700 border-sky-200">{profil.jabatan?.nama || "-"}</Badge>
+          <h2 className="text-lg font-bold text-sky-950 dark:text-slate-100">{profil.nama}</h2>
+          <p className="text-sm text-sky-500 dark:text-slate-400">{profil.nip}</p>
+          <Badge className="mt-2 bg-sky-50 text-sky-700 border-sky-200 dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600">{profil.jabatan?.nama || "-"}</Badge>
         </div>
       </div>
 
-      <div className={`bg-white/70 backdrop-blur-xl rounded-2xl border border-sky-200/50 shadow-xl shadow-sky-200/20 p-5 space-y-4 transition-all duration-500 ${mounted ? "opacity-100" : "opacity-0"}`}>
-        <h3 className="text-xs font-bold text-sky-500 uppercase tracking-wider">Informasi Pribadi</h3>
+      <div className={`bg-white/70 backdrop-blur-xl rounded-2xl border border-sky-200/50 shadow-xl shadow-sky-200/20 p-5 space-y-4 transition-all duration-500 dark:bg-slate-800/70 dark:border-slate-700/50 dark:shadow-slate-900/30 ${mounted ? "opacity-100" : "opacity-0"}`}>
+        <h3 className="text-xs font-bold text-sky-500 dark:text-slate-400 uppercase tracking-wider">Informasi Pribadi</h3>
         <div className="space-y-3">
-          <div className="flex items-center gap-3 p-3 rounded-xl bg-sky-50/50">
-            <Mail className="h-4 w-4 text-sky-400" />
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-sky-50/50 dark:bg-slate-700/50">
+            <Mail className="h-4 w-4 text-sky-400 dark:text-slate-400" />
             <div className="flex-1 min-w-0">
-              <p className="text-[10px] text-sky-500 font-medium">Email</p>
-              <p className="text-sm font-medium text-sky-900 truncate">{profil.email}</p>
+              <p className="text-[10px] text-sky-500 dark:text-slate-400 font-medium">Email</p>
+              <p className="text-sm font-medium text-sky-900 dark:text-slate-100 truncate">{profil.email}</p>
             </div>
           </div>
-          <div className="flex items-center gap-3 p-3 rounded-xl bg-sky-50/50">
-            <Briefcase className="h-4 w-4 text-sky-400" />
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-sky-50/50 dark:bg-slate-700/50">
+            <Briefcase className="h-4 w-4 text-sky-400 dark:text-slate-400" />
             <div className="flex-1 min-w-0">
-              <p className="text-[10px] text-sky-500 font-medium">Unit Kerja</p>
-              <p className="text-sm font-medium text-sky-900 truncate">{profil.unit_kerja || "-"}</p>
+              <p className="text-[10px] text-sky-500 dark:text-slate-400 font-medium">Unit Kerja</p>
+              <p className="text-sm font-medium text-sky-900 dark:text-slate-100 truncate">{profil.unit_kerja || "-"}</p>
             </div>
           </div>
-          <div className="flex items-center gap-3 p-3 rounded-xl bg-sky-50/50">
-            <Phone className="h-4 w-4 text-sky-400" />
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-sky-50/50 dark:bg-slate-700/50">
+            <Phone className="h-4 w-4 text-sky-400 dark:text-slate-400" />
             <div className="flex-1 min-w-0">
-              <p className="text-[10px] text-sky-500 font-medium">No. HP</p>
+              <p className="text-[10px] text-sky-500 dark:text-slate-400 font-medium">No. HP</p>
               {editMode ? (
                 <input type="tel" value={formData.no_hp} onChange={(e) => setFormData((prev) => ({ ...prev, no_hp: e.target.value }))}
-                  className="w-full bg-transparent border-b border-sky-300 py-1 text-sm font-medium text-sky-900 focus:outline-none focus:border-sky-500"
+                  className="w-full bg-transparent border-b border-sky-300 py-1 text-sm font-medium text-sky-900 focus:outline-none focus:border-sky-500 dark:border-slate-600 dark:text-slate-100 dark:focus:border-slate-400"
                   placeholder="Masukkan nomor HP" />
               ) : (
-                <p className="text-sm font-medium text-sky-900">{profil.no_hp || "-"}</p>
+                <p className="text-sm font-medium text-sky-900 dark:text-slate-100">{profil.no_hp || "-"}</p>
               )}
             </div>
           </div>
-          <div className="flex items-center gap-3 p-3 rounded-xl bg-sky-50/50">
-            <MapPin className="h-4 w-4 text-sky-400" />
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-sky-50/50 dark:bg-slate-700/50">
+            <MapPin className="h-4 w-4 text-sky-400 dark:text-slate-400" />
             <div className="flex-1 min-w-0">
-              <p className="text-[10px] text-sky-500 font-medium">Alamat</p>
+              <p className="text-[10px] text-sky-500 dark:text-slate-400 font-medium">Alamat</p>
               {editMode ? (
                 <textarea value={formData.alamat} onChange={(e) => setFormData((prev) => ({ ...prev, alamat: e.target.value }))}
-                  className="w-full bg-transparent border-b border-sky-300 py-1 text-sm font-medium text-sky-900 focus:outline-none focus:border-sky-500 resize-none"
+                  className="w-full bg-transparent border-b border-sky-300 py-1 text-sm font-medium text-sky-900 focus:outline-none focus:border-sky-500 resize-none dark:border-slate-600 dark:text-slate-100 dark:focus:border-slate-400"
                   rows={2} placeholder="Masukkan alamat" />
               ) : (
-                <p className="text-sm font-medium text-sky-900">{profil.alamat || "-"}</p>
+                <p className="text-sm font-medium text-sky-900 dark:text-slate-100">{profil.alamat || "-"}</p>
               )}
             </div>
           </div>
@@ -369,7 +369,7 @@ export default function ProfilPage() {
         <div className="flex gap-2 pt-2">
           {editMode ? (
             <>
-              <Button variant="outline" className="flex-1 border-sky-200 text-sky-700 hover:bg-sky-50"
+              <Button variant="outline" className="flex-1 border-sky-200 text-sky-700 hover:bg-sky-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
                 onClick={() => { setEditMode(false); setFormData({ no_hp: profil.no_hp || "", alamat: profil.alamat || "" }); }}>
                 Batal
               </Button>
@@ -380,32 +380,32 @@ export default function ProfilPage() {
               </Button>
             </>
           ) : (
-            <Button variant="outline" className="w-full border-sky-200 text-sky-700 hover:bg-sky-50" onClick={() => setEditMode(true)}>
+            <Button variant="outline" className="w-full border-sky-200 text-sky-700 hover:bg-sky-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700" onClick={() => setEditMode(true)}>
               <User className="h-4 w-4 mr-2" /> Edit Profil
             </Button>
           )}
         </div>
       </div>
 
-      <div className={`bg-white/70 backdrop-blur-xl rounded-2xl border border-sky-200/50 shadow-xl shadow-sky-200/20 p-5 space-y-4 transition-all duration-500 ${mounted ? "opacity-100" : "opacity-0"}`}>
+      <div className={`bg-white/70 backdrop-blur-xl rounded-2xl border border-sky-200/50 shadow-xl shadow-sky-200/20 p-5 space-y-4 transition-all duration-500 dark:bg-slate-800/70 dark:border-slate-700/50 dark:shadow-slate-900/30 ${mounted ? "opacity-100" : "opacity-0"}`}>
         <div className="flex items-center justify-between">
-          <h3 className="text-xs font-bold text-sky-500 uppercase tracking-wider">Registrasi Wajah</h3>
+          <h3 className="text-xs font-bold text-sky-500 dark:text-slate-400 uppercase tracking-wider">Registrasi Wajah</h3>
           {faceLoading ? (
-            <Loader2 className="h-4 w-4 animate-spin text-sky-400" />
+            <Loader2 className="h-4 w-4 animate-spin text-sky-400 dark:text-slate-400" />
           ) : faceRegistered ? (
-            <Badge className="bg-sky-100 text-sky-700 border-sky-200">
+            <Badge className="bg-sky-100 text-sky-700 border-sky-200 dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600">
               <CheckCircle2 className="h-3 w-3 mr-1" /> Terdaftar
             </Badge>
           ) : (
-            <Badge className="bg-red-50 text-red-700 border-red-200">
+            <Badge className="bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800/50">
               <XCircle className="h-3 w-3 mr-1" /> Belum
             </Badge>
           )}
         </div>
         {!faceLoading && !faceRegistered && modelError && (
-          <div className="p-3 rounded-xl bg-red-50/80 border border-red-200/60">
-            <p className="text-xs font-medium text-red-700">Gagal memuat model wajah</p>
-            <p className="text-[10px] text-red-500 mt-0.5">{modelError}</p>
+          <div className="p-3 rounded-xl bg-red-50/80 border border-red-200/60 dark:bg-red-900/30 dark:border-red-800/50">
+            <p className="text-xs font-medium text-red-700 dark:text-red-300">Gagal memuat model wajah</p>
+            <p className="text-[10px] text-red-500 dark:text-red-400 mt-0.5">{modelError}</p>
           </div>
         )}
         {!faceLoading && !faceRegistered && cameraActive && (
@@ -429,12 +429,12 @@ export default function ProfilPage() {
         {!faceLoading && !faceRegistered && (
           <div className="flex gap-2">
             {!cameraActive ? (
-              <Button onClick={startCamera} variant="outline" className="flex-1 border-sky-200 text-sky-700 hover:bg-sky-50">
+              <Button onClick={startCamera} variant="outline" className="flex-1 border-sky-200 text-sky-700 hover:bg-sky-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700">
                 <Camera className="h-4 w-4 mr-2" /> Buka Kamera
               </Button>
             ) : (
               <>
-                <Button onClick={stopCamera} variant="outline" className="flex-1 border-sky-200 text-sky-700 hover:bg-sky-50">
+                <Button onClick={stopCamera} variant="outline" className="flex-1 border-sky-200 text-sky-700 hover:bg-sky-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700">
                   <XCircle className="h-4 w-4 mr-2" /> Batal
                 </Button>
                 <Button onClick={handleRegisterFace} disabled={faceStatus !== "verified" || registering}
@@ -447,34 +447,34 @@ export default function ProfilPage() {
           </div>
         )}
         {!faceLoading && faceRegistered && (
-          <p className="text-xs text-sky-500">Data wajah Anda telah terdaftar dan siap digunakan untuk absensi.</p>
+          <p className="text-xs text-sky-500 dark:text-slate-400">Data wajah Anda telah terdaftar dan siap digunakan untuk absensi.</p>
         )}
       </div>
 
-      <div className={`bg-white/70 backdrop-blur-xl rounded-2xl border border-sky-200/50 shadow-xl shadow-sky-200/20 p-5 space-y-4 transition-all duration-500 ${mounted ? "opacity-100" : "opacity-0"}`}>
-        <h3 className="text-xs font-bold text-sky-500 uppercase tracking-wider">Keamanan</h3>
+      <div className={`bg-white/70 backdrop-blur-xl rounded-2xl border border-sky-200/50 shadow-xl shadow-sky-200/20 p-5 space-y-4 transition-all duration-500 dark:bg-slate-800/70 dark:border-slate-700/50 dark:shadow-slate-900/30 ${mounted ? "opacity-100" : "opacity-0"}`}>
+        <h3 className="text-xs font-bold text-sky-500 dark:text-slate-400 uppercase tracking-wider">Keamanan</h3>
         {showPasswordForm ? (
           <form onSubmit={handleChangePassword} className="space-y-3">
             <div>
-              <label className="block text-xs font-medium text-sky-600 mb-1">Password Lama</label>
+              <label className="block text-xs font-medium text-sky-600 dark:text-slate-300 mb-1">Password Lama</label>
               <input type="password" value={passwordForm.password_lama}
                 onChange={(e) => setPasswordForm((prev) => ({ ...prev, password_lama: e.target.value }))}
-                className="w-full rounded-xl border border-sky-200/60 bg-white/60 px-3 py-2.5 text-sm text-sky-900 focus:outline-none focus:ring-2 focus:ring-sky-500 backdrop-blur-sm" required />
+                className="w-full rounded-xl border border-sky-200/60 bg-white/60 px-3 py-2.5 text-sm text-sky-900 focus:outline-none focus:ring-2 focus:ring-sky-500 backdrop-blur-sm dark:border-slate-600/60 dark:bg-slate-700/60 dark:text-slate-100 dark:focus:ring-slate-400" required />
             </div>
             <div>
-              <label className="block text-xs font-medium text-sky-600 mb-1">Password Baru</label>
+              <label className="block text-xs font-medium text-sky-600 dark:text-slate-300 mb-1">Password Baru</label>
               <input type="password" value={passwordForm.password_baru}
                 onChange={(e) => setPasswordForm((prev) => ({ ...prev, password_baru: e.target.value }))}
-                className="w-full rounded-xl border border-sky-200/60 bg-white/60 px-3 py-2.5 text-sm text-sky-900 focus:outline-none focus:ring-2 focus:ring-sky-500 backdrop-blur-sm" required minLength={6} />
+                className="w-full rounded-xl border border-sky-200/60 bg-white/60 px-3 py-2.5 text-sm text-sky-900 focus:outline-none focus:ring-2 focus:ring-sky-500 backdrop-blur-sm dark:border-slate-600/60 dark:bg-slate-700/60 dark:text-slate-100 dark:focus:ring-slate-400" required minLength={6} />
             </div>
             <div>
-              <label className="block text-xs font-medium text-sky-600 mb-1">Konfirmasi Password Baru</label>
+              <label className="block text-xs font-medium text-sky-600 dark:text-slate-300 mb-1">Konfirmasi Password Baru</label>
               <input type="password" value={passwordForm.konfirmasi_password}
                 onChange={(e) => setPasswordForm((prev) => ({ ...prev, konfirmasi_password: e.target.value }))}
-                className="w-full rounded-xl border border-sky-200/60 bg-white/60 px-3 py-2.5 text-sm text-sky-900 focus:outline-none focus:ring-2 focus:ring-sky-500 backdrop-blur-sm" required />
+                className="w-full rounded-xl border border-sky-200/60 bg-white/60 px-3 py-2.5 text-sm text-sky-900 focus:outline-none focus:ring-2 focus:ring-sky-500 backdrop-blur-sm dark:border-slate-600/60 dark:bg-slate-700/60 dark:text-slate-100 dark:focus:ring-slate-400" required />
             </div>
             <div className="flex gap-2">
-              <Button type="button" variant="outline" size="sm" className="flex-1 border-sky-200 text-sky-700"
+              <Button type="button" variant="outline" size="sm" className="flex-1 border-sky-200 text-sky-700 dark:border-slate-600 dark:text-slate-200"
                 onClick={() => { setShowPasswordForm(false); setPasswordForm({ password_lama: "", password_baru: "", konfirmasi_password: "" }); }}>
                 Batal
               </Button>
@@ -485,13 +485,13 @@ export default function ProfilPage() {
             </div>
           </form>
         ) : (
-          <Button variant="outline" className="w-full border-sky-200 text-sky-700 hover:bg-sky-50" onClick={() => setShowPasswordForm(true)}>
+          <Button variant="outline" className="w-full border-sky-200 text-sky-700 hover:bg-sky-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700" onClick={() => setShowPasswordForm(true)}>
             <Key className="h-4 w-4 mr-2" /> Ganti Password
           </Button>
         )}
       </div>
 
-      <Button variant="destructive" className="md:hidden w-full bg-red-50 text-red-700 border-red-200 hover:bg-red-100 hover:text-red-800" onClick={handleLogout}>
+      <Button variant="destructive" className="md:hidden w-full bg-red-50 text-red-700 border-red-200 hover:bg-red-100 hover:text-red-800 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800/50 dark:hover:bg-red-900/50 dark:hover:text-red-200" onClick={handleLogout}>
         <LogOut className="h-4 w-4 mr-2" /> Logout
       </Button>
     </div>

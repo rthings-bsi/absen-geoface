@@ -7,13 +7,13 @@ import Link from "next/link";
 import {
   LayoutDashboard, FileSpreadsheet, Users, Briefcase, Clock, MapPin,
   ClipboardList, Shield, GitBranch, Menu, ChevronLeft, ChevronRight,
-  Sun, Moon, Bell, LogOut,
+  Sun, Moon, LogOut,
 } from "lucide-react";
 import { useTheme } from "@/components/ui/theme-provider";
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import NotifikasiDropdown from "@/components/ui/notifikasi-dropdown";
 
 const menuGroups: { label: string; items: { label: string; href: string; icon: any }[] }[] = [
   { label: "Dashboard", items: [{ label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard }] },
@@ -206,13 +206,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 >
                   {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                 </button>
-                <button
-                  onClick={() => toast.info("Fitur notifikasi akan segera tersedia")}
-                  className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400 relative"
-                  title="Notifikasi"
-                >
-                  <Bell className="w-4 h-4" />
-                </button>
+                <NotifikasiDropdown />
               </div>
             </div>
           </div>
