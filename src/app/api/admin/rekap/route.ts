@@ -39,7 +39,7 @@ export async function GET(request: Request) {
     .leftJoin(pegawai, eq(absensi.id_pegawai, pegawai.id))
     .where(eq(absensi.tanggal, date));
 
-  const data = rows.map(({ pegawai_nip, pegawai_nama, pegawai_id_jabatan, ...rest }) => ({
+  const data = rows.map(({ pegawai_nip, pegawai_nama, pegawai_id_jabatan, ...rest }: Record<string, unknown>) => ({
     ...rest,
     pegawai: {
       nip: pegawai_nip,

@@ -7,7 +7,7 @@ import { eq, inArray } from "drizzle-orm";
 export async function GET() {
   const data = await db.query.roles.findMany();
   const rows = await Promise.all(
-    data.map(async (role) => {
+    data.map(async (role: any) => {
       const rp = await db
         .select({ nama: permissions.nama })
         .from(role_permission)
@@ -15,7 +15,7 @@ export async function GET() {
         .where(eq(role_permission.id_role, role.id));
       return {
         ...role,
-        permissions: rp.map((p) => p.nama),
+        permissions: rp.map((p: any) => p.nama),
       };
     })
   );

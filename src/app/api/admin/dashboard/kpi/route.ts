@@ -25,8 +25,8 @@ export async function GET() {
     .from(absensi)
     .where(eq(absensi.tanggal, today));
 
-  const hadirHariIni = todayAbsensi.filter((a) => a.status_masuk === "Hadir").length;
-  const terlambatHariIni = todayAbsensi.filter((a) => a.status_masuk === "Terlambat").length;
+  const hadirHariIni = todayAbsensi.filter((a: { status_masuk: string | null }) => a.status_masuk === "Hadir").length;
+  const terlambatHariIni = todayAbsensi.filter((a: { status_masuk: string | null }) => a.status_masuk === "Terlambat").length;
 
   // Today's approved pengajuan (izin/sakit)
   const todayPengajuan = await db

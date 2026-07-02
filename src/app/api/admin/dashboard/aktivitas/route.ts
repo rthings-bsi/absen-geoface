@@ -25,7 +25,7 @@ export async function GET() {
     .limit(10);
 
   return NextResponse.json(
-    aktivitas.map((a) => ({
+    aktivitas.map((a: { id: number; pegawai_nama: string | null; jam_masuk: string | null; status_masuk: string | null; tanggal: string | null }) => ({
       id: a.id,
       pegawai_nama: a.pegawai_nama || "Unknown",
       aksi: `${a.status_masuk === "Hadir" ? "✅" : "⚠️"} Absen ${a.status_masuk === "Hadir" ? "masuk (Hadir)" : "masuk (Terlambat)"} jam ${a.jam_masuk?.slice(0, 5) || "--:--"}`,

@@ -35,8 +35,8 @@ export async function GET() {
 
     months.push({
       bulan: namaBulan[month - 1],
-      hadir: monthData.filter((a) => a.status_masuk === "Hadir").length,
-      terlambat: monthData.filter((a) => a.status_masuk === "Terlambat").length,
+      hadir: monthData.filter((a: { status_masuk: string | null }) => a.status_masuk === "Hadir").length,
+      terlambat: monthData.filter((a: { status_masuk: string | null }) => a.status_masuk === "Terlambat").length,
     });
   }
 

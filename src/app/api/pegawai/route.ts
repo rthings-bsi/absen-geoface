@@ -48,7 +48,7 @@ export async function GET(request: Request) {
     .limit(limit)
     .offset(offset);
 
-  const data = rows.map(({ jabatan_nama, is_active, no_hp, id_jabatan, ...rest }) => ({
+  const data = rows.map(({ jabatan_nama, is_active, no_hp, id_jabatan, ...rest }: Record<string, unknown>) => ({
     ...rest,
     id_jabatan,
     jabatan_id: id_jabatan,

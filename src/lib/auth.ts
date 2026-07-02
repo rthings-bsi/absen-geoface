@@ -39,6 +39,11 @@ const authConfig: NextAuthConfig = {
     signIn: "/login",
     error: "/login",
   },
+  session: {
+    strategy: "jwt",
+    maxAge: 60 * 60, // 1 Jam aja (3600 detik) - Setelah ini dipaksa logout
+    updateAge: 15 * 60, // Update token tiap 15 menit kalau user aktif
+  },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
@@ -106,7 +111,7 @@ const authConfig: NextAuthConfig = {
                 .from(role_permission)
                 .innerJoin(permissions, eq(role_permission.id_permission, permissions.id))
                 .where(eq(role_permission.id_role, role.id));
-              rolePerms = rp.map((r) => r.perm);
+              rolePerms = rp.map((r: any) => r.perm);
             }
           }
 
@@ -117,7 +122,7 @@ const authConfig: NextAuthConfig = {
 
           if (can_admin) {
             const allPerms = await db.select().from(permissions);
-            rolePerms = allPerms.map((p) => p.nama);
+            rolePerms = allPerms.map((p: any) => p.nama);
           }
 
           return {

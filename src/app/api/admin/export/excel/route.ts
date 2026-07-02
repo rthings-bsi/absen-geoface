@@ -43,7 +43,7 @@ export async function GET(request: Request) {
     { header: "Verifikasi", key: "verifikasi", width: 15 },
   ];
 
-  data.forEach((row, i) => {
+  data.forEach((row: { jam_masuk?: string; jam_pulang?: string; pegawai_nip?: string; pegawai_nama?: string; jabatan_nama?: string; status_masuk?: string; is_face_verified?: boolean | null }, i: number) => {
     sheet.addRow({
       no: i + 1,
       nip: row.pegawai_nip || "-",

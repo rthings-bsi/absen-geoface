@@ -99,17 +99,23 @@ export default function PegawaiDashboardPage() {
     let cancelled = false;
     async function fetchData() {
       try {
-        const [statusRes, rekapRes, notifRes] = await Promise.all([
-          fetch("/api/absensi/status"),
-          fetch("/api/absensi/rekap-bulanan"),
-          fetch("/api/notifikasi?limit=5"),
+        setLoading(true);
+        // Panggil API secara paralel. Kalau satu gagal, yang lain tetap jalan.
+        const [statusRes, rekapRes, notifRes] = await Promise.allSettled([
+          fetch("/api/absensi/status").then(res => res.ok ? res.json() : null),
+          fetch("/api/absensi/rekap-bulanan").then(res => res.ok ? res.json() : null),
+          fetch("/api/notifikasi?limit=5").then(res => res.ok ? res.json() : []),
         ]);
+        
         if (cancelled) return;
-        if (statusRes.ok) setAbsensiStatus(await statusRes.json());
-        if (rekapRes.ok) setRekap(await rekapRes.json());
-        if (notifRes.ok) setNotifications(await notifRes.json());
+
+        // Cek hasil masing-masing status
+        if (statusRes.status === 'fulfilled') setAbsensiStatus(statusRes.value);
+        if (rekapRes.status === 'fulfilled') setRekap(rekapRes.value);
+        if (notifRes.status === 'fulfilled') setNotifications(notifRes.value || []);
+        
       } catch (err) {
-        console.error(err);
+        console.error("Dashboard fetch error:", err);
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -433,3 +439,4 @@ function DashboardSkeleton() {
     </div>
   );
 }
+

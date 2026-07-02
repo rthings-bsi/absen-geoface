@@ -8,6 +8,11 @@ export const authConfig: NextAuthConfig = {
     signIn: "/login",
     error: "/login",
   },
+  session: {
+    strategy: "jwt",
+    maxAge: 60 * 60, // 1 Jam aja (3600 detik) - Setelah ini dipaksa logout
+    updateAge: 15 * 60, // Update token tiap 15 menit kalau user aktif scroll/klik
+  },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {

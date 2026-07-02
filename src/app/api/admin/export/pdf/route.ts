@@ -104,7 +104,7 @@ export async function GET(request: Request) {
             React.createElement(ReactPDF.Text, { style: { ...styles.cellHeader, ...styles.colStatus } }, "Status"),
           ),
           // Data
-          ...data.map((a, i) =>
+          ...data.map((a: any, i: number) =>
             React.createElement(ReactPDF.View, { key: i, style: styles.row },
               React.createElement(ReactPDF.Text, { style: { ...styles.cellData, ...styles.colNo, textAlign: "center" } }, String(i + 1)),
               React.createElement(ReactPDF.Text, { style: { ...styles.cellData, ...styles.colNip } }, a.pegawai_nip || "-"),
@@ -189,7 +189,7 @@ export async function GET(request: Request) {
             </tr>
           </thead>
           <tbody>
-            ${data.map((a, i) => `
+            ${data.map((a: any, i: number) => `
               <tr>
                 <td>${i + 1}</td>
                 <td>${a.pegawai_nip || "-"}</td>

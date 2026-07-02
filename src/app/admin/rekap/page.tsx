@@ -107,7 +107,7 @@ export default function RekapPage() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "rekap-absensi-${pdfPreviewModal.date}.pdf";
+      a.download = `rekap-absensi-${date}.xlsx`;
       a.click();
       URL.revokeObjectURL(url);
       toast.success("Export Excel berhasil");
@@ -132,7 +132,7 @@ export default function RekapPage() {
     // Gunakan elemen anchor untuk download
     const a = document.createElement("a");
     a.href = pdfPreviewModal.url.replace("&download=false", "&download=true");
-    a.download = "rekap-absensi-${pdfPreviewModal.date}.pdf";
+    a.download = `rekap-absensi-${pdfPreviewModal.date}.pdf`;
     a.click();
     
     toast.success("Mulai mengunduh PDF");

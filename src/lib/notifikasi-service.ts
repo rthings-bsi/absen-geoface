@@ -29,7 +29,7 @@ export class NotifikasiService {
    */
   static async sendToAllAdmin(judul: string, pesan: string, link?: string) {
     const admins = await db.query.pegawai.findMany({
-      where: (p, { eq }) => eq(p.role, "Admin"),
+      where: (p: any, { eq }: any) => eq(p.role, "Admin"),
     });
 
     for (const admin of admins) {

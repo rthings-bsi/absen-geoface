@@ -20,12 +20,45 @@ const navItems = [
   { href: "/pegawai/profil", label: "Profil", icon: User },
 ];
 
+// ─── Komponen Jam Digital Terpisah ───
+// Ini mencegah re-render pada seluruh layout tiap detik
+function ClockDisplay() {
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    // Update setiap 1 menit (bukan 1 detik) karena kita cuma nampilin HH:mm
+    const t = setInterval(() => setCurrentTime(new Date()), 60000);
+    return () => clearInterval(t);
+  }, []);
+
+  return (
+    <span className="text-xs text-sky-400 dark:text-sky-500 font-mono">
+      {currentTime.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB
+    </span>
+  );
+}
+
+function MobileClockDisplay() {
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    // Update setiap 1 menit (60000ms) bukan 1 detik, buat hemat performa re-render
+    const t = setInterval(() => setCurrentTime(new Date()), 60000);
+    return () => clearInterval(t);
+  }, []);
+
+  return (
+    <p className="text-[10px] text-sky-500 dark:text-sky-400 font-mono">
+      {currentTime.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB
+    </p>
+  );
+}
+
 export default function PegawaiLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { data: session, status: sessionStatus } = useSession();
   const { theme, setTheme } = useTheme();
-  const [currentTime, setCurrentTime] = useState(new Date());
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -55,11 +88,6 @@ export default function PegawaiLayout({ children }: { children: React.ReactNode 
   }, [sessionStatus]);
 
   useEffect(() => {
-    const t = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(t);
-  }, []);
-
-  useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -82,10 +110,10 @@ export default function PegawaiLayout({ children }: { children: React.ReactNode 
 
   return (
     <div key={layoutKey} className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-sky-100 dark:from-gray-900 dark:via-gray-950 dark:to-slate-900">
-      {/* Floating bg orbs */}
+      {/* Floating bg orbs (Animasi pulse dihilangkan biar enteng) */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-sky-200/30 dark:bg-sky-800/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -bottom-40 -left-40 w-[400px] h-[400px] bg-sky-100/40 dark:bg-sky-900/10 rounded-full blur-3xl animate-pulse [animation-delay:1s]" />
+        <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-sky-200/30 dark:bg-sky-800/10 rounded-full blur-3xl opacity-70" />
+        <div className="absolute -bottom-40 -left-40 w-[400px] h-[400px] bg-sky-100/40 dark:bg-sky-900/10 rounded-full blur-3xl opacity-70" />
       </div>
 
       {/* Desktop top navbar */}
@@ -109,7 +137,7 @@ export default function PegawaiLayout({ children }: { children: React.ReactNode 
 
           {/* Right side */}
           <div className="flex items-center gap-3" ref={menuRef}>
-            <span className="text-xs text-sky-400 dark:text-sky-500 font-mono">{currentTime.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB</span>
+            <ClockDisplay />
             <div className="w-px h-5 bg-sky-200/50 dark:bg-gray-700/50" />
 
             {/* Notifikasi bell */}
@@ -200,7 +228,7 @@ export default function PegawaiLayout({ children }: { children: React.ReactNode 
               <Building2 className="w-4 h-4 text-white" />
             </div>
             <div>
-              <p className="text-[10px] text-sky-500 dark:text-sky-400 font-mono">{currentTime.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB</p>
+              <MobileClockDisplay />
               <p className="text-xs font-semibold text-sky-900 dark:text-white">{session?.user?.nama?.split(" ")[0]}</p>
             </div>
           </Link>

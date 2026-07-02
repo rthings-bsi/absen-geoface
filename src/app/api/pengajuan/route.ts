@@ -53,7 +53,7 @@ export async function GET(request: Request) {
       .where(whereClause)
       .orderBy(desc(pengajuan.created_at));
 
-    const data = rows.map(({ pegawai_nip, pegawai_nama, ...rest }) => ({
+    const data = rows.map(({ pegawai_nip, pegawai_nama, ...rest }: Record<string, unknown>) => ({
       ...rest,
       pegawai: {
         nip: pegawai_nip,

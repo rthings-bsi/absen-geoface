@@ -132,8 +132,8 @@ export default function MonitoringPage() {
               <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center mb-4">
                 <Users className="w-6 h-6 text-gray-400" />
               </div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Semua pegawai sudah {type === "terlambat" ? "tepat waktu" : "absen"}</p>
-              <p className="text-xs mt-1">Tidak ada data untuk ditampilkan</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Tidak ada pegawai yang {type === "terlambat" ? "terlambat" : "tidak absen"}</p>
+              <p className="text-xs mt-1">Data aman terkendali</p>
             </div>
           ) : (
             <div className="space-y-3">

@@ -16,8 +16,8 @@ export async function POST(request: Request) {
   // Gunakan timezone Asia/Jakarta (WIB)
   const now = new Date();
   const today = now.toLocaleDateString("sv-SE", { timeZone: "Asia/Jakarta" }); // YYYY-MM-DD
-  const timeStr = now.toLocaleTimeString("sv-SE", { timeZone: "Asia/Jakarta", hour: "2-digit", minute: "2-digit", hour12: false });
-  // Parse jam:menit WIB untuk perbandingan — hindari new Date() dari string lokal yang unreliable
+  // Pastikan ambil HH:mm dalam format 24 jam dengan zero-padding
+  const timeStr = now.toLocaleTimeString("en-GB", { timeZone: "Asia/Jakarta", hour: "2-digit", minute: "2-digit" }); 
   const [hh, mm] = timeStr.split(":").map(Number);
   const nowMinutes = hh * 60 + mm;
 
@@ -110,9 +110,12 @@ export async function POST(request: Request) {
       where: eq(jam_kerja.id, pegawaiData.id_jam_kerja),
     });
     if (jk) {
+      // 08:00
       const [jamH, jamM] = jk.jam_masuk.split(":").map(Number);
-      const jamToleransi = jamH * 60 + jamM + jk.toleransi_terlambat;
-      if (nowMinutes > jamToleransi) {
+      const limitMenit = jamH * 60 + jamM + jk.toleransi_terlambat;
+      
+      // Jika waktu absen (nowMinutes) LEBIH BESAR dari batas jam masuk + toleransi
+      if (nowMinutes > limitMenit) {
         status_masuk = "Terlambat";
       }
     }

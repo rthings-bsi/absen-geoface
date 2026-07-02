@@ -33,8 +33,8 @@ export async function GET(request: Request) {
     .orderBy(desc(absensi.tanggal));
 
   const rekap = {
-    hadir: data.filter((a) => a.status_masuk === "Hadir").length,
-    terlambat: data.filter((a) => a.status_masuk === "Terlambat").length,
+    hadir: data.filter((a: { status_masuk: string | null }) => a.status_masuk === "Hadir").length,
+    terlambat: data.filter((a: { status_masuk: string | null }) => a.status_masuk === "Terlambat").length,
     izin: 0,
     sakit: 0,
     cuti: 0,

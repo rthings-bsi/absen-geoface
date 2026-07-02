@@ -45,7 +45,7 @@ export async function GET(request: Request) {
 
   // Map untuk reshape
   const reshapedAbsensi = todayAbsensi.map(
-    ({ pegawai_nip, pegawai_nama, pegawai_role, ...rest }) => ({
+    ({ pegawai_nip, pegawai_nama, pegawai_role, ...rest }: Record<string, unknown>) => ({
       ...rest,
       pegawai: {
         nip: pegawai_nip,
@@ -55,18 +55,18 @@ export async function GET(request: Request) {
     })
   );
 
-  const absensiPegawaiIds = new Set(todayAbsensi.map((a) => a.id_pegawai));
+  const absensiPegawaiIds = new Set(todayAbsensi.map((a: any) => a.id_pegawai));
 
-  const terlambat = reshapedAbsensi.filter((a) => a.status_masuk === "Terlambat");
+  const terlambat = reshapedAbsensi.filter((a: { status_masuk: string | null }) => a.status_masuk === "Terlambat");
   const tidakAbsen = allPegawai
-    .filter((p) => !absensiPegawaiIds.has(p.id))
-    .map(({ jabatan_nama, ...rest }) => ({
+    .filter((p: any) => !absensiPegawaiIds.has(p.id))
+    .map(({ jabatan_nama, ...rest }: any) => ({
       ...rest,
       jabatan: jabatan_nama ? { nama: jabatan_nama } : null,
     }));
 
   return NextResponse.json({
-    hadir: reshapedAbsensi.filter((a) => a.status_masuk === "Hadir").length,
+    hadir: reshapedAbsensi.filter((a: { status_masuk: string | null }) => a.status_masuk === "Hadir").length,
     terlambat,
     tidak_absen: tidakAbsen,
     total_pegawai: allPegawai.length,

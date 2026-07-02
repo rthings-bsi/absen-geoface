@@ -42,11 +42,11 @@ export async function GET() {
       )
     );
 
-  const hadir = absensiThisMonth.filter((a) => a.status_masuk === "Hadir").length;
-  const terlambat = absensiThisMonth.filter((a) => a.status_masuk === "Terlambat").length;
-  const cuti = pengajuanThisMonth.filter((p) => p.jenis === "Cuti").length;
-  const izin = pengajuanThisMonth.filter((p) => p.jenis === "Izin").length;
-  const sakit = pengajuanThisMonth.filter((p) => p.jenis === "Sakit").length;
+  const hadir = absensiThisMonth.filter((a: { status_masuk: string | null }) => a.status_masuk === "Hadir").length;
+  const terlambat = absensiThisMonth.filter((a: { status_masuk: string | null }) => a.status_masuk === "Terlambat").length;
+  const cuti = pengajuanThisMonth.filter((p: { jenis: string | null }) => p.jenis === "Cuti").length;
+  const izin = pengajuanThisMonth.filter((p: { jenis: string | null }) => p.jenis === "Izin").length;
+  const sakit = pengajuanThisMonth.filter((p: { jenis: string | null }) => p.jenis === "Sakit").length;
 
   // Count working days (Monday-Friday) as total possible
   const totalWorkingDays = countWorkingDays(wibYear, wibMonth);
