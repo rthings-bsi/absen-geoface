@@ -51,7 +51,7 @@ function LoginForm() {
     </div>
   );
 
-  if (status === "loading" || (isLoading && status !== "authenticated")) return <LoadingSpinner />;
+  if (status === "loading" || isLoading) return <LoadingSpinner />;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
