@@ -74,7 +74,7 @@ const getIconForNotification = (judul: string) => {
 function AnimatedCounter({ value, duration = 800 }: { value: number; duration?: number }) {
   const [display, setDisplay] = useState(0);
   const prevValue = useRef(0);
-  const rafRef = useRef<number>();
+  const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
     const start = prevValue.current;
