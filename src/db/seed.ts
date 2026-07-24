@@ -60,7 +60,7 @@ async function seed() {
   console.log("Creating jabatan...");
   const [jabKepalaDinas] = await db.insert(jabatan).values({
     nama: "Kepala Dinas",
-    deskripsi: "Kepala Dinas Pemerintah Kota Karawang",
+    deskripsi: "Kepala Desa Kuta Mekar",
   }).returning();
 
   const [jabKabid] = await db.insert(jabatan).values({
@@ -84,7 +84,7 @@ async function seed() {
   // 6. Create struktur organisasi
   console.log("Creating struktur organisasi...");
   const [strukDinas] = await db.insert(struktur_organisasi).values({
-    nama: "Dinas Pemerintah Kota Karawang",
+    nama: "Pemerintah Desa Kuta Mekar",
     level: 0,
     urutan: 1,
   }).returning();
@@ -146,8 +146,8 @@ async function seed() {
   // 8. Create lokasi kantor
   console.log("Creating lokasi kantor...");
   await db.insert(lokasi_kantor).values({
-    nama_instansi: "Pemerintah Kota Karawang",
-    alamat: "Jl. Proklamasi No. 1, Karawang, Jawa Barat",
+    nama_instansi: "Pemerintah Desa Kuta Mekar",
+    alamat: "Jl. Proklamasi No. 1, Kuta Mekar, Karawang, Jawa Barat",
     latitude: "-6.2671",
     longitude: "107.2726",
     radius: 100,

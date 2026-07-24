@@ -11,7 +11,7 @@ export async function GET() {
   }
 
   const id_pegawai = session.user.id_pegawai;
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Jakarta" }); // YYYY-MM-DD
 
   // Get today's absensi
   const todayAbsensi = await db.query.absensi.findFirst({

@@ -57,16 +57,34 @@ export async function POST(request: Request) {
     const fileName = `foto-${targetId}-${Date.now()}.${ext}`;
     const key = `foto-profile/${fileName}`;
 
-    // Upload ke Supabase Storage via S3 API
-    await s3.send(new PutObjectCommand({
-      Bucket: "uploads",
-      Key: key,
-      Body: buffer,
-      ContentType: file.type,
-    }));
+    let publicUrl = "";
 
-    // URL public
-    const publicUrl = `https://xzsjurveiasdvteuvdgb.storage.supabase.co/storage/v1/object/public/uploads/${key}`;
+    // Bypass S3 if running locally with SQLite
+    if (process.env.DATABASE_URL?.startsWith("file:")) {
+      const fs = require("fs");
+      const path = require("path");
+      
+      const uploadDir = path.join(process.cwd(), "public", "uploads", "foto-profile");
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+      
+      const filePath = path.join(uploadDir, fileName);
+      fs.writeFileSync(filePath, buffer);
+      
+      publicUrl = `/uploads/foto-profile/${fileName}`;
+    } else {
+      // Upload ke Supabase Storage via S3 API
+      await s3.send(new PutObjectCommand({
+        Bucket: "uploads",
+        Key: key,
+        Body: buffer,
+        ContentType: file.type,
+      }));
+
+      // URL public
+      publicUrl = `https://xzsjurveiasdvteuvdgb.storage.supabase.co/storage/v1/object/public/uploads/${key}`;
+    }
 
     // Update database
     await db.update(pegawai)

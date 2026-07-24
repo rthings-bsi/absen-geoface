@@ -6,8 +6,8 @@ import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Sistem Absensi - Pemerintah Kota Karawang",
-  description: "Sistem Informasi Absensi Pemerintah Kota Karawang",
+  title: "Sistem Absensi - Pemerintah Desa Kuta Mekar",
+  description: "Sistem Informasi Absensi Pemerintah Desa Kuta Mekar",
 };
 
 export default async function RootLayout({

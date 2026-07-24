@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { absensi, pegawai } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, like, and } from "drizzle-orm";
 
 export async function GET(request: Request) {
   const session = await auth();
@@ -11,7 +11,29 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url);
-  const date = searchParams.get("tanggal") || searchParams.get("date") || new Date().toISOString().split("T")[0];
+  const periode = searchParams.get("periode") || "hari";
+
+  let dateFilter;
+  if (periode === "bulan") {
+    const bulan = searchParams.get("bulan");
+    if (bulan) {
+      dateFilter = like(absensi.tanggal, bulan + "-%");
+    } else {
+      const now = new Date();
+      const m = String(now.getMonth() + 1).padStart(2, "0");
+      dateFilter = like(absensi.tanggal, `${now.getFullYear()}-${m}-%`);
+    }
+  } else if (periode === "tahun") {
+    const tahun = searchParams.get("tahun");
+    if (tahun) {
+      dateFilter = like(absensi.tanggal, tahun + "-%");
+    } else {
+      dateFilter = like(absensi.tanggal, `${new Date().getFullYear()}-%`);
+    }
+  } else {
+    const date = searchParams.get("tanggal") || searchParams.get("date") || new Date().toISOString().split("T")[0];
+    dateFilter = eq(absensi.tanggal, date);
+  }
 
   const rows = await db
     .select({
@@ -37,7 +59,7 @@ export async function GET(request: Request) {
     })
     .from(absensi)
     .leftJoin(pegawai, eq(absensi.id_pegawai, pegawai.id))
-    .where(eq(absensi.tanggal, date));
+    .where(and(dateFilter));
 
   const data = rows.map(({ pegawai_nip, pegawai_nama, pegawai_id_jabatan, ...rest }: Record<string, unknown>) => ({
     ...rest,

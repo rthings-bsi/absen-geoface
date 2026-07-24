@@ -81,12 +81,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           )}
         >
           <div className={cn("flex items-center gap-2.5 min-w-0", collapsed && "lg:justify-center")}>
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-sm shadow-blue-200/40 dark:shadow-blue-900/30 flex items-center justify-center flex-shrink-0">
-              <span className="text-white text-sm font-bold">K</span>
+            <div className="w-9 h-9 rounded-xl bg-white shadow-sm shadow-blue-200/40 dark:shadow-blue-900/30 flex items-center justify-center flex-shrink-0 p-1">
+              <img src="/lambang-karawang.png" alt="Lambang Kabupaten Karawang" className="w-full h-full object-contain" />
             </div>
             <div className={cn("min-w-0", collapsed ? "lg:hidden" : "")}>
               <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">Admin Panel</p>
-              <p className="text-[10px] text-gray-400 dark:text-gray-500 truncate">Karawang</p>
+              <p className="text-[10px] text-gray-400 dark:text-gray-500 truncate">Kuta Mekar</p>
             </div>
           </div>
           {!collapsed && (

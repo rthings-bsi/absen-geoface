@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { absensi, pegawai } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, like, and } from "drizzle-orm";
 
 export async function GET(request: Request) {
   const session = await auth();
@@ -11,12 +11,58 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url);
-  const date = searchParams.get("tanggal") || searchParams.get("date") || new Date().toISOString().split("T")[0];
   const download = searchParams.get("download") === "true";
+  const periode = searchParams.get("periode") || "hari";
+
+  let dateFilter;
+  let dateLabel = "";
+  let filenameDate = "";
+
+  if (periode === "bulan") {
+    const bulan = searchParams.get("bulan");
+    if (bulan) {
+      dateFilter = like(absensi.tanggal, bulan + "-%");
+      filenameDate = bulan;
+      const [y, m] = bulan.split("-");
+      const monthName = new Date(parseInt(y), parseInt(m) - 1).toLocaleDateString("id-ID", { month: "long", year: "numeric" });
+      dateLabel = "Bulan " + monthName;
+    } else {
+      const now = new Date();
+      const m = String(now.getMonth() + 1).padStart(2, "0");
+      const ym = `${now.getFullYear()}-${m}`;
+      dateFilter = like(absensi.tanggal, `${ym}-%`);
+      filenameDate = ym;
+      dateLabel = "Bulan " + now.toLocaleDateString("id-ID", { month: "long", year: "numeric" });
+    }
+  } else if (periode === "tahun") {
+    const tahun = searchParams.get("tahun");
+    if (tahun) {
+      dateFilter = like(absensi.tanggal, tahun + "-%");
+      filenameDate = tahun;
+      dateLabel = "Tahun " + tahun;
+    } else {
+      const y = `${new Date().getFullYear()}`;
+      dateFilter = like(absensi.tanggal, `${y}-%`);
+      filenameDate = y;
+      dateLabel = "Tahun " + y;
+    }
+  } else {
+    const date = searchParams.get("tanggal") || searchParams.get("date") || new Date().toISOString().split("T")[0];
+    dateFilter = eq(absensi.tanggal, date);
+    filenameDate = date;
+    const dateObj = new Date(date);
+    dateLabel = dateObj.toLocaleDateString("id-ID", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  }
 
   const data = await db
     .select({
       id: absensi.id,
+      tanggal: absensi.tanggal,
       jam_masuk: absensi.jam_masuk,
       jam_pulang: absensi.jam_pulang,
       status_masuk: absensi.status_masuk,
@@ -25,16 +71,7 @@ export async function GET(request: Request) {
     })
     .from(absensi)
     .leftJoin(pegawai, eq(absensi.id_pegawai, pegawai.id))
-    .where(eq(absensi.tanggal, date));
-
-  // Format date to Indonesian format
-  const dateObj = new Date(date);
-  const formattedDate = dateObj.toLocaleDateString('id-ID', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
+    .where(and(dateFilter));
 
   try {
     const ReactPDF = await import("@react-pdf/renderer");
@@ -55,15 +92,16 @@ export async function GET(request: Request) {
       table: { display: "flex", flexDirection: "column", width: "100%", borderTopWidth: 1, borderLeftWidth: 1, borderColor: "#000" },
       row: { flexDirection: "row" },
       headerRow: { flexDirection: "row", backgroundColor: "#f3f4f6", fontWeight: "bold" },
-      cellHeader: { padding: 6, borderRightWidth: 1, borderBottomWidth: 1, borderColor: "#000", textAlign: "center" },
-      cellData: { padding: 6, borderRightWidth: 1, borderBottomWidth: 1, borderColor: "#000" },
+      cellHeader: { padding: 4, borderRightWidth: 1, borderBottomWidth: 1, borderColor: "#000", textAlign: "center", fontSize: 8 },
+      cellData: { padding: 4, borderRightWidth: 1, borderBottomWidth: 1, borderColor: "#000", fontSize: 8 },
 
-      colNo: { width: "8%" },
-      colNip: { width: "22%" },
-      colNama: { width: "30%" },
-      colMasuk: { width: "12%", textAlign: "center" },
-      colPulang: { width: "12%", textAlign: "center" },
-      colStatus: { width: "16%", textAlign: "center" },
+      colNo: { width: "5%" },
+      colTanggal: { width: "11%", textAlign: "center" },
+      colNip: { width: "23%" },
+      colNama: { width: "29%" },
+      colMasuk: { width: "10%", textAlign: "center" },
+      colPulang: { width: "10%", textAlign: "center" },
+      colStatus: { width: "12%", textAlign: "center" },
 
       signatureSection: { marginTop: 40, flexDirection: "row", justifyContent: "space-between" },
       signatureBlock: { width: "30%", textAlign: "center", flexDirection: "column" },
@@ -89,7 +127,7 @@ export async function GET(request: Request) {
         // JUDUL LAPORAN
         React.createElement(ReactPDF.View, { style: styles.reportTitleContainer },
           React.createElement(ReactPDF.Text, { style: styles.reportTitle }, "REKAPITULASI ABSENSI PEGAWAI"),
-          React.createElement(ReactPDF.Text, { style: styles.reportDate }, "Tanggal: " + formattedDate)
+          React.createElement(ReactPDF.Text, { style: styles.reportDate }, dateLabel)
         ),
 
         // TABEL
@@ -97,6 +135,7 @@ export async function GET(request: Request) {
           // Header
           React.createElement(ReactPDF.View, { style: styles.headerRow },
             React.createElement(ReactPDF.Text, { style: { ...styles.cellHeader, ...styles.colNo } }, "No"),
+            React.createElement(ReactPDF.Text, { style: { ...styles.cellHeader, ...styles.colTanggal } }, "Tanggal"),
             React.createElement(ReactPDF.Text, { style: { ...styles.cellHeader, ...styles.colNip } }, "NIP"),
             React.createElement(ReactPDF.Text, { style: { ...styles.cellHeader, ...styles.colNama } }, "Nama Pegawai"),
             React.createElement(ReactPDF.Text, { style: { ...styles.cellHeader, ...styles.colMasuk } }, "Masuk"),
@@ -107,8 +146,9 @@ export async function GET(request: Request) {
           ...data.map((a: any, i: number) =>
             React.createElement(ReactPDF.View, { key: i, style: styles.row },
               React.createElement(ReactPDF.Text, { style: { ...styles.cellData, ...styles.colNo, textAlign: "center" } }, String(i + 1)),
-              React.createElement(ReactPDF.Text, { style: { ...styles.cellData, ...styles.colNip } }, a.pegawai_nip || "-"),
-              React.createElement(ReactPDF.Text, { style: { ...styles.cellData, ...styles.colNama } }, a.pegawai_nama || "-"),
+              React.createElement(ReactPDF.Text, { style: { ...styles.cellData, ...styles.colTanggal } }, a.tanggal || "-"),
+              React.createElement(ReactPDF.Text, { style: { ...styles.cellData, ...styles.colNip, fontSize: 8 } }, a.pegawai_nip || "-"),
+              React.createElement(ReactPDF.Text, { style: { ...styles.cellData, ...styles.colNama, fontSize: 8 } }, a.pegawai_nama || "-"),
               React.createElement(ReactPDF.Text, { style: { ...styles.cellData, ...styles.colMasuk } }, a.jam_masuk?.slice(0, 5) || "-"),
               React.createElement(ReactPDF.Text, { style: { ...styles.cellData, ...styles.colPulang } }, a.jam_pulang?.slice(0, 5) || "-"),
               React.createElement(ReactPDF.Text, { style: { ...styles.cellData, ...styles.colStatus } }, a.status_masuk || "Alpa"),
@@ -155,9 +195,9 @@ export async function GET(request: Request) {
     // Jika parameter download=true, set sebagai attachment
     // Jika tidak, biarkan default inline agar bisa di-preview di browser
     if (download) {
-      headers.set("Content-Disposition", `attachment; filename="rekap-absensi-${date}.pdf"`);
+      headers.set("Content-Disposition", `attachment; filename="rekap-absensi-${filenameDate}.pdf"`);
     } else {
-      headers.set("Content-Disposition", `inline; filename="rekap-absensi-${date}.pdf"`);
+      headers.set("Content-Disposition", `inline; filename="rekap-absensi-${filenameDate}.pdf"`);
     }
 
     return new NextResponse(new Uint8Array(arrayBuffer), { headers });
@@ -176,11 +216,12 @@ export async function GET(request: Request) {
         </style>
       </head>
       <body>
-        <h1>Rekap Absensi - ${formattedDate}</h1>
+        <h1>Rekap Absensi - ${dateLabel}</h1>
         <table>
           <thead>
             <tr>
               <th>No</th>
+              <th>Tanggal</th>
               <th>NIP</th>
               <th>Nama</th>
               <th>Jam Masuk</th>
@@ -192,6 +233,7 @@ export async function GET(request: Request) {
             ${data.map((a: any, i: number) => `
               <tr>
                 <td>${i + 1}</td>
+                <td>${a.tanggal || "-"}</td>
                 <td>${a.pegawai_nip || "-"}</td>
                 <td>${a.pegawai_nama || "-"}</td>
                 <td>${a.jam_masuk?.slice(0, 5) || "-"}</td>
@@ -208,9 +250,9 @@ export async function GET(request: Request) {
     const headers = new Headers();
     headers.set("Content-Type", "text/html");
     if (download) {
-      headers.set("Content-Disposition", `attachment; filename="rekap-absensi-${date}.html"`);
+      headers.set("Content-Disposition", `attachment; filename="rekap-absensi-${filenameDate}.html"`);
     } else {
-      headers.set("Content-Disposition", `inline; filename="rekap-absensi-${date}.html"`);
+      headers.set("Content-Disposition", `inline; filename="rekap-absensi-${filenameDate}.html"`);
     }
 
     return new NextResponse(html, { headers });

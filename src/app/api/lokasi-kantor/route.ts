@@ -8,8 +8,8 @@ export async function GET() {
   const data = await db.query.lokasi_kantor.findFirst();
   if (!data) {
     return NextResponse.json({
-      nama: "Pemerintah Kota Karawang",
-      alamat: "Karawang, Jawa Barat",
+      nama: "Pemerintah Desa Kuta Mekar",
+      alamat: "Kuta Mekar, Karawang, Jawa Barat",
       latitude: "-6.2671",
       longitude: "107.2726",
       radius: 100,

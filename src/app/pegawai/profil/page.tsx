@@ -53,7 +53,7 @@ export default function ProfilPage() {
   const [registering, setRegistering] = useState(false);
   const [faceLoading, setFaceLoading] = useState(true);
   const [faceDescriptor, setFaceDescriptor] = useState<number[] | null>(null);
-  const { modelsLoaded, modelError, usingFallback, loadingProgress, loadModels, registerFace, detectFace } = useFaceRecognition();
+  const { modelsLoaded, modelError, loadingProgress, loadModels, registerFace, detectFace } = useFaceRecognition();
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -408,11 +408,7 @@ export default function ProfilPage() {
             <p className="text-xs text-sky-700 dark:text-sky-300">{loadingProgress}</p>
           </div>
         )}
-        {usingFallback && !faceLoading && !faceRegistered && (
-          <div className="flex items-center gap-2 p-2 rounded-lg bg-amber-50/80 dark:bg-amber-900/30 border border-amber-200/60 dark:border-amber-700/50">
-            <span className="text-[10px] text-amber-700 dark:text-amber-300">📱 Mode HP — menggunakan deteksi ringan</span>
-          </div>
-        )}
+        {/* Fallback indicator (hidden per request) */}
         {!faceLoading && !faceRegistered && modelError && (
           <div className="p-3 rounded-xl bg-red-50/80 border border-red-200/60 dark:bg-red-900/30 dark:border-red-800/50">
             <p className="text-xs font-medium text-red-700 dark:text-red-300">Gagal memuat model wajah</p>

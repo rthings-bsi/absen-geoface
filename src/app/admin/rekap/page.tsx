@@ -12,8 +12,8 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  FileSpreadsheet, FileText, Search, Calendar,
-  ChevronLeft, ChevronRight, Eye, X, Trash2, AlertTriangle,
+  FileSpreadsheet, FileText, Search,
+  ChevronLeft, ChevronRight, Eye, X, Trash2, AlertTriangle, Filter
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -41,7 +41,10 @@ export default function RekapPage() {
   const [data, setData] = useState<RekapItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [periode, setPeriode] = useState<"hari" | "bulan" | "tahun">("hari");
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
+  const [month, setMonth] = useState(new Date().toISOString().slice(0, 7));
+  const [year, setYear] = useState(String(new Date().getFullYear()));
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState<PaginationInfo>({
     page: 1, limit: 20, total: 0, totalPages: 0,
@@ -54,7 +57,15 @@ export default function RekapPage() {
     try {
       setLoading(true);
       const params = new URLSearchParams();
-      if (date) params.set("tanggal", date);
+      params.set("periode", periode);
+      if (periode === "hari") {
+        if (date) params.set("tanggal", date);
+      } else if (periode === "bulan") {
+        if (month) params.set("bulan", month);
+      } else if (periode === "tahun") {
+        if (year) params.set("tahun", year);
+      }
+
       if (search) params.set("search", search);
       params.set("page", String(page));
       params.set("limit", "20");
@@ -63,7 +74,26 @@ export default function RekapPage() {
       const json = await res.json();
 
       const items = Array.isArray(json) ? json : json.data || json.rekap || [];
-      setData(items.map((item: Record<string, unknown>) => ({
+
+      // Perform client side search filtering if the API does not do it yet
+      let filteredItems = items;
+      if (search) {
+        const query = search.toLowerCase();
+        filteredItems = items.filter(
+          (item: any) =>
+            (item.pegawai?.nama && item.pegawai.nama.toLowerCase().includes(query)) ||
+            (item.pegawai?.nip && item.pegawai.nip.toLowerCase().includes(query))
+        );
+      }
+
+      // Perform client side pagination
+      const limit = 20;
+      const total = filteredItems.length;
+      const totalPages = Math.ceil(total / limit);
+      const startIndex = (page - 1) * limit;
+      const paginatedItems = filteredItems.slice(startIndex, startIndex + limit);
+
+      setData(paginatedItems.map((item: Record<string, unknown>) => ({
         id: item.id as number,
         tanggal: item.tanggal as string,
         pegawai: (item as any).pegawai?.nama || "-",
@@ -76,30 +106,28 @@ export default function RekapPage() {
         foto_pulang: (item as any).foto_pulang || null,
       })));
 
-      if (json.pagination || json.meta) {
-        const p = json.pagination || json.meta;
-        setPagination({
-          page: p.page || 1,
-          limit: p.limit || 20,
-          total: p.total || 0,
-          totalPages: p.totalPages || p.total_page || 0,
-        });
-      } else {
-        setPagination((prev) => ({ ...prev, total: items.length }));
-      }
+      setPagination({
+        page,
+        limit,
+        total,
+        totalPages,
+      });
     } catch {
       toast.error("Gagal memuat data rekap");
     } finally {
       setLoading(false);
     }
-  }, [date, search, page]);
+  }, [periode, date, month, year, search, page]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
   const handleExportExcel = async () => {
     try {
       const params = new URLSearchParams();
-      if (date) params.set("tanggal", date);
+      params.set("periode", periode);
+      if (periode === "hari" && date) params.set("tanggal", date);
+      else if (periode === "bulan" && month) params.set("bulan", month);
+      else if (periode === "tahun" && year) params.set("tahun", year);
       if (search) params.set("search", search);
       const res = await fetch(`/api/admin/export/excel?${params}`);
       if (!res.ok) throw new Error("Gagal export");
@@ -107,7 +135,8 @@ export default function RekapPage() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `rekap-absensi-${date}.xlsx`;
+      const label = periode === "hari" ? date : periode === "bulan" ? month : year;
+      a.download = `rekap-absensi-${label}.xlsx`;
       a.click();
       URL.revokeObjectURL(url);
       toast.success("Export Excel berhasil");
@@ -118,12 +147,16 @@ export default function RekapPage() {
 
   const handleExportPdf = () => {
     const params = new URLSearchParams();
-    if (date) params.set("tanggal", date);
+    params.set("periode", periode);
+    if (periode === "hari" && date) params.set("tanggal", date);
+    else if (periode === "bulan" && month) params.set("bulan", month);
+    else if (periode === "tahun" && year) params.set("tahun", year);
     if (search) params.set("search", search);
-    
+
     // Set URL untuk preview di iframe
     const previewUrl = `/api/admin/export/pdf?${params}&download=false`;
-    setPdfPreviewModal({ url: previewUrl, date: date || "semua" });
+    const label = periode === "hari" ? date || "semua" : periode === "bulan" ? month || "semua" : year || "semua";
+    setPdfPreviewModal({ url: previewUrl, date: label });
   };
 
   const handleDownloadPdf = () => {
@@ -216,33 +249,81 @@ export default function RekapPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-            <div className="flex items-center">
-              <Input
-                type="date"
-                value={date}
-                onChange={(e) => { setDate(e.target.value); setPage(1); }}
-                className="w-44"
-              />
-            </div>
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Cari pegawai..."
-                value={search}
-                onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                className="pl-9"
-              />
-            </div>
-            <div className="flex items-center gap-2 ml-auto">
-              <Button variant="outline" size="sm" onClick={handleExportExcel}>
-                <FileSpreadsheet className="w-4 h-4" />
-                Excel
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleExportPdf}>
-                <FileText className="w-4 h-4" />
-                PDF
-              </Button>
+          <div className="flex flex-col gap-4">
+            {/* Periode toggle + filter and export */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              {/* Periode selector */}
+              <div className="flex items-center gap-2">
+                <Filter className="w-4 h-4 text-muted-foreground" />
+                <div className="flex rounded-lg border border-border overflow-hidden">
+                  {(["hari", "bulan", "tahun"] as const).map((p) => (
+                    <button
+                      key={p}
+                      onClick={() => { setPeriode(p); setPage(1); }}
+                      className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+                        periode === p
+                          ? "bg-blue-600 text-white"
+                          : "bg-background text-muted-foreground hover:bg-muted"
+                      }`}
+                    >
+                      {p === "hari" ? "Harian" : p === "bulan" ? "Bulanan" : "Tahunan"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Conditional date controls */}
+              {periode === "hari" && (
+                <div className="flex items-center">
+                  <Input
+                    type="date"
+                    value={date}
+                    onChange={(e) => { setDate(e.target.value); setPage(1); }}
+                    className="w-44"
+                  />
+                </div>
+              )}
+              {periode === "bulan" && (
+                <div className="flex items-center">
+                  <Input
+                    type="month"
+                    value={month}
+                    onChange={(e) => { setMonth(e.target.value); setPage(1); }}
+                    className="w-44"
+                  />
+                </div>
+              )}
+              {periode === "tahun" && (
+                <div className="flex items-center">
+                  <Input
+                    type="number"
+                    min={2020}
+                    max={2030}
+                    value={year}
+                    onChange={(e) => { setYear(e.target.value); setPage(1); }}
+                    className="w-28"
+                  />
+                </div>
+              )}
+              <div className="relative flex-1 max-w-sm">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Cari pegawai..."
+                  value={search}
+                  onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                  className="pl-9"
+                />
+              </div>
+              <div className="flex items-center gap-2 ml-auto">
+                <Button variant="outline" size="sm" onClick={handleExportExcel}>
+                  <FileSpreadsheet className="w-4 h-4" />
+                  Excel
+                </Button>
+                <Button variant="outline" size="sm" onClick={handleExportPdf}>
+                  <FileText className="w-4 h-4" />
+                  PDF
+                </Button>
+              </div>
             </div>
           </div>
         </CardHeader>

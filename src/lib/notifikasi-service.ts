@@ -88,14 +88,16 @@ export class NotifikasiService {
     pegawaiId: number,
     jenis: string,
     status: "Disetujui" | "Ditolak",
-    alasan?: string
+    alasan?: string,
+    pengajuanId?: number | string
   ) {
     const message =
       status === "Disetujui"
         ? `Pengajuan ${jenis} Anda telah disetujui`
         : `Pengajuan ${jenis} Anda ditolak${alasan ? `: ${alasan}` : ""}`;
 
-    await this.sendToPegawai(pegawaiId, `Pengajuan ${status}`, message, "/pegawai/pengajuan");
+    const link = pengajuanId ? `/pegawai/pengajuan/${pengajuanId}` : "/pegawai/pengajuan";
+    await this.sendToPegawai(pegawaiId, `Pengajuan ${status}`, message, link);
   }
 
   /**

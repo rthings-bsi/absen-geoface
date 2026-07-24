@@ -98,8 +98,10 @@ export async function POST(request: Request) {
   if (file && file.size > 0) {
     const buffer = Buffer.from(await file.arrayBuffer());
     const fileName = `${Date.now()}-${file.name}`;
-    const filePath = `public/uploads/struktur/${fileName}`;
-    const { writeFile } = await import("fs/promises");
+    const uploadDir = "public/uploads/struktur";
+    const { mkdir, writeFile } = await import("fs/promises");
+    await mkdir(uploadDir, { recursive: true });
+    const filePath = `${uploadDir}/${fileName}`;
     await writeFile(filePath, buffer);
     file_pendukung = `/uploads/struktur/${fileName}`;
   }

@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { pengajuan, pegawai, notifikasi } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { alias } from "drizzle-orm/pg-core";
+import { alias } from "drizzle-orm/sqlite-core";
 
 const approver = alias(pegawai, "approver");
 
@@ -110,7 +110,7 @@ export async function PUT(
       id_pengirim: session.user.id_pegawai,
       judul: `Pengajuan ${newStatus}`,
       pesan: `Pengajuan ${pengajuanData.jenis} Anda ${newStatus.toLowerCase()}${action === "reject" ? `: ${alasan_penolakan}` : ""}`,
-      link: "/pegawai/pengajuan",
+      link: `/pegawai/pengajuan/${id}`,
     });
   } catch (err) {
     console.error("Notification error:", err);

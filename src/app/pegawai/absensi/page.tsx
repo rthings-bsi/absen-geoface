@@ -79,7 +79,7 @@ export default function AbsensiPage() {
   const [gpsSkipped, setGpsSkipped] = useState(false);
   const [faceRetryCount, setFaceRetryCount] = useState(0);
   const [faceDescriptor, setFaceDescriptor] = useState<number[] | null>(null);
-  const { modelsLoaded, modelError, usingFallback, loadingProgress, loadModels, detectFace } = useFaceRecognition();
+  const { modelsLoaded, modelError, loadingProgress, loadModels, detectFace } = useFaceRecognition();
 
   const fetchOfficeLocation = useCallback(async () => {
     try {
@@ -557,12 +557,7 @@ export default function AbsensiPage() {
             </div>
           )}
 
-          {/* Mobile mode indicator */}
-          {usingFallback && (
-            <div className="flex items-center gap-2 p-2 rounded-lg bg-amber-50/80 dark:bg-amber-900/30 border border-amber-200/60 dark:border-amber-700/50">
-              <span className="text-[10px] text-amber-700 dark:text-amber-300">📱 Mode HP — deteksi wajah ringan</span>
-            </div>
-          )}
+          {/* Mobile mode indicator (hidden per user request) */}
 
           {/* Desktop: face status indicator */}
           {cameraActive && (

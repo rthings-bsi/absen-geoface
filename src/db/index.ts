@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { drizzle as drizzleSqlite } from "drizzle-orm/better-sqlite3";
@@ -12,6 +13,13 @@ let db: any;
 if (connectionString.startsWith("file:")) {
   // SQLite local
   const sqlitePath = connectionString.replace("file:", "");
+  // Pastikan folder data/ ada
+  const fs = require("fs");
+  const path = require("path");
+  const dir = path.dirname(sqlitePath);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
   const sqliteDb = new Database(sqlitePath);
   db = drizzleSqlite(sqliteDb, { schema });
 } else {

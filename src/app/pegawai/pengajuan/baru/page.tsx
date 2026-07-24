@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -25,6 +25,8 @@ export default function PengajuanBaruPage() {
   const [file, setFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const tanggalMulaiRef = useRef<HTMLInputElement>(null);
+  const tanggalSelesaiRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -161,16 +163,19 @@ export default function PengajuanBaruPage() {
                 Tanggal Mulai <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
-                <CalendarDays className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-sky-400 pointer-events-none dark:text-sky-500" />
                 <input
+                  ref={tanggalMulaiRef}
                   type="date"
                   value={tanggalMulai}
                   onChange={(e) => setTanggalMulai(e.target.value)}
                   className={cn(
-                    "w-full rounded-xl border pl-10 pr-3.5 py-2.5 text-sm bg-white/80 text-sky-900 focus:outline-none focus:ring-2 focus:ring-sky-400/30 focus:border-sky-400 transition-all dark:bg-gray-800/80 dark:text-sky-100 dark:focus:ring-sky-500/30 dark:focus:border-sky-500 [color-scheme:dark]",
+                    "w-full rounded-xl border pl-3.5 pr-10 py-3.5 text-sm bg-white/80 text-sky-900 focus:outline-none focus:ring-2 focus:ring-sky-400/30 focus:border-sky-400 transition-all cursor-pointer dark:bg-gray-800/80 dark:text-sky-100 dark:focus:ring-sky-500/30 dark:focus:border-sky-500 [color-scheme:dark] min-h-[52px]",
                     errors.tanggalMulai ? "border-rose-300 dark:border-rose-700" : "border-sky-200/60 dark:border-gray-700"
                   )}
                 />
+                <button type="button" onClick={() => tanggalMulaiRef.current?.showPicker()} className="absolute right-3 top-1/2 -translate-y-1/2 p-1 cursor-pointer text-sky-400 hover:text-sky-600 dark:text-sky-500 dark:hover:text-sky-300 transition-colors">
+                  <CalendarDays className="w-5 h-5" />
+                </button>
               </div>
               {errors.tanggalMulai && (
                 <p className="text-[10px] font-semibold text-rose-500 mt-1 dark:text-rose-400">
@@ -184,17 +189,20 @@ export default function PengajuanBaruPage() {
                 Tanggal Selesai
               </label>
               <div className="relative">
-                <CalendarDays className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-sky-400 pointer-events-none dark:text-sky-500" />
                 <input
+                  ref={tanggalSelesaiRef}
                   type="date"
                   value={tanggalSelesai}
                   onChange={(e) => setTanggalSelesai(e.target.value)}
                   min={tanggalMulai || undefined}
                   className={cn(
-                    "w-full rounded-xl border pl-10 pr-3.5 py-2.5 text-sm bg-white/80 text-sky-900 focus:outline-none focus:ring-2 focus:ring-sky-400/30 focus:border-sky-400 transition-all dark:bg-gray-800/80 dark:text-sky-100 dark:focus:ring-sky-500/30 dark:focus:border-sky-500 [color-scheme:dark]",
+                    "w-full rounded-xl border pl-3.5 pr-10 py-3.5 text-sm bg-white/80 text-sky-900 focus:outline-none focus:ring-2 focus:ring-sky-400/30 focus:border-sky-400 transition-all cursor-pointer dark:bg-gray-800/80 dark:text-sky-100 dark:focus:ring-sky-500/30 dark:focus:border-sky-500 [color-scheme:dark] min-h-[52px]",
                     errors.tanggalSelesai ? "border-rose-300 dark:border-rose-700" : "border-sky-200/60 dark:border-gray-700"
                   )}
                 />
+                <button type="button" onClick={() => tanggalSelesaiRef.current?.showPicker()} className="absolute right-3 top-1/2 -translate-y-1/2 p-1 cursor-pointer text-sky-400 hover:text-sky-600 dark:text-sky-500 dark:hover:text-sky-300 transition-colors">
+                  <CalendarDays className="w-5 h-5" />
+                </button>
               </div>
               {errors.tanggalSelesai && (
                 <p className="text-[10px] font-semibold text-rose-500 mt-1 dark:text-rose-400">
