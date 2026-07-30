@@ -74,8 +74,8 @@ export default function RiwayatPage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen relative font-['Inter',sans-serif] text-on-surface selection:bg-primary/20 bg-[#f8fafc] dark:bg-[#020617]">
-      <main className="max-w-[1440px] mx-auto px-4 md:px-6 lg:px-8 py-4 md:py-8 pb-32 md:pb-12">
+    <>
+      <main className="max-w-[1440px] mx-auto px-4 md:px-6 lg:px-8 py-4 md:py-8 pb-28 md:pb-8">
         
         {/* Header */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 mb-6 border border-slate-200 dark:border-slate-800 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-none flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -242,6 +242,6 @@ export default function RiwayatPage() {
           </div>
         )}
       </main>
-    </div>
+    </>
   );
 }

@@ -7,7 +7,11 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { MapPin, Save, Crosshair, Search } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import { MapPin, Save, Crosshair, Search, Building2, Navigation, Radius, Clock, FileText } from "lucide-react";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
 
@@ -183,9 +187,11 @@ export default function LokasiKantorPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">Lokasi Kantor</h1>
-        <p className="text-muted-foreground">Pengaturan lokasi kantor untuk absensi berbasis GPS</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">Lokasi Kantor</h1>
+          <p className="text-muted-foreground">Pengaturan lokasi kantor untuk absensi berbasis GPS</p>
+        </div>
       </div>
 
       <Card className="border-white/40 dark:border-gray-800/50 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl shadow-sm">
@@ -200,47 +206,49 @@ export default function LokasiKantorPage() {
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Nama Lokasi</label>
-              <Input
-                value={form.nama}
-                onChange={(e) => setForm({ ...form, nama: e.target.value })}
-                placeholder="Nama kantor"
-              />
+        <CardContent className="space-y-6">
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <Building2 className="w-4 h-4 text-blue-500" />
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Informasi Lokasi</h3>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Radius Absensi (meter)</label>
-              <Input
-                type="number"
-                value={form.radius}
-                onChange={(e) => setForm({ ...form, radius: parseInt(e.target.value) || 0 })}
-                min={1}
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="nama_lokasi">Nama Lokasi</Label>
+                <div className="relative">
+                  <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input id="nama_lokasi" value={form.nama} onChange={(e) => setForm({ ...form, nama: e.target.value })} placeholder="Nama kantor" className="pl-9" />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="radius">Radius Absensi (meter)</Label>
+                <div className="relative">
+                  <Radius className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input id="radius" type="number" value={form.radius} onChange={(e) => setForm({ ...form, radius: parseInt(e.target.value) || 0 })} min={1} className="pl-9" />
+                </div>
+              </div>
+            </div>
+            <div className="mt-4 space-y-2">
+              <Label htmlFor="alamat_lokasi">Alamat</Label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                <textarea id="alamat_lokasi" className="flex min-h-[80px] w-full rounded-xl border border-gray-200/60 dark:border-gray-700/50 bg-white/50 dark:bg-gray-900/50 px-3 py-2 text-sm ring-offset-background placeholder:text-gray-400 dark:placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:border-blue-500 transition-colors resize-none shadow-sm pl-9" value={form.alamat} onChange={(e) => setForm({ ...form, alamat: e.target.value })} placeholder="Alamat lengkap kantor" />
+              </div>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Alamat</label>
-            <textarea
-              className="flex min-h-[80px] w-full rounded-xl border border-input bg-background px-3 py-2 text-sm"
-              value={form.alamat}
-              onChange={(e) => setForm({ ...form, alamat: e.target.value })}
-              placeholder="Alamat lengkap kantor"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium">Titik Lokasi (Maps)</label>
-              <Button type="button" variant="outline" size="sm" onClick={locateUser}>
-                <Crosshair className="w-4 h-4 mr-2" />
-                Gunakan Lokasi Saat Ini
-              </Button>
+          <div className="border-t border-gray-100 dark:border-gray-800 pt-5">
+            <div className="flex items-center gap-2 mb-3">
+              <Navigation className="w-4 h-4 text-blue-500" />
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Titik Koordinat</h3>
+              <div className="ml-auto">
+                <Button type="button" variant="outline" size="sm" onClick={locateUser}>
+                  <Crosshair className="w-4 h-4 mr-2" />
+                  Gunakan Lokasi Saat Ini
+                </Button>
+              </div>
             </div>
-
-            <div className="flex gap-2">
+            <div className="flex gap-2 mb-4">
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -251,49 +259,45 @@ export default function LokasiKantorPage() {
                 <Search className="w-4 h-4" />
               </Button>
             </div>
-
             <MapPicker
               latitude={Number(form.latitude) || -6.2088}
               longitude={Number(form.longitude) || 106.8456}
               radius={form.radius}
               onChange={(lat, lng) => setForm(prev => ({ ...prev, latitude: String(lat), longitude: String(lng) }))}
             />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Latitude</label>
-              <Input
-                value={form.latitude}
-                onChange={(e) => setForm({ ...form, latitude: e.target.value })}
-                placeholder="-6.2088"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Longitude</label>
-              <Input
-                value={form.longitude}
-                onChange={(e) => setForm({ ...form, longitude: e.target.value })}
-                placeholder="106.8456"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <div className="space-y-2">
+                <Label htmlFor="latitude">Latitude</Label>
+                <Input id="latitude" value={form.latitude} onChange={(e) => setForm({ ...form, latitude: e.target.value })} placeholder="-6.2088" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="longitude">Longitude</Label>
+                <Input id="longitude" value={form.longitude} onChange={(e) => setForm({ ...form, longitude: e.target.value })} placeholder="106.8456" />
+              </div>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Jam Kerja Default</label>
-            <select
-              className="flex h-10 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm"
-              value={form.jam_kerja_id}
-              onChange={(e) => setForm({ ...form, jam_kerja_id: e.target.value })}
-            >
-              <option value="">Pilih Jam Kerja</option>
-              {jamKerjaList.map((jk) => (
-                <option key={jk.id} value={jk.id}>{jk.nama}</option>
-              ))}
-            </select>
+          <div className="border-t border-gray-100 dark:border-gray-800 pt-5">
+            <div className="flex items-center gap-2 mb-3">
+              <Clock className="w-4 h-4 text-blue-500" />
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Pengaturan Absensi</h3>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="jam_kerja">Jam Kerja Default</Label>
+              <Select value={form.jam_kerja_id} onValueChange={(v) => setForm({ ...form, jam_kerja_id: v })}>
+                <SelectTrigger id="jam_kerja">
+                  <SelectValue placeholder="Pilih Jam Kerja" />
+                </SelectTrigger>
+                <SelectContent>
+                  {jamKerjaList.map((jk) => (
+                    <SelectItem key={jk.id} value={String(jk.id)}>{jk.nama}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
-          <div className="flex justify-end pt-2">
+          <div className="flex justify-end pt-2 border-t border-gray-100 dark:border-gray-800">
             <Button onClick={handleSave} disabled={saving}>
               <Save className="w-4 h-4" />
               {saving ? "Menyimpan..." : "Simpan"}

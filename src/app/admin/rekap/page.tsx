@@ -204,7 +204,7 @@ export default function RekapPage() {
           <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">Rekap Absensi</h1>
           <p className="text-muted-foreground">Rekapitulasi data absensi pegawai</p>
         </div>
-        <Card>
+        <Card className="border-white/40 dark:border-gray-800/50 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl shadow-sm">
           <CardHeader><Skeleton className="h-5 w-32" /></CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -214,28 +214,6 @@ export default function RekapPage() {
             </div>
           </CardContent>
         </Card>
-
-      {/* PDF Preview Modal */}
-      <Dialog open={!!pdfPreviewModal} onOpenChange={(open) => !open && setPdfPreviewModal(null)}>
-        <DialogContent className="max-w-4xl w-[90vw] h-[90vh] flex flex-col">
-          <DialogHeader className="flex flex-row items-center justify-between pb-2 border-b">
-            <DialogTitle>Preview Rekap Absensi PDF</DialogTitle>
-            <Button size="sm" onClick={handleDownloadPdf} className="ml-auto mr-4">
-              <FileText className="w-4 h-4 mr-2" />
-              Download PDF
-            </Button>
-          </DialogHeader>
-          <div className="flex-1 w-full bg-muted rounded-md overflow-hidden mt-2">
-            {pdfPreviewModal?.url && (
-              <iframe 
-                src={pdfPreviewModal.url} 
-                className="w-full h-full border-0" 
-                title="PDF Preview" 
-              />
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
       </div>
     );
   }
@@ -244,10 +222,10 @@ export default function RekapPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">Rekap Absensi</h1>
-        <p className="text-muted-foreground">Rekapitulasi data absensi pegawai</p>
+        <p className="text-gray-500 dark:text-gray-400 mt-0.5">Rekapitulasi data absensi pegawai</p>
       </div>
 
-      <Card>
+      <Card className="border-white/40 dark:border-gray-800/50 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl shadow-sm">
         <CardHeader>
           <div className="flex flex-col gap-4">
             {/* Periode toggle + filter and export */}
@@ -338,7 +316,7 @@ export default function RekapPage() {
             </div>
           ) : (
             <>
-              <div className="overflow-x-auto">
+              <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-gray-100 dark:border-gray-800">
@@ -409,6 +387,72 @@ export default function RekapPage() {
                 </table>
               </div>
 
+              <div className="md:hidden space-y-3">
+                {data.map((item) => (
+                  <div
+                    key={item.id}
+                    className="p-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-gray-900/50 space-y-3"
+                  >
+                    <div className="flex justify-between items-start gap-2">
+                      <div>
+                        <p className="font-semibold text-sm text-gray-950 dark:text-white">{item.pegawai}</p>
+                        <p className="font-mono text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{item.nip}</p>
+                      </div>
+                      {statusBadge(item.status)}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-xs border-t border-gray-100/50 dark:border-gray-800/50 pt-2.5">
+                      <div>
+                        <span className="text-[10px] text-gray-400 dark:text-gray-500 block">Tanggal</span>
+                        <span className="font-medium text-gray-700 dark:text-gray-300">{item.tanggal}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-gray-400 dark:text-gray-500 block">Keterangan</span>
+                        <span className="text-gray-700 dark:text-gray-300 italic">{item.keterangan || "-"}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-gray-400 dark:text-gray-500 block">Jam Masuk</span>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <span className="font-mono bg-gray-50 dark:bg-gray-800/30 px-1.5 py-0.5 rounded text-[11px]">{item.jam_masuk || "-"}</span>
+                          {item.jam_masuk && (
+                            <button
+                              onClick={() => setPhotoModal({ src: item.foto_masuk || "", label: "Foto Masuk" })}
+                              className="text-gray-400 hover:text-blue-500"
+                            >
+                              <Eye className="h-3.5 w-3.5" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-gray-400 dark:text-gray-500 block">Jam Keluar</span>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <span className="font-mono bg-gray-50 dark:bg-gray-800/30 px-1.5 py-0.5 rounded text-[11px]">{item.jam_keluar || "-"}</span>
+                          {item.jam_keluar && (
+                            <button
+                              onClick={() => setPhotoModal({ src: item.foto_pulang || "", label: "Foto Pulang" })}
+                              className="text-gray-400 hover:text-blue-500"
+                            >
+                              <Eye className="h-3.5 w-3.5" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end border-t border-gray-100/50 dark:border-gray-800/50 pt-2">
+                      <button
+                        onClick={() => setDeleteModal({ id: item.id, label: `${item.pegawai} (${item.tanggal})` })}
+                        className="text-xs text-red-500 hover:text-red-600 dark:text-red-400 flex items-center gap-1 bg-red-50 dark:bg-red-950/30 px-2 py-1 rounded-md"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        Hapus
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
               {pagination.totalPages > 1 && (
                 <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
                   <p className="text-sm text-muted-foreground">
@@ -444,20 +488,20 @@ export default function RekapPage() {
 
       {/* PDF Preview Modal */}
       <Dialog open={!!pdfPreviewModal} onOpenChange={(open) => !open && setPdfPreviewModal(null)}>
-        <DialogContent className="max-w-4xl w-[90vw] h-[90vh] flex flex-col">
+        <DialogContent className="max-w-4xl w-[95vw] sm:w-[90vw] h-[90vh] flex flex-col p-4 sm:p-6">
           <DialogHeader className="flex flex-row items-center justify-between pb-2 border-b">
-            <DialogTitle>Preview Rekap Absensi PDF</DialogTitle>
-            <Button size="sm" onClick={handleDownloadPdf} className="ml-auto mr-4">
-              <FileText className="w-4 h-4 mr-2" />
-              Download PDF
+            <DialogTitle>Preview PDF</DialogTitle>
+            <Button size="sm" onClick={handleDownloadPdf} className="ml-auto">
+              <FileText className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Download</span>
             </Button>
           </DialogHeader>
           <div className="flex-1 w-full bg-muted rounded-md overflow-hidden mt-2">
             {pdfPreviewModal?.url && (
-              <iframe 
-                src={pdfPreviewModal.url} 
-                className="w-full h-full border-0" 
-                title="PDF Preview" 
+              <iframe
+                src={pdfPreviewModal.url}
+                className="w-full h-full border-0"
+                title="PDF Preview"
               />
             )}
           </div>
@@ -465,17 +509,19 @@ export default function RekapPage() {
       </Dialog>
 
       <Dialog open={!!photoModal} onOpenChange={(open) => !open && setPhotoModal(null)}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-2xl p-2 sm:p-6">
           <DialogHeader>
             <DialogTitle>{photoModal?.label}</DialogTitle>
           </DialogHeader>
           <div className="flex justify-center">
             {photoModal?.src ? (
-              <img
-                src={photoModal.src}
-                alt={photoModal.label}
-                className="max-w-full max-h-80 rounded-lg object-contain"
-              />
+              <div className="relative w-full max-h-[60vh] overflow-hidden rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                <img
+                  src={photoModal.src}
+                  alt={photoModal.label}
+                  className="w-full h-full object-contain max-h-[60vh]"
+                />
+              </div>
             ) : (
               <div className="flex flex-col items-center gap-2 py-8 text-muted-foreground">
                 <X className="h-8 w-8" />

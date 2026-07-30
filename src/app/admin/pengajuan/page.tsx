@@ -174,9 +174,11 @@ export default function PengajuanPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">Pengajuan</h1>
-        <p className="text-muted-foreground">Kelola pengajuan izin, sakit, cuti</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">Pengajuan</h1>
+          <p className="text-muted-foreground">Kelola pengajuan izin, sakit, cuti</p>
+        </div>
       </div>
 
       <Card className="border-white/40 dark:border-gray-800/50 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl shadow-sm">
@@ -302,15 +304,15 @@ export default function PengajuanPage() {
             <DialogDescription>Informasi lengkap pengajuan</DialogDescription>
           </DialogHeader>
           {selected && (
-            <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-3 overflow-y-auto max-h-[55vh] px-1 -mx-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <p className="text-xs text-muted-foreground">Pegawai</p>
                   <p className="text-sm font-medium">{selected.pegawai}</p>
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">NIP</p>
-                  <p className="text-sm font-medium">{selected.nip}</p>
+                  <p className="text-sm font-medium break-all">{selected.nip}</p>
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">Jenis</p>
@@ -371,10 +373,10 @@ export default function PengajuanPage() {
             <DialogTitle>Tolak Pengajuan</DialogTitle>
             <DialogDescription>Masukkan alasan penolakan</DialogDescription>
           </DialogHeader>
-          <div className="space-y-2 py-2">
-            <label className="text-sm font-medium">Alasan Penolakan</label>
+          <div className="space-y-2 py-2 overflow-y-auto max-h-[70vh]">
+            <label className="text-sm font-medium text-gray-900 dark:text-gray-100">Alasan Penolakan</label>
             <textarea
-              className="flex min-h-[100px] w-full rounded-xl border border-input bg-background px-3 py-2 text-sm"
+              className="flex min-h-[100px] w-full rounded-xl border border-gray-200/60 dark:border-gray-700/50 bg-white/50 dark:bg-gray-900/50 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:border-blue-500 transition-colors resize-none shadow-sm"
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               placeholder="Alasan mengapa pengajuan ditolak..."

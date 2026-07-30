@@ -109,7 +109,7 @@ export default function MonitoringPage() {
     const color = type === "terlambat" ? "text-amber-600 bg-amber-50 dark:bg-amber-900/30 border-amber-200/50" : "text-red-600 bg-red-50 dark:bg-red-900/30 border-red-200/50";
 
     return (
-      <Card className="border-white/40 dark:border-gray-800/50 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl shadow-sm overflow-hidden flex flex-col h-[500px]">
+      <Card className="border-white/40 dark:border-gray-800/50 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl shadow-sm overflow-hidden flex flex-col max-h-[500px] min-h-[300px] h-auto">
         <CardHeader className="pb-3 border-b border-gray-100 dark:border-gray-800/50 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -143,20 +143,20 @@ export default function MonitoringPage() {
                   className="flex items-center justify-between p-3.5 rounded-xl bg-white/50 dark:bg-gray-800/30 border border-gray-100 dark:border-gray-800/50 hover:bg-white dark:hover:bg-gray-800/60 transition-all duration-300 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] animate-fade-slide-up group"
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-400 to-slate-500 flex items-center justify-center flex-shrink-0 ring-2 ring-white dark:ring-gray-900 shadow-sm">
                       <span className="text-white text-xs font-bold">
                         {item.pegawai?.charAt(0) || "?"}
                       </span>
                     </div>
-                    <div>
-                      <p className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{item.pegawai}</p>
-                      <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400 mt-0.5">
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">{item.pegawai}</p>
+                      <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400 mt-0.5 truncate">
                         <span className="font-mono bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-[10px]">{item.nip}</span> {item.jabatan ? `• ${item.jabatan}` : ""}
                       </p>
                     </div>
                   </div>
-                  <div className="text-right">
+                  <div className="text-right flex-shrink-0 ml-2">
                     {type === "terlambat" && item.durasi_terlambat ? (
                       <p className="text-xs font-bold text-amber-600 bg-amber-50 dark:bg-amber-950/30 px-2 py-1 rounded-md inline-block mb-1 border border-amber-100 dark:border-amber-900/50">
                         {item.durasi_terlambat} mnt

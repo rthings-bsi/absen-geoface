@@ -8,12 +8,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
 import {
-  Plus, Pencil, Trash2, Clock, Search,
+  Plus, Pencil, Trash2, Clock, Search, Calendar, Timer, FileText, Sun, Moon,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -215,145 +219,199 @@ export default function JamKerjaPage() {
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-gray-100 dark:border-gray-800">
-                    <th className="text-left py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Nama Jadwal</th>
-                    <th className="text-left py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Jam Masuk</th>
-                    <th className="text-left py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Jam Keluar</th>
-                    <th className="text-left py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Toleransi</th>
-                    <th className="text-left py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Hari Kerja</th>
-                    <th className="text-left py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Status</th>
-                    <th className="text-right py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map((item, index) => (
-                    <tr
-                      key={item.id}
-                      className="border-b border-gray-50 dark:border-gray-800/50 hover:bg-blue-50/30 dark:hover:bg-blue-900/10 transition-colors group animate-fade-slide-up"
-                      style={{ animationDelay: `${index * 50}ms` }}
-                    >
-                      <td className="py-3.5 px-3 font-semibold text-gray-800 dark:text-gray-200">{item.nama}</td>
-                      <td className="py-3.5 px-3 font-mono text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/30 rounded-md my-1 inline-flex items-center justify-center min-w-[60px]">{item.jam_masuk}</td>
-                      <td className="py-3.5 px-3 font-mono text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/30 rounded-md my-1 inline-flex items-center justify-center min-w-[60px] ml-2">{item.jam_keluar}</td>
-                      <td className="py-3.5 px-3 text-gray-600 dark:text-gray-400">{item.toleransi_terlambat} <span className="text-[10px] text-gray-400">mnt</span></td>
-                      <td className="py-3.5 px-3 text-gray-500 dark:text-gray-400 capitalize">{item.hari_kerja.replace("-", " - ")}</td>
-                      <td className="py-3.5 px-3">
-                        <Badge variant={item.aktif ? "success" : "secondary"} className={item.aktif ? "" : "text-gray-500 dark:text-gray-400"}>
-                          {item.aktif ? "Aktif" : "Nonaktif"}
-                        </Badge>
-                      </td>
-                      <td className="py-3.5 px-3 text-right">
-                        <div className="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            onClick={() => openEdit(item)}
-                            className="text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:text-blue-400 dark:hover:bg-blue-900/30 transition-colors"
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            onClick={() => handleDelete(item.id)}
-                            className="text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-400 dark:hover:bg-red-900/30 transition-colors"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </td>
+            <>
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-100 dark:border-gray-800">
+                      <th className="text-left py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Nama Jadwal</th>
+                      <th className="text-left py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Jam Masuk</th>
+                      <th className="text-left py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Jam Keluar</th>
+                      <th className="text-left py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Toleransi</th>
+                      <th className="text-left py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Hari Kerja</th>
+                      <th className="text-left py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Status</th>
+                      <th className="text-right py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Aksi</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {filtered.map((item, index) => (
+                      <tr
+                        key={item.id}
+                        className="border-b border-gray-50 dark:border-gray-800/50 hover:bg-blue-50/30 dark:hover:bg-blue-900/10 transition-colors group animate-fade-slide-up"
+                        style={{ animationDelay: `${index * 50}ms` }}
+                      >
+                        <td className="py-3.5 px-3 font-semibold text-gray-800 dark:text-gray-200">{item.nama}</td>
+                        <td className="py-3.5 px-3"><span className="font-mono text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/30 rounded-md inline-block px-2 py-1">{item.jam_masuk}</span></td>
+                        <td className="py-3.5 px-3"><span className="font-mono text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/30 rounded-md inline-block px-2 py-1">{item.jam_keluar}</span></td>
+                        <td className="py-3.5 px-3 text-gray-600 dark:text-gray-400">{item.toleransi_terlambat} <span className="text-[10px] text-gray-400">mnt</span></td>
+                        <td className="py-3.5 px-3 text-gray-500 dark:text-gray-400 capitalize">{item.hari_kerja.replace("-", " - ")}</td>
+                        <td className="py-3.5 px-3">
+                          <Badge variant={item.aktif ? "success" : "secondary"} className={item.aktif ? "" : "text-gray-500 dark:text-gray-400"}>
+                            {item.aktif ? "Aktif" : "Nonaktif"}
+                          </Badge>
+                        </td>
+                        <td className="py-3.5 px-3 text-right">
+                          <div className="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              onClick={() => openEdit(item)}
+                              className="text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:text-blue-400 dark:hover:bg-blue-900/30 transition-colors"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              onClick={() => handleDelete(item.id)}
+                              className="text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-400 dark:hover:bg-red-900/30 transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="md:hidden space-y-2">
+                {filtered.map((item) => (
+                  <div
+                    key={item.id}
+                    className="group p-3.5 rounded-xl border border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-gray-900/50 hover:border-blue-100 dark:hover:border-blue-900/50 transition-all"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-blue-500" />
+                        <span className="font-semibold text-sm text-gray-950 dark:text-white">{item.nama}</span>
+                      </div>
+                      <Badge variant={item.aktif ? "success" : "secondary"} className="text-[10px]">
+                        {item.aktif ? "Aktif" : "Nonaktif"}
+                      </Badge>
+                    </div>
+                    <div className="grid grid-cols-2 gap-y-1.5 text-xs">
+                      <div>
+                        <span className="text-[10px] text-gray-400 dark:text-gray-500 block">Jam Masuk</span>
+                        <span className="font-mono font-medium text-gray-700 dark:text-gray-300">{item.jam_masuk}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-gray-400 dark:text-gray-500 block">Jam Keluar</span>
+                        <span className="font-mono font-medium text-gray-700 dark:text-gray-300">{item.jam_keluar}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-gray-400 dark:text-gray-500 block">Toleransi</span>
+                        <span className="text-gray-700 dark:text-gray-300">{item.toleransi_terlambat} mnt</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-gray-400 dark:text-gray-500 block">Hari Kerja</span>
+                        <span className="capitalize text-gray-700 dark:text-gray-300">{item.hari_kerja.replace("-", " - ")}</span>
+                      </div>
+                    </div>
+                    <div className="flex justify-end gap-1 mt-2 pt-2 border-t border-gray-100/50 dark:border-gray-800/50">
+                      <Button variant="ghost" size="icon-sm" onClick={() => openEdit(item)} className="text-gray-400">
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon-sm" onClick={() => handleDelete(item.id)} className="text-gray-400">
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>{editing ? "Edit Jam Kerja" : "Tambah Jam Kerja"}</DialogTitle>
-            <DialogDescription>
-              {editing ? "Ubah jadwal jam kerja" : "Masukkan jadwal jam kerja baru"}
-            </DialogDescription>
+        <DialogContent className="max-w-2xl p-0 gap-0">
+          <DialogHeader className="px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm">
+                <Clock className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-xl">{editing ? "Edit Jam Kerja" : "Tambah Jam Kerja"}</DialogTitle>
+                <DialogDescription className="text-sm mt-0.5">
+                  {editing ? "Ubah jadwal jam kerja" : "Masukkan jadwal jam kerja baru"}
+                </DialogDescription>
+              </div>
+            </div>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Nama Jadwal</label>
-              <Input
-                value={form.nama}
-                onChange={(e) => setForm({ ...form, nama: e.target.value })}
-                placeholder="Contoh: Reguler Pagi"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Jam Masuk</label>
-                <Input
-                  type="time"
-                  value={form.jam_masuk}
-                  onChange={(e) => setForm({ ...form, jam_masuk: e.target.value })}
-                />
+          <div className="overflow-y-auto max-h-[70vh] px-6 py-5 space-y-6">
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <Calendar className="w-4 h-4 text-blue-500" />
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Jadwal Waktu</h3>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Jam Keluar</label>
-                <Input
-                  type="time"
-                  value={form.jam_keluar}
-                  onChange={(e) => setForm({ ...form, jam_keluar: e.target.value })}
-                />
+                <Label htmlFor="nama">Nama Jadwal</Label>
+                <div className="relative">
+                  <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input id="nama" value={form.nama} onChange={(e) => setForm({ ...form, nama: e.target.value })} placeholder="Contoh: Reguler Pagi" className="pl-9" />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                <div className="space-y-2">
+                  <Label htmlFor="jam_masuk">Jam Masuk</Label>
+                  <div className="relative">
+                    <Sun className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Input id="jam_masuk" type="time" value={form.jam_masuk} onChange={(e) => setForm({ ...form, jam_masuk: e.target.value })} className="pl-9" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="jam_keluar">Jam Keluar</Label>
+                  <div className="relative">
+                    <Moon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Input id="jam_keluar" type="time" value={form.jam_keluar} onChange={(e) => setForm({ ...form, jam_keluar: e.target.value })} className="pl-9" />
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Toleransi Terlambat (menit)</label>
-                <Input
-                  type="number"
-                  value={form.toleransi_terlambat}
-                  onChange={(e) => setForm({ ...form, toleransi_terlambat: parseInt(e.target.value) || 0 })}
-                  min={0}
-                />
+            <div className="border-t border-gray-100 dark:border-gray-800 pt-5">
+              <div className="flex items-center gap-2 mb-3">
+                <Timer className="w-4 h-4 text-blue-500" />
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Pengaturan</h3>
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Hari Kerja</label>
-                <select
-                  className="flex h-10 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm"
-                  value={form.hari_kerja}
-                  onChange={(e) => setForm({ ...form, hari_kerja: e.target.value })}
-                >
-                  <option value="senin-jumat">Senin - Jumat</option>
-                  <option value="senin-sabtu">Senin - Sabtu</option>
-                  <option value="senin-kamis">Senin - Kamis</option>
-                  <option value="setiap-hari">Setiap Hari</option>
-                </select>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="toleransi">Toleransi Terlambat (menit)</Label>
+                  <div className="relative">
+                    <Timer className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Input id="toleransi" type="number" value={form.toleransi_terlambat} onChange={(e) => setForm({ ...form, toleransi_terlambat: parseInt(e.target.value) || 0 })} min={0} className="pl-9" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="hari_kerja">Hari Kerja</Label>
+                  <Select value={form.hari_kerja} onValueChange={(v) => setForm({ ...form, hari_kerja: v })}>
+                    <SelectTrigger id="hari_kerja">
+                      <SelectValue placeholder="Pilih hari kerja" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="senin-jumat">Senin - Jumat</SelectItem>
+                      <SelectItem value="senin-sabtu">Senin - Sabtu</SelectItem>
+                      <SelectItem value="senin-kamis">Senin - Kamis</SelectItem>
+                      <SelectItem value="setiap-hari">Setiap Hari</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="aktif"
-                checked={form.aktif}
-                onChange={(e) => setForm({ ...form, aktif: e.target.checked })}
-                className="rounded border-input"
-              />
-              <label htmlFor="aktif" className="text-sm font-medium">Aktif</label>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Keterangan</label>
-              <textarea
-                className="flex min-h-[60px] w-full rounded-xl border border-input bg-background px-3 py-2 text-sm"
-                value={form.keterangan}
-                onChange={(e) => setForm({ ...form, keterangan: e.target.value })}
-                placeholder="Keterangan (opsional)"
-              />
+              <div className="flex items-center gap-2 mt-4">
+                <input type="checkbox" id="aktif" checked={form.aktif} onChange={(e) => setForm({ ...form, aktif: e.target.checked })} className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500" />
+                <Label htmlFor="aktif" className="cursor-pointer">Aktif</Label>
+              </div>
+              <div className="mt-4 space-y-2">
+                <Label htmlFor="keterangan">Keterangan</Label>
+                <div className="relative">
+                  <FileText className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                  <textarea id="keterangan" className="flex min-h-[60px] w-full rounded-xl border border-gray-200/60 dark:border-gray-700/50 bg-white/50 dark:bg-gray-900/50 px-3 py-2 text-sm ring-offset-background placeholder:text-gray-400 dark:placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:border-blue-500 transition-colors resize-none shadow-sm pl-9" value={form.keterangan} onChange={(e) => setForm({ ...form, keterangan: e.target.value })} placeholder="Keterangan (opsional)" />
+                </div>
+              </div>
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50">
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Batal</Button>
             <Button onClick={handleSave} disabled={saving}>
               {saving ? "Menyimpan..." : "Simpan"}

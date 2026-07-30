@@ -88,7 +88,7 @@ export default function NotifikasiPage() {
   };
 
   return (
-    <div className="relative min-h-screen">
+    <>
       {/* Premium Background Accent */}
       <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-sky-600 to-sky-800 dark:from-sky-900/60 dark:to-sky-950/40 rounded-b-[40px] shadow-lg" />
 
@@ -210,6 +210,6 @@ export default function NotifikasiPage() {
           )}
         </div>
       </div>
-    </div>
+    </>
   );
 }

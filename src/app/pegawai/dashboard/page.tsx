@@ -83,10 +83,8 @@ export default function PegawaiDashboardPage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen relative font-['Inter',sans-serif] text-on-surface selection:bg-primary/20 bg-[#f8fafc] dark:bg-[#020617]">
-      {/* ── Desktop Top Nav (Optional/Handled by layout, but we'll adapt to Design.md structure) ── */}
-      {/* ── Main Content ── */}
-      <main className="max-w-[1440px] mx-auto px-4 md:px-6 lg:px-8 py-4 md:py-8 pb-32 md:pb-12 grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
+    <>
+      <main className="max-w-[1440px] mx-auto px-4 md:px-6 lg:px-8 py-4 md:py-8 pb-28 md:pb-8 grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
         
         {/* ── Left Column ── */}
         <div className="lg:col-span-8 flex flex-col gap-6 md:gap-8">
@@ -270,6 +268,6 @@ export default function PegawaiDashboardPage() {
           </section>
         </div>
       </main>
-    </div>
+    </>
   );
 }

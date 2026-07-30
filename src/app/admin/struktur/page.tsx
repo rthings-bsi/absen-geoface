@@ -7,13 +7,14 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Building2, Plus, Pencil, Trash2, ChevronDown, ChevronRight,
-  Users, ChevronDownSquare, User, Search, X,
+  Users, ChevronDownSquare, User, Search, X, GitBranch, Crown,
 } from "lucide-react";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -141,7 +142,7 @@ function OrgNodeCard({
         </div>
 
         {/* Action buttons */}
-        <div className="absolute -top-2 -right-2 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-all duration-200 scale-90 group-hover:scale-100">
+        <div className="absolute -top-2 -right-2 flex gap-0.5 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-200 lg:scale-90 lg:group-hover:scale-100">
           <button
             onClick={(e) => { e.stopPropagation(); onAddChild(node.id); }}
             className="p-1.5 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-110 active:scale-95"
@@ -446,47 +447,62 @@ export default function StrukturPage() {
 
       {/* ── Dialog ── */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>
-              {editing ? "Edit Unit" : parentId ? "Tambah Sub-Unit" : "Tambah Unit Utama"}
-            </DialogTitle>
-            <DialogDescription>
-              {editing ? "Ubah data unit organisasi" : "Masukkan data unit baru"}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Nama Unit / Bagian</label>
-              <Input
-                value={form.nama}
-                onChange={(e) => setForm({ ...form, nama: e.target.value })}
-                placeholder="Contoh: Direktur Utama"
-                autoFocus
-              />
+        <DialogContent className="max-w-2xl p-0 gap-0">
+          <DialogHeader className="px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm">
+                <GitBranch className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-xl">
+                  {editing ? "Edit Unit" : parentId ? "Tambah Sub-Unit" : "Tambah Unit Utama"}
+                </DialogTitle>
+                <DialogDescription className="text-sm mt-0.5">
+                  {editing ? "Ubah data unit organisasi" : "Masukkan data unit baru"}
+                </DialogDescription>
+              </div>
             </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Kepala Unit (Opsional)</label>
-              <Select
-                value={form.id_pegawai_kepala}
-                onValueChange={(val) => setForm({ ...form, id_pegawai_kepala: val === "none" ? "" : val })}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Pilih Pegawai..." />
-                </SelectTrigger>
-                <SelectContent className="max-h-60">
-                  <SelectItem value="none" className="text-muted-foreground italic">-- Kosongkan Kepala Unit --</SelectItem>
-                  {pegawaiList.map((p) => (
-                    <SelectItem key={p.id} value={String(p.id)}>
-                      {p.nama} {p.jabatan_nama ? `— ${p.jabatan_nama}` : ""}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          </DialogHeader>
+          <div className="overflow-y-auto max-h-[70vh] px-6 py-5 space-y-5">
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <Building2 className="w-4 h-4 text-blue-500" />
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Informasi Unit</h3>
+              </div>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="nama_unit">Nama Unit / Bagian</Label>
+                  <div className="relative">
+                    <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Input id="nama_unit" value={form.nama} onChange={(e) => setForm({ ...form, nama: e.target.value })} placeholder="Contoh: Direktur Utama" autoFocus className="pl-9" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="kepala_unit">Kepala Unit (Opsional)</Label>
+                  <div className="relative">
+                    <Crown className="absolute left-3 top-1/2 translate-y-[1px] z-10 w-4 h-4 text-gray-400" />
+                    <Select
+                      value={form.id_pegawai_kepala}
+                      onValueChange={(val) => setForm({ ...form, id_pegawai_kepala: val === "none" ? "" : val })}
+                    >
+                      <SelectTrigger id="kepala_unit" className="pl-9">
+                        <SelectValue placeholder="Pilih Pegawai..." />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-60">
+                        <SelectItem value="none" className="text-muted-foreground italic">-- Kosongkan Kepala Unit --</SelectItem>
+                        {pegawaiList.map((p) => (
+                          <SelectItem key={p.id} value={String(p.id)}>
+                            {p.nama} {p.jabatan_nama ? `— ${p.jabatan_nama}` : ""}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50">
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Batal</Button>
             <Button onClick={handleSave} disabled={saving}>
               {saving ? "Menyimpan..." : "Simpan"}
@@ -538,7 +554,7 @@ function TreeList({
                   : "hover:bg-white/60 dark:hover:bg-gray-800/40 border border-transparent hover:border-gray-100 dark:hover:border-gray-700/50 shadow-sm hover:shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)]"
                 }
               `}
-              style={{ marginLeft: `${depth * 28}px` }}
+              style={{ marginLeft: `${depth * 16}px` }}
             >
               {/* Expand toggle */}
               <button

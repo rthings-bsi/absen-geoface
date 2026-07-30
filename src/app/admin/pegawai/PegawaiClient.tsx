@@ -2,18 +2,22 @@
 
 import { useState, useEffect, useCallback } from "react";
 import {
-  Card, CardContent, CardHeader, CardTitle,
+  Card, CardContent, CardHeader,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
 import {
-  Search, Plus, Pencil, Trash2, Users, UserPlus, ChevronRight, Camera,
+  Search, Plus, Pencil, Trash2, Users, UserPlus, Camera,
+  Mail, Phone, MapPin, Key, User, Hash, ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -237,8 +241,8 @@ export default function PegawaiPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Pegawai</h1>
-          <p className="text-sm text-gray-400 dark:text-gray-500 mt-0.5">Kelola data pegawai</p>
+          <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">Pegawai</h1>
+          <p className="text-muted-foreground">Kelola data pegawai</p>
         </div>
         <Button onClick={openCreate} className="shadow-sm">
           <Plus className="w-4 h-4" />
@@ -367,42 +371,64 @@ export default function PegawaiPage() {
                 </table>
               </div>
 
-              <div className="md:hidden space-y-2">
+              <div className="md:hidden space-y-3">
                 {filtered.map((item) => {
                   const sc = statusConfig[item.status] || statusConfig.nonaktif;
                   return (
                     <div
                       key={item.id}
-                      className="group flex items-center gap-3 p-3 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-blue-100 dark:hover:border-blue-900/50 hover:shadow-sm transition-all"
+                      className="group flex flex-col gap-3 p-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-gray-900/50 hover:border-blue-100 dark:hover:border-blue-900/50 transition-all shadow-sm"
                     >
-                      {item.foto_profile ? (
-                        <img src={item.foto_profile} alt={item.nama} className="w-9 h-9 rounded-full object-cover shadow-sm flex-shrink-0" />
-                      ) : (
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center flex-shrink-0 shadow-sm">
-                          <span className="text-white text-xs font-bold">{item.nama.charAt(0)}</span>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3 min-w-0">
+                          {item.foto_profile ? (
+                            <img src={item.foto_profile} alt={item.nama} className="w-10 h-10 rounded-full object-cover shadow-sm flex-shrink-0 border-2 border-white dark:border-gray-800" />
+                          ) : (
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center flex-shrink-0 shadow-sm border-2 border-white dark:border-gray-800">
+                              <span className="text-white text-sm font-bold">{item.nama.charAt(0)}</span>
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{item.nama}</p>
+                            <p className="font-mono text-[10px] text-gray-500 dark:text-gray-400 truncate mt-0.5">{item.nip}</p>
+                          </div>
                         </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{item.nama}</p>
-                        <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{item.nip} · {item.jabatan?.nama || "-"}</p>
+                        <div className={cn("w-2 h-2 rounded-full bg-gradient-to-r flex-shrink-0", sc.gradient)} title={sc.label} />
                       </div>
-                      <div className="flex items-center gap-1">
-                        <div className={cn("w-1.5 h-1.5 rounded-full bg-gradient-to-r mr-1", sc.gradient)} />
+                      <div className="grid grid-cols-2 gap-2 text-xs border-t border-gray-100/50 dark:border-gray-800/50 pt-2.5">
+                        <div>
+                          <span className="text-[10px] text-gray-400 dark:text-gray-500 block">Email</span>
+                          <span className="font-medium text-gray-700 dark:text-gray-300 truncate block">{item.email}</span>
+                        </div>
+                        <div>
+                          <span className="text-[10px] text-gray-400 dark:text-gray-500 block">Jabatan</span>
+                          <span className="font-medium text-gray-700 dark:text-gray-300 truncate block">{item.jabatan?.nama || "-"}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-end gap-1.5 pt-2 border-t border-gray-100/50 dark:border-gray-800/50">
                         <Button
                           variant="ghost"
                           size="icon-sm"
                           onClick={() => openPhoto(item)}
-                          className="text-gray-400"
+                          className="text-gray-500 hover:text-emerald-600 bg-gray-50 dark:bg-gray-800/50 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
                         >
-                          <Camera className="w-4 h-4" />
+                          <Camera className="w-3.5 h-3.5" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon-sm"
                           onClick={() => openEdit(item)}
-                          className="text-gray-400"
+                          className="text-gray-500 hover:text-blue-600 bg-gray-50 dark:bg-gray-800/50 hover:bg-blue-50 dark:hover:bg-blue-900/30"
                         >
-                          <Pencil className="w-4 h-4" />
+                          <Pencil className="w-3.5 h-3.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => handleDelete(item.id)}
+                          className="text-gray-500 hover:text-red-600 bg-gray-50 dark:bg-gray-800/50 hover:bg-red-50 dark:hover:bg-red-900/30"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
                         </Button>
                       </div>
                     </div>
@@ -415,97 +441,108 @@ export default function PegawaiPage() {
       </Card>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>{editing ? "Edit Pegawai" : "Tambah Pegawai"}</DialogTitle>
-            <DialogDescription>
-              {editing ? "Ubah data pegawai" : "Masukkan data pegawai baru"}
-            </DialogDescription>
+        <DialogContent className="max-w-2xl p-0 gap-0">
+          <DialogHeader className="px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm">
+                <UserPlus className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-xl">{editing ? "Edit Pegawai" : "Tambah Pegawai"}</DialogTitle>
+                <DialogDescription className="text-sm mt-0.5">
+                  {editing ? "Ubah data pegawai" : "Masukkan data pegawai baru"}
+                </DialogDescription>
+              </div>
+            </div>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">NIP</label>
-                <Input
-                  value={form.nip}
-                  onChange={(e) => setForm({ ...form, nip: e.target.value })}
-                  placeholder="NIP"
-                />
+          <div className="overflow-y-auto max-h-[70vh] px-6 py-5 space-y-6">
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <ShieldCheck className="w-4 h-4 text-blue-500" />
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Informasi Akun</h3>
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
-                <select
-                  className="flex h-10 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors"
-                  value={form.status}
-                  onChange={(e) => setForm({ ...form, status: e.target.value })}
-                >
-                  <option value="aktif">Aktif</option>
-                  <option value="nonaktif">Nonaktif</option>
-                </select>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="nip">NIP</Label>
+                  <div className="relative">
+                    <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Input id="nip" value={form.nip} onChange={(e) => setForm({ ...form, nip: e.target.value })} placeholder="NIP" className="pl-9" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="status">Status</Label>
+                  <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v })}>
+                    <SelectTrigger id="status">
+                      <SelectValue placeholder="Pilih status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="aktif">Aktif</SelectItem>
+                      <SelectItem value="nonaktif">Nonaktif</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Nama</label>
-              <Input
-                value={form.nama}
-                onChange={(e) => setForm({ ...form, nama: e.target.value })}
-                placeholder="Nama lengkap"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-              <Input
-                type="email"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                placeholder="email@example.com"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Password {editing && <span className="text-gray-400 dark:text-gray-500 font-normal">(kosongkan jika tidak diubah)</span>}
-              </label>
-              <Input
-                type="password"
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                placeholder={editing ? "Biarkan kosong" : "Password"}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Jabatan</label>
-                <select
-                  className="flex h-10 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors"
-                  value={form.jabatan_id}
-                  onChange={(e) => setForm({ ...form, jabatan_id: e.target.value })}
-                >
-                  <option value="">Pilih Jabatan</option>
-                  {jabatanList.map((j) => (
-                    <option key={j.id} value={j.id}>{j.nama}</option>
-                  ))}
-                </select>
+              <div className="mt-4 space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input id="email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="email@example.com" className="pl-9" />
+                </div>
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Telepon</label>
-                <Input
-                  value={form.telepon}
-                  onChange={(e) => setForm({ ...form, telepon: e.target.value })}
-                  placeholder="Nomor telepon"
-                />
+              <div className="mt-4 space-y-2">
+                <Label htmlFor="password">
+                  Password {editing && <span className="text-gray-400 dark:text-gray-500 font-normal">(kosongkan jika tidak diubah)</span>}
+                </Label>
+                <div className="relative">
+                  <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input id="password" type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder={editing ? "Biarkan kosong" : "Password"} className="pl-9" />
+                </div>
               </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Alamat</label>
-              <textarea
-                className="flex min-h-[80px] w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors"
-                value={form.alamat}
-                onChange={(e) => setForm({ ...form, alamat: e.target.value })}
-                placeholder="Alamat"
-              />
+            <div className="border-t border-gray-100 dark:border-gray-800 pt-5">
+              <div className="flex items-center gap-2 mb-3">
+                <User className="w-4 h-4 text-blue-500" />
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Data Pribadi</h3>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="nama">Nama Lengkap</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input id="nama" value={form.nama} onChange={(e) => setForm({ ...form, nama: e.target.value })} placeholder="Nama lengkap" className="pl-9" />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                <div className="space-y-2">
+                  <Label htmlFor="telepon">Telepon</Label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Input id="telepon" value={form.telepon} onChange={(e) => setForm({ ...form, telepon: e.target.value })} placeholder="Nomor telepon" className="pl-9" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="jabatan">Jabatan</Label>
+                  <Select value={form.jabatan_id} onValueChange={(v) => setForm({ ...form, jabatan_id: v })}>
+                    <SelectTrigger id="jabatan">
+                      <SelectValue placeholder="Pilih Jabatan" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {jabatanList.map((j) => (
+                        <SelectItem key={j.id} value={String(j.id)}>{j.nama}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="mt-4 space-y-2">
+                <Label htmlFor="alamat">Alamat</Label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                  <textarea id="alamat" className="flex min-h-[80px] w-full rounded-xl border border-gray-200/60 dark:border-gray-700/50 bg-white/50 dark:bg-gray-900/50 px-3 py-2 text-sm ring-offset-background placeholder:text-gray-400 dark:placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:border-blue-500 transition-colors resize-none shadow-sm pl-9" value={form.alamat} onChange={(e) => setForm({ ...form, alamat: e.target.value })} placeholder="Alamat" />
+                </div>
+              </div>
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50">
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Batal</Button>
             <Button onClick={handleSave} disabled={saving}>
               {saving ? "Menyimpan..." : "Simpan"}
@@ -523,9 +560,9 @@ export default function PegawaiPage() {
               {editing && `Unggah foto untuk ${editing.nama}`}
             </DialogDescription>
           </DialogHeader>
-          <div className="flex flex-col items-center gap-4 py-4">
+          <div className="flex flex-col items-center gap-4 py-4 overflow-y-auto max-h-[70vh]">
             {editing?.foto_profile && (
-              <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-border shadow-sm">
+              <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-border shadow-sm flex-shrink-0">
                 <img
                   src={editing.foto_profile}
                   alt="Preview"
@@ -533,13 +570,13 @@ export default function PegawaiPage() {
                 />
               </div>
             )}
-            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-input rounded-xl cursor-pointer hover:border-primary/50 hover:bg-muted/30 transition-colors">
-              <div className="flex flex-col items-center justify-center pt-5 pb-6">
+            <label className="flex flex-col items-center justify-center w-full min-h-[120px] border-2 border-dashed border-input rounded-xl cursor-pointer hover:border-primary/50 hover:bg-muted/30 transition-colors">
+              <div className="flex flex-col items-center justify-center py-6 px-4">
                 <Camera className="w-8 h-8 text-muted-foreground mb-2" />
                 <p className="text-sm text-muted-foreground">
                   <span className="font-medium text-primary">Klik untuk memilih</span>
                 </p>
-                <p className="text-xs text-muted-foreground mt-1">JPG, PNG, WebP (max 5MB)</p>
+                <p className="text-xs text-muted-foreground mt-1 text-center">JPG, PNG, WebP (max 5MB)</p>
               </div>
               <input
                 type="file"

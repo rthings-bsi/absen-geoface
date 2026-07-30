@@ -179,7 +179,7 @@ export default function ProfilPage() {
   };
 
   if (loading) return (
-    <div className="min-h-screen relative font-['Inter',sans-serif] text-on-surface selection:bg-primary/20 bg-[#f8fafc] dark:bg-[#020617]">
+    <>
       <main className="max-w-lg mx-auto px-4 py-6 space-y-4 animate-pulse pb-24">
         <div className="h-10 bg-slate-100 dark:bg-slate-800 rounded-xl w-32" />
         <div className="flex flex-col items-center gap-3 py-6">
@@ -190,22 +190,22 @@ export default function ProfilPage() {
         <div className="h-40 bg-slate-100 dark:bg-slate-800 rounded-2xl" />
         <div className="h-12 bg-slate-100 dark:bg-slate-800 rounded-2xl" />
       </main>
-    </div>
+    </>
   );
 
   if (!profil) return (
-    <div className="min-h-screen relative font-['Inter',sans-serif] text-on-surface selection:bg-primary/20 bg-[#f8fafc] dark:bg-[#020617]">
+    <>
       <main className="max-w-lg mx-auto px-4 py-12 text-center text-slate-500">
         <User className="h-12 w-12 mx-auto mb-3 opacity-50" />
         <p>Gagal memuat profil</p>
         <button onClick={fetchProfil} className="mt-3 text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20 px-4 py-2 rounded-xl hover:bg-indigo-100">Muat Ulang</button>
       </main>
-    </div>
+    </>
   );
 
   return (
-    <div className="min-h-screen relative font-['Inter',sans-serif] text-on-surface selection:bg-primary/20 bg-[#f8fafc] dark:bg-[#020617]">
-      <main className="max-w-[1440px] mx-auto px-4 md:px-6 lg:px-8 py-4 md:py-8 pb-32 md:pb-12">
+    <>
+      <main className="max-w-[1440px] mx-auto px-4 md:px-6 lg:px-8 py-4 md:py-8 pb-28 md:pb-8">
 
         {/* Header */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 mb-6 border border-slate-200 dark:border-slate-800 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-none flex items-center gap-3 sm:gap-4">
@@ -417,6 +417,6 @@ export default function ProfilPage() {
           </div>
         </div>
       </main>
-    </div>
+    </>
   );
 }

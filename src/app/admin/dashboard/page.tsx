@@ -123,7 +123,7 @@ export default function AdminDashboardPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <Skeleton className="h-8 w-40 mb-2" />
             <Skeleton className="h-4 w-56" />
@@ -167,18 +167,18 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
             Dashboard
           </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 font-medium">
+          <p className="text-muted-foreground">
             Selamat pagi, <span className="text-blue-600 dark:text-blue-400">{session?.user?.nama || "Admin"}</span> — {new Date().toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
           </p>
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {kpiCards.map((card) => (
           <Card
             key={card.title}
@@ -284,8 +284,8 @@ export default function AdminDashboardPage() {
                       data={donutData}
                       cx="50%"
                       cy="50%"
-                      innerRadius={75}
-                      outerRadius={115}
+                      innerRadius={65}
+                      outerRadius={95}
                       paddingAngle={4}
                       dataKey="value"
                     >
