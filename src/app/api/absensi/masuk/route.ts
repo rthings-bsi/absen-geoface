@@ -43,12 +43,10 @@ export async function POST(request: Request) {
   }
 
   // Check rate limiting — last_absen_attempt disimpan sebagai string WIB "YYYY-MM-DD HH:mm:ss"
-  // Parsing: tambahkan "+07:00" agar JS tidak salah interpretasi sebagai UTC
   if (pegawaiData.last_absen_attempt) {
     const lastAttemptStr = pegawaiData.last_absen_attempt.replace(" ", "T") + "+07:00";
     const lastAttempt = new Date(lastAttemptStr);
-    const nowWibMs = now.getTime() + (7 * 60 * 60 * 1000); // timestamp epoch dalam WIB
-    const diffMs = nowWibMs - lastAttempt.getTime();
+    const diffMs = now.getTime() - lastAttempt.getTime();
     const diffSec = Math.floor(diffMs / 1000);
 
     // Minimum 5 seconds between attempts

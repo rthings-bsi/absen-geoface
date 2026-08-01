@@ -212,8 +212,14 @@ export default function AbsensiPage() {
           face_descriptor: faceDescriptor,
         }),
       });
-      if (res.status === 429) throw new Error((await res.json().catch(() => ({}))).error || "Terlalu banyak percobaan");
-      if (!res.ok) throw new Error((await res.json()).error || "Gagal absensi");
+      if (res.status === 429) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || "Terlalu banyak percobaan");
+      }
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || "Gagal absensi");
+      }
 
       toast.success(type === "masuk" ? "Absen masuk berhasil" : "Absen pulang berhasil");
       playAbsensiSuccess();
@@ -339,11 +345,13 @@ export default function AbsensiPage() {
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         {/* Camera */}
         <div className="lg:col-span-3">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+          <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden relative">
+            {/* Top accent gradient bar */}
+            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-500 via-blue-400 to-cyan-400" />
             {/* Card header */}
-            <div className="flex items-center justify-between px-5 pt-5 pb-4">
+            <div className="flex items-center justify-between px-5 pt-6 pb-4">
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 shadow-sm border border-white dark:border-slate-700">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-500 to-blue-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-indigo-500/20 border border-white/40 dark:border-slate-700">
                   <ScanFace className="w-5 h-5" />
                 </div>
                 <div>
@@ -448,36 +456,38 @@ export default function AbsensiPage() {
         {/* Sidebar */}
         <div className="lg:col-span-2 space-y-4">
           {/* Status */}
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5">
-            <div className="flex items-center justify-between mb-4">
+          <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 relative overflow-hidden">
+            {/* Top accent gradient bar */}
+            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400" />
+            <div className="flex items-center justify-between mb-4 mt-1">
               <div className="flex items-center gap-2">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/50 dark:to-teal-950/50 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0 border border-white dark:border-slate-700">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center shrink-0 border border-white/40 dark:border-slate-700 shadow-md shadow-emerald-500/20">
                   <History className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-gray-900 dark:text-white leading-tight">Aksi Absensi</p>
-                  <p className="text-[10px] text-gray-400 dark:text-gray-500">Lakukan absensi saat siap</p>
+                  <p className="text-xs font-bold text-gray-900 dark:text-white leading-tight">Status Hari Ini</p>
+                  <p className="text-[10px] text-gray-400 dark:text-gray-500">Catatan waktu kehadiran</p>
                 </div>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-xl bg-gray-50 dark:bg-slate-800/60 border border-gray-100 dark:border-slate-700 p-3 text-center">
+              <div className="rounded-xl bg-white dark:bg-slate-800/80 border border-gray-100 dark:border-slate-700 p-3 text-center shadow-sm">
                 <p className="text-[10px] uppercase tracking-widest font-bold text-gray-400 dark:text-gray-500 mb-1">Masuk</p>
-                <p className="text-lg font-bold tabular-nums text-gray-900 dark:text-white leading-none">{todayStatus?.masuk?.slice(0, 5) || "--:--"}</p>
+                <p className="text-xl font-extrabold tabular-nums text-gray-900 dark:text-white leading-none tracking-tight">{todayStatus?.masuk?.slice(0, 5) || "--:--"}</p>
               </div>
-              <div className="rounded-xl bg-gray-50 dark:bg-slate-800/60 border border-gray-100 dark:border-slate-700 p-3 text-center">
+              <div className="rounded-xl bg-white dark:bg-slate-800/80 border border-gray-100 dark:border-slate-700 p-3 text-center shadow-sm">
                 <p className="text-[10px] uppercase tracking-widest font-bold text-gray-400 dark:text-gray-500 mb-1">Pulang</p>
-                <p className="text-lg font-bold tabular-nums text-gray-900 dark:text-white leading-none">{todayStatus?.pulang?.slice(0, 5) || "--:--"}</p>
+                <p className="text-xl font-extrabold tabular-nums text-gray-900 dark:text-white leading-none tracking-tight">{todayStatus?.pulang?.slice(0, 5) || "--:--"}</p>
               </div>
             </div>
 
             {/* Wajah → Lokasi → Siap stepper */}
-            <div className="flex items-center justify-between mt-4">
+            <div className="flex items-center justify-between mt-5">
               <div className={cn(
                 "flex items-center gap-1.5 px-3 py-1.5 rounded-full border shadow-sm transition-all",
                 faceStatus === "verified"
                   ? "bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-900"
-                  : "bg-white/60 border-gray-200 dark:bg-slate-800 dark:border-slate-700"
+                  : "bg-white border-gray-200 dark:bg-slate-800 dark:border-slate-700"
               )}>
                 <span className={cn("w-2 h-2 rounded-full", faceStatus === "verified" ? "bg-emerald-500" : "bg-gray-300 dark:bg-gray-600")} />
                 <span className={cn("text-[11px] font-bold", faceStatus === "verified" ? "text-emerald-700 dark:text-emerald-400" : "text-gray-500 dark:text-gray-400")}>Wajah</span>
@@ -487,7 +497,7 @@ export default function AbsensiPage() {
                 "flex items-center gap-1.5 px-3 py-1.5 rounded-full border shadow-sm transition-all",
                 gpsStatus === "success"
                   ? "bg-blue-50 border-blue-200 dark:bg-blue-950/30 dark:border-blue-900"
-                  : "bg-white/60 border-gray-200 dark:bg-slate-800 dark:border-slate-700"
+                  : "bg-white border-gray-200 dark:bg-slate-800 dark:border-slate-700"
               )}>
                 {gpsStatus === "loading" ? (
                   <span className="relative flex items-center justify-center">
@@ -504,7 +514,7 @@ export default function AbsensiPage() {
                 "flex items-center gap-1.5 px-3 py-1.5 rounded-full border shadow-sm transition-all",
                 faceStatus === "verified" && gpsStatus === "success"
                   ? "bg-indigo-50 border-indigo-200 dark:bg-indigo-950/30 dark:border-indigo-900"
-                  : "bg-white/60 border-gray-200 dark:bg-slate-800 dark:border-slate-700"
+                  : "bg-white border-gray-200 dark:bg-slate-800 dark:border-slate-700"
               )}>
                 <span className={cn("w-2 h-2 rounded-full", faceStatus === "verified" && gpsStatus === "success" ? "bg-indigo-500" : "bg-gray-300 dark:bg-gray-600")} />
                 <span className={cn("text-[11px] font-bold", faceStatus === "verified" && gpsStatus === "success" ? "text-indigo-700 dark:text-indigo-400" : "text-gray-500 dark:text-gray-400")}>Siap</span>
@@ -513,8 +523,10 @@ export default function AbsensiPage() {
           </div>
 
           {/* Location & Actions */}
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 space-y-4">
-            <div className="flex items-center justify-between">
+          <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 space-y-4 relative overflow-hidden">
+            {/* Top accent gradient bar */}
+            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400" />
+            <div className="flex items-center justify-between mt-1">
               <div className="flex items-center gap-2">
                 <div className={cn(
                   "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border",
@@ -549,20 +561,20 @@ export default function AbsensiPage() {
                 onClick={() => handleAbsen("masuk")}
                 disabled={isProcessing || (todayStatus?.masuk !== null && todayStatus?.masuk !== undefined) || faceStatus !== "verified"}
                 className={cn(
-                  "relative overflow-hidden group flex flex-col items-center justify-center p-4 rounded-xl border shadow-sm transition-all active:scale-[0.98]",
+                  "relative overflow-hidden group flex flex-col items-center justify-center p-4 rounded-2xl border shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] transition-all active:scale-[0.98]",
                   (todayStatus?.masuk !== null && todayStatus?.masuk !== undefined) || faceStatus !== "verified"
-                    ? "bg-gray-50 border-gray-200/50 text-gray-400 dark:bg-gray-800/30 dark:border-gray-700/50 dark:text-gray-600 cursor-not-allowed opacity-60"
+                    ? "bg-gray-50/80 border-gray-200/50 text-gray-400 dark:bg-gray-800/30 dark:border-gray-700/50 dark:text-gray-600 cursor-not-allowed opacity-60"
                     : "bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/40 dark:to-teal-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-800 hover:shadow-md hover:border-emerald-300 dark:hover:border-emerald-700"
                 )}
               >
-                <div className={cn("w-10 h-10 rounded-full flex items-center justify-center mb-2.5",
+                <div className={cn("w-10 h-10 rounded-full flex items-center justify-center mb-2.5 transition-colors",
                   (todayStatus?.masuk !== null && todayStatus?.masuk !== undefined) || faceStatus !== "verified"
                     ? "bg-gray-200/50 dark:bg-gray-800"
-                    : "bg-emerald-200/50 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-400"
+                    : "bg-emerald-200/50 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-400 group-hover:scale-110"
                 )}>
                   {isProcessing ? <Loader2 className="w-5 h-5 animate-spin" /> : <LogIn className="w-5 h-5 ml-1" />}
                 </div>
-                <span className="font-bold text-sm tracking-tight mb-0.5">Masuk</span>
+                <span className="font-extrabold text-sm tracking-tight mb-0.5">MASUK</span>
                 <span className={cn("text-[9px] uppercase tracking-widest font-bold",
                   (todayStatus?.masuk !== null && todayStatus?.masuk !== undefined) || faceStatus !== "verified"
                     ? "text-gray-400/70"
@@ -574,20 +586,20 @@ export default function AbsensiPage() {
                 onClick={() => handleAbsen("pulang")}
                 disabled={isProcessing || !todayStatus?.masuk || todayStatus?.pulang !== null || faceStatus !== "verified"}
                 className={cn(
-                  "relative overflow-hidden group flex flex-col items-center justify-center p-4 rounded-xl border shadow-sm transition-all active:scale-[0.98]",
+                  "relative overflow-hidden group flex flex-col items-center justify-center p-4 rounded-2xl border shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] transition-all active:scale-[0.98]",
                   !todayStatus?.masuk || todayStatus?.pulang !== null || faceStatus !== "verified"
-                    ? "bg-gray-50 border-gray-200/50 text-gray-400 dark:bg-gray-800/30 dark:border-gray-700/50 dark:text-gray-600 cursor-not-allowed opacity-60"
+                    ? "bg-gray-50/80 border-gray-200/50 text-gray-400 dark:bg-gray-800/30 dark:border-gray-700/50 dark:text-gray-600 cursor-not-allowed opacity-60"
                     : "bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/40 dark:to-indigo-950/40 text-blue-800 dark:text-blue-300 border-blue-200/60 dark:border-blue-800 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-700"
                 )}
               >
-                <div className={cn("w-10 h-10 rounded-full flex items-center justify-center mb-2.5",
+                <div className={cn("w-10 h-10 rounded-full flex items-center justify-center mb-2.5 transition-colors",
                   !todayStatus?.masuk || todayStatus?.pulang !== null || faceStatus !== "verified"
                     ? "bg-gray-200/50 dark:bg-gray-800"
-                    : "bg-blue-200/50 dark:bg-blue-900/60 text-blue-600 dark:text-blue-400"
+                    : "bg-blue-200/50 dark:bg-blue-900/60 text-blue-600 dark:text-blue-400 group-hover:scale-110"
                 )}>
                   {isProcessing ? <Loader2 className="w-5 h-5 animate-spin" /> : <LogOut className="w-5 h-5 mr-1" />}
                 </div>
-                <span className="font-bold text-sm tracking-tight mb-0.5">Pulang</span>
+                <span className="font-extrabold text-sm tracking-tight mb-0.5">PULANG</span>
                 <span className={cn("text-[9px] uppercase tracking-widest font-bold",
                   !todayStatus?.masuk || todayStatus?.pulang !== null || faceStatus !== "verified"
                     ? "text-gray-400/70"

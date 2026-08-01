@@ -36,6 +36,33 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Anda sudah melakukan absen pulang hari ini" }, { status: 400 });
   }
 
+  const pegawaiData = await db.query.pegawai.findFirst({
+    where: eq(pegawai.id, id_pegawai),
+  });
+
+  if (!pegawaiData) {
+    return NextResponse.json({ error: "Data pegawai tidak ditemukan" }, { status: 404 });
+  }
+
+  // Check rate limiting
+  if (pegawaiData.last_absen_attempt) {
+    const lastAttemptStr = pegawaiData.last_absen_attempt.replace(" ", "T") + "+07:00";
+    const lastAttempt = new Date(lastAttemptStr);
+    const diffMs = now.getTime() - lastAttempt.getTime();
+    const diffSec = Math.floor(diffMs / 1000);
+
+    if (diffSec < 5) {
+      return NextResponse.json({ error: "Tunggu 5 detik antar percobaan" }, { status: 429 });
+    }
+
+    if (pegawaiData.failed_attempts >= 5 && diffSec < 300) {
+      const remaining = Math.ceil((300 - diffSec) / 60);
+      return NextResponse.json({
+        error: `Terlalu banyak percobaan gagal. Coba lagi dalam ${remaining} menit`,
+      }, { status: 429 });
+    }
+  }
+
   const body = await request.json();
   const { latitude, longitude, confidence, foto, face_descriptor } = body;
 
@@ -43,11 +70,7 @@ export async function POST(request: Request) {
   let is_face_verified = false;
   let face_verify_error: string | null = null;
 
-  const pegawaiData = await db.query.pegawai.findFirst({
-    where: eq(pegawai.id, id_pegawai),
-  });
-
-  if (pegawaiData?.face_data && Array.isArray(face_descriptor) && face_descriptor.length === 128) {
+  if (pegawaiData.face_data && Array.isArray(face_descriptor) && face_descriptor.length === 128) {
     try {
       const storedDescriptor: number[] = JSON.parse(pegawaiData.face_data);
       if (Array.isArray(storedDescriptor) && storedDescriptor.length === 128) {
@@ -63,6 +86,14 @@ export async function POST(request: Request) {
   }
 
   if (!is_face_verified) {
+    // Increment failed attempts
+    await db.update(pegawai)
+      .set({
+        failed_attempts: sql`COALESCE(failed_attempts, 0) + 1`,
+        last_absen_attempt: sql`(datetime('now','localtime'))`,
+      })
+      .where(eq(pegawai.id, id_pegawai));
+
     return NextResponse.json({
       error: face_verify_error || "Wajah tidak cocok dengan data terdaftar",
     }, { status: 403 });
@@ -84,6 +115,11 @@ export async function POST(request: Request) {
       }
     }
   }
+
+  // Reset failed attempts
+  await db.update(pegawai)
+    .set({ failed_attempts: 0, last_absen_attempt: sql`(datetime('now','localtime'))` })
+    .where(eq(pegawai.id, id_pegawai));
 
   // Update absensi
   await db.update(absensi)

@@ -15,7 +15,9 @@ export async function GET() {
   const nowWibStr = now.toLocaleDateString("sv-SE", { timeZone: "Asia/Jakarta" }); // YYYY-MM-DD
   const [wibYear, wibMonth] = nowWibStr.split("-").map(Number);
   const firstDay = `${wibYear}-${String(wibMonth).padStart(2, "0")}-01`;
-  const lastDay = new Date(wibYear, wibMonth, 0).toISOString().split("T")[0];
+  // Last day of the month computed from WIB year/month directly (avoid toISOString() UTC shift)
+  const lastDayNum = new Date(Date.UTC(wibYear, wibMonth, 0)).getUTCDate();
+  const lastDay = `${wibYear}-${String(wibMonth).padStart(2, "0")}-${String(lastDayNum).padStart(2, "0")}`;
 
   // Count absensi this month
   const absensiThisMonth = await db

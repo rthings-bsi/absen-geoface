@@ -57,10 +57,18 @@ export default function ProfilPage() {
 
   const startCamera = useCallback(async () => {
     try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error("Browser memblokir kamera. Gunakan HTTPS atau akses via localhost.");
+      }
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: 640, height: 480 } });
       streamRef.current = stream;
       setCameraActive(true);
-    } catch { toast.error("Kamera tidak dapat diakses. Periksa izin browser."); }
+    } catch (err: unknown) {
+      const message = err instanceof Error && err.message.includes("HTTPS")
+        ? err.message
+        : "Kamera tidak dapat diakses. Periksa izin browser dan pastikan koneksi HTTPS.";
+      toast.error(message);
+    }
   }, []);
 
   const stopCamera = useCallback(() => {

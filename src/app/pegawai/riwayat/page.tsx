@@ -38,21 +38,26 @@ export default function RiwayatPage() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
-  useEffect(() => { fetchRiwayat(); }, [month, year]);
-
-  const fetchRiwayat = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/absensi/riwayat?month=${month}&year=${year}`);
-      if (!res.ok) throw new Error("Gagal mengambil data");
-      const data = await res.json();
-      setRiwayat(data.absensi ?? []);
-      setRekap(data.rekap ?? null);
-    } catch {
-      setRiwayat([]);
-      setRekap(null);
-    } finally { setLoading(false); }
-  };
+  useEffect(() => {
+    const controller = new AbortController();
+    const fetchRiwayat = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/absensi/riwayat?month=${month}&year=${year}`, { signal: controller.signal });
+        if (!res.ok) throw new Error("Gagal mengambil data");
+        const data = await res.json();
+        setRiwayat(data.absensi ?? []);
+        setRekap(data.rekap ?? null);
+      } catch (err: any) {
+        if (err.name !== "AbortError") {
+          setRiwayat([]);
+          setRekap(null);
+        }
+      } finally { setLoading(false); }
+    };
+    fetchRiwayat();
+    return () => controller.abort();
+  }, [month, year]);
 
   const navigateMonth = (dir: "prev" | "next") => {
     if (dir === "prev") {

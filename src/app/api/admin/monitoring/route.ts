@@ -10,7 +10,8 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const today = new Date().toISOString().split("T")[0];
+  const { searchParams } = new URL(request.url);
+  const today = searchParams.get("tanggal") || new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Jakarta" });
 
   // Single JOIN: get today's absensi with pegawai data
   const todayAbsensi = await db
