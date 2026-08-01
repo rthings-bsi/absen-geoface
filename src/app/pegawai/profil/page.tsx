@@ -265,6 +265,12 @@ export default function ProfilPage() {
               </span>
             </div>
 
+            {/* Logout Mobile */}
+            <button onClick={handleLogout}
+              className="w-full py-3 rounded-xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/50 text-rose-700 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-950/40 text-sm font-bold transition-all flex items-center justify-center gap-2 lg:hidden">
+              <LogOut className="h-4 w-4" /> Logout
+            </button>
+
             {/* Keamanan */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-none p-6 space-y-4">
               <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Keamanan</h3>
@@ -296,12 +302,6 @@ export default function ProfilPage() {
                 </button>
               )}
             </div>
-            
-            {/* Logout Mobile */}
-            <button onClick={handleLogout}
-              className="w-full py-3 rounded-xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/50 text-rose-700 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-950/40 text-sm font-bold transition-all flex items-center justify-center gap-2 lg:hidden">
-              <LogOut className="h-4 w-4" /> Logout
-            </button>
           </div>
 
           {/* Right Column */}
