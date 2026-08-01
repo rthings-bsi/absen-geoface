@@ -264,44 +264,6 @@ export default function ProfilPage() {
                 {profil.jabatan?.nama || "-"}
               </span>
             </div>
-
-            {/* Logout Mobile */}
-            <button onClick={handleLogout}
-              className="w-full py-3 rounded-xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/50 text-rose-700 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-950/40 text-sm font-bold transition-all flex items-center justify-center gap-2 lg:hidden">
-              <LogOut className="h-4 w-4" /> Logout
-            </button>
-
-            {/* Keamanan */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-none p-6 space-y-4">
-              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Keamanan</h3>
-              {showPasswordForm ? (
-                <form onSubmit={handleChangePassword} className="space-y-3">
-                  {["password_lama", "password_baru", "konfirmasi_password"].map((field) => (
-                    <div key={field}>
-                      <label className="block text-xs font-semibold text-slate-500 mb-1">
-                        {field === "password_lama" ? "Password Lama" : field === "password_baru" ? "Password Baru" : "Konfirmasi Password Baru"}
-                      </label>
-                      <input type="password" value={(passwordForm as any)[field]}
-                        onChange={(e) => setPasswordForm(p => ({ ...p, [field]: e.target.value }))}
-                        className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2.5 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-indigo-400/30" required={field !== "konfirmasi_password" || true} minLength={field !== "password_lama" ? 6 : undefined as any} />
-                    </div>
-                  ))}
-                  <div className="flex gap-2 pt-2">
-                    <button type="button" onClick={() => { setShowPasswordForm(false); setPasswordForm({ password_lama: "", password_baru: "", konfirmasi_password: "" }); }}
-                      className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-bold transition-all">Batal</button>
-                    <button type="submit" disabled={changingPassword}
-                      className="flex-1 py-2.5 rounded-xl bg-[#1e1b4b] hover:bg-[#312e81] dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white text-xs font-bold transition-all flex items-center justify-center gap-2 disabled:opacity-50">
-                      {changingPassword ? <Loader2 className="h-4 w-4 animate-spin" /> : <Key className="h-4 w-4" />} Ubah Password
-                    </button>
-                  </div>
-                </form>
-              ) : (
-                <button onClick={() => setShowPasswordForm(true)}
-                  className="w-full py-3 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold transition-all flex items-center justify-center gap-2">
-                  <Key className="h-4 w-4" /> Ganti Password
-                </button>
-              )}
-            </div>
           </div>
 
           {/* Right Column */}
@@ -424,6 +386,44 @@ export default function ProfilPage() {
             </div>
           </div>
         </div>
+
+        {/* Ganti Password */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-none p-6 space-y-4 mt-6">
+          <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Keamanan</h3>
+          {showPasswordForm ? (
+            <form onSubmit={handleChangePassword} className="space-y-3">
+              {["password_lama", "password_baru", "konfirmasi_password"].map((field) => (
+                <div key={field}>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1">
+                    {field === "password_lama" ? "Password Lama" : field === "password_baru" ? "Password Baru" : "Konfirmasi Password Baru"}
+                  </label>
+                  <input type="password" value={(passwordForm as any)[field]}
+                    onChange={(e) => setPasswordForm(p => ({ ...p, [field]: e.target.value }))}
+                    className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2.5 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-indigo-400/30" required={field !== "konfirmasi_password" || true} minLength={field !== "password_lama" ? 6 : undefined as any} />
+                </div>
+              ))}
+              <div className="flex gap-2 pt-2">
+                <button type="button" onClick={() => { setShowPasswordForm(false); setPasswordForm({ password_lama: "", password_baru: "", konfirmasi_password: "" }); }}
+                  className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-bold transition-all">Batal</button>
+                <button type="submit" disabled={changingPassword}
+                  className="flex-1 py-2.5 rounded-xl bg-[#1e1b4b] hover:bg-[#312e81] dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white text-xs font-bold transition-all flex items-center justify-center gap-2 disabled:opacity-50">
+                  {changingPassword ? <Loader2 className="h-4 w-4 animate-spin" /> : <Key className="h-4 w-4" />} Ubah Password
+                </button>
+              </div>
+            </form>
+          ) : (
+            <button onClick={() => setShowPasswordForm(true)}
+              className="w-full py-3 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold transition-all flex items-center justify-center gap-2">
+              <Key className="h-4 w-4" /> Ganti Password
+            </button>
+          )}
+        </div>
+
+        {/* Logout */}
+        <button onClick={handleLogout}
+          className="w-full py-3 rounded-xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/50 text-rose-700 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-950/40 text-sm font-bold transition-all flex items-center justify-center gap-2 mt-6">
+          <LogOut className="h-4 w-4" /> Logout
+        </button>
       </main>
     </>
   );
