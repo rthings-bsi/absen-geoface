@@ -17,7 +17,8 @@ export async function POST(request: Request) {
   const now = new Date();
   const today = now.toLocaleDateString("sv-SE", { timeZone: "Asia/Jakarta" }); // YYYY-MM-DD
   // Pastikan ambil HH:mm dalam format 24 jam dengan zero-padding
-  const timeStr = now.toLocaleTimeString("en-GB", { timeZone: "Asia/Jakarta", hour: "2-digit", minute: "2-digit" }); 
+  const timeStr = now.toLocaleTimeString("en-GB", { timeZone: "Asia/Jakarta", hour: "2-digit", minute: "2-digit" });
+  const wibNow = now.toLocaleString("sv-SE", { timeZone: "Asia/Jakarta", hour12: false });
   const [hh, mm] = timeStr.split(":").map(Number);
   const nowMinutes = hh * 60 + mm;
 
@@ -91,7 +92,7 @@ export async function POST(request: Request) {
     await db.update(pegawai)
       .set({
         failed_attempts: sql`COALESCE(failed_attempts, 0) + 1`,
-        last_absen_attempt: sql`(datetime('now','localtime'))`,
+        last_absen_attempt: wibNow,
       })
       .where(eq(pegawai.id, id_pegawai));
 
@@ -139,7 +140,7 @@ export async function POST(request: Request) {
 
   // Reset failed attempts
   await db.update(pegawai)
-    .set({ failed_attempts: 0, last_absen_attempt: sql`(datetime('now','localtime'))` })
+    .set({ failed_attempts: 0, last_absen_attempt: wibNow })
     .where(eq(pegawai.id, id_pegawai));
 
   // Send notification to all admins
