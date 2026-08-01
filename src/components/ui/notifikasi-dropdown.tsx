@@ -31,11 +31,16 @@ export default function NotifikasiDropdown() {
     }
   }, []);
 
-  // Fetch on mount & every 30s
+  // Fetch on mount, every 30s, and when tab becomes visible again
   useEffect(() => {
     fetchNotif();
     const interval = setInterval(fetchNotif, 30000);
-    return () => clearInterval(interval);
+    const onVisibility = () => { if (document.visibilityState === "visible") fetchNotif(); };
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, [fetchNotif]);
 
   // Click outside to close

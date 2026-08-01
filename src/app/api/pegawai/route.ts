@@ -22,7 +22,8 @@ export async function GET(request: Request) {
   if (search) {
     whereClause = or(
       like(pegawai.nama, `%${search}%`),
-      like(pegawai.nip, `%${search}%`)
+      like(pegawai.nip, `%${search}%`),
+      like(users.email, `%${search}%`)
     );
   }
 

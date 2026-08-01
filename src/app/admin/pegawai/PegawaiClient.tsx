@@ -38,6 +38,7 @@ interface Pegawai {
 export default function PegawaiPage() {
   const [data, setData] = useState<Pegawai[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [photoDialogOpen, setPhotoDialogOpen] = useState(false);
@@ -58,7 +59,9 @@ export default function PegawaiPage() {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/pegawai");
+      const params = new URLSearchParams();
+      if (search) params.set("search", search);
+      const res = await fetch(`/api/pegawai?${params}`);
       const json = await res.json();
       setData(Array.isArray(json) ? json : json.data || []);
     } catch (err) {
@@ -67,7 +70,7 @@ export default function PegawaiPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [search]);
 
   const fetchJabatan = useCallback(async () => {
     try {
@@ -84,6 +87,14 @@ export default function PegawaiPage() {
     fetchData();
     fetchJabatan();
   }, [fetchData, fetchJabatan]);
+
+  // Debounce search input to avoid hitting database on every keystroke
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setSearch(searchInput);
+    }, 400);
+    return () => clearTimeout(t);
+  }, [searchInput]);
 
   const openCreate = () => {
     setEditing(null);
@@ -202,11 +213,13 @@ export default function PegawaiPage() {
     }
   };
 
+  // Server already filters by search (nama/nip/email). This is a null-safe
+  // fallback for any residual rows (e.g. pegawai without linked user email).
   const filtered = data.filter(
     (d) =>
       d.nama.toLowerCase().includes(search.toLowerCase()) ||
       d.nip.toLowerCase().includes(search.toLowerCase()) ||
-      d.email.toLowerCase().includes(search.toLowerCase())
+      (d.email || "").toLowerCase().includes(search.toLowerCase())
   );
 
   const statusConfig: Record<string, { gradient: string; label: string }> = {
@@ -252,14 +265,14 @@ export default function PegawaiPage() {
 
       <Card className="overflow-hidden border-white/40 dark:border-gray-800/50 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl shadow-sm">
         <CardHeader className="pb-0 border-b border-transparent">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-            <div className="relative flex-1 max-w-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="relative flex-1 w-full md:max-w-2xl">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
               <Input
                 placeholder="Cari pegawai..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-9 bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                className="pl-9 h-11 bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800"
               />
             </div>
             <div className="flex items-center gap-2 text-sm text-gray-400 dark:text-gray-500">

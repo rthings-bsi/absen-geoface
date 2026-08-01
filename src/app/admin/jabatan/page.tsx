@@ -151,13 +151,13 @@ export default function JabatanPage() {
       <Card className="border-white/40 dark:border-gray-800/50 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl shadow-sm">
         <CardHeader>
           <div className="flex items-center gap-4">
-            <div className="relative flex-1 max-w-sm">
+            <div className="relative flex-1 w-full md:max-w-2xl">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder="Cari jabatan..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-9"
+                className="pl-9 h-11 bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800"
               />
             </div>
             <Badge variant="secondary" className="ml-auto">

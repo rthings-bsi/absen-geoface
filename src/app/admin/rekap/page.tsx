@@ -40,6 +40,7 @@ interface PaginationInfo {
 export default function RekapPage() {
   const [data, setData] = useState<RekapItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
   const [periode, setPeriode] = useState<"hari" | "bulan" | "tahun">("hari");
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
@@ -120,6 +121,15 @@ export default function RekapPage() {
   }, [periode, date, month, year, search, page]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
+
+  // Debounce search: fire the API only after the user stops typing for 400ms
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setSearch(searchInput);
+      setPage(1);
+    }, 400);
+    return () => clearTimeout(t);
+  }, [searchInput]);
 
   const handleExportExcel = async () => {
     try {
@@ -283,13 +293,13 @@ export default function RekapPage() {
                   />
                 </div>
               )}
-              <div className="relative flex-1 max-w-sm">
+              <div className="relative flex-1 w-full md:max-w-2xl">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   placeholder="Cari pegawai..."
-                  value={search}
-                  onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                  className="pl-9"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  className="pl-9 h-11 bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800"
                 />
               </div>
               <div className="flex items-center gap-2 ml-auto">

@@ -199,13 +199,13 @@ export default function PengajuanPage() {
                 </button>
               ))}
             </div>
-            <div className="relative flex-1 max-w-sm">
+            <div className="relative flex-1 w-full md:max-w-2xl">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder="Cari pengajuan..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-9"
+                className="pl-9 h-11 bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800"
               />
             </div>
           </div>
@@ -298,14 +298,14 @@ export default function PengajuanPage() {
       </Card>
 
       <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-2xl p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle>Detail Pengajuan</DialogTitle>
             <DialogDescription>Informasi lengkap pengajuan</DialogDescription>
           </DialogHeader>
           {selected && (
-            <div className="space-y-3 overflow-y-auto max-h-[55vh] px-1 -mx-1">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-xs text-muted-foreground">Pegawai</p>
                   <p className="text-sm font-medium">{selected.pegawai}</p>

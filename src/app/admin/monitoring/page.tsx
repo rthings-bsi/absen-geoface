@@ -195,13 +195,13 @@ export default function MonitoringPage() {
         </div>
       </div>
 
-      <div className="relative max-w-sm mb-2">
+      <div className="relative w-full md:max-w-2xl mb-2">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
           placeholder="Cari pegawai..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="pl-9"
+          className="pl-9 h-11 bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800"
         />
       </div>
 

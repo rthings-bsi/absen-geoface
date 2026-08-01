@@ -88,6 +88,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Jenis, tanggal mulai, dan alasan harus diisi" }, { status: 400 });
   }
 
+  // Validate past dates
+  const todayStr = (() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  })();
+
+  if (tanggal_mulai < todayStr) {
+    return NextResponse.json({ error: "Tidak dapat mengajukan untuk tanggal yang sudah lewat" }, { status: 400 });
+  }
+
   if (alasan.length < 10) {
     return NextResponse.json({ error: "Alasan minimal 10 karakter" }, { status: 400 });
   }

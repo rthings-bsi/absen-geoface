@@ -15,6 +15,20 @@ import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import NotifikasiDropdown from "@/components/ui/notifikasi-dropdown";
 
+function AdminClockDisplay() {
+  const [currentTime, setCurrentTime] = useState(new Date());
+  useEffect(() => {
+    const t = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  return (
+    <span className="text-sm font-semibold text-gray-600 dark:text-gray-300 bg-gray-100/50 dark:bg-gray-800/50 px-3 py-1.5 rounded-lg border border-gray-200/50 dark:border-gray-700/50 hidden sm:block">
+      {currentTime.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" })} WIB
+    </span>
+  );
+}
+
 const menuGroups: { label: string; items: { label: string; href: string; icon: any }[] }[] = [
   { label: "Dashboard", items: [{ label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard }] },
   { label: "Absensi", items: [
@@ -41,8 +55,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const { theme, setTheme } = useTheme();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [currentTime, setCurrentTime] = useState(new Date());
-  useEffect(() => { const t = setInterval(() => setCurrentTime(new Date()), 1000); return () => clearInterval(t); }, []);
 
   const handleLogout = async () => {
     await signOut({ redirect: false });
@@ -196,9 +208,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <span className="text-sm font-semibold text-gray-600 dark:text-gray-300 bg-gray-100/50 dark:bg-gray-800/50 px-3 py-1.5 rounded-lg border border-gray-200/50 dark:border-gray-700/50 hidden sm:block">
-                {currentTime.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" })} WIB
-              </span>
+              <AdminClockDisplay />
               <div className="flex items-center gap-1 border-l border-gray-200 dark:border-gray-800 pl-4">
                 <button
                   onClick={() => setTheme(theme === "dark" ? "light" : "dark")}

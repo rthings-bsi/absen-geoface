@@ -35,10 +35,16 @@ export default function PengajuanBaruPage() {
 
   useEffect(() => { setMounted(true); }, []);
 
+  const todayStr = (() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  })();
+
   const validate = (): boolean => {
     const errs: Record<string, string> = {};
     if (!jenis) errs.jenis = "Pilih jenis pengajuan";
     if (!tanggalMulai) errs.tanggalMulai = "Pilih tanggal mulai";
+    else if (tanggalMulai < todayStr) errs.tanggalMulai = "Tidak dapat mengajukan untuk tanggal yang sudah lewat";
     if (!alasan.trim()) errs.alasan = "Alasan harus diisi";
     if (alasan.trim().length < 10) errs.alasan = "Alasan minimal 10 karakter";
     if (tanggalMulai && tanggalSelesai && tanggalSelesai < tanggalMulai) {
@@ -124,7 +130,7 @@ export default function PengajuanBaruPage() {
                   <div className="space-y-1.5">
                     <Label htmlFor="tanggal_mulai">Tanggal Mulai <span className="text-rose-500">*</span></Label>
                     <div className="relative">
-                      <input ref={tanggalMulaiRef} id="tanggal_mulai" type="date" value={tanggalMulai} onChange={(e) => setTanggalMulai(e.target.value)}
+                      <input ref={tanggalMulaiRef} id="tanggal_mulai" type="date" min={todayStr} value={tanggalMulai} onChange={(e) => setTanggalMulai(e.target.value)}
                         className={cn(
                           "w-full rounded-xl border pl-3.5 pr-10 py-3 text-sm bg-slate-50 dark:bg-slate-800 text-on-surface focus:outline-none focus:ring-2 focus:ring-indigo-400/30 focus:border-indigo-400 transition-all cursor-pointer [color-scheme:dark]",
                           errors.tanggalMulai ? "border-rose-300 dark:border-rose-700" : "border-slate-200 dark:border-slate-700"

@@ -368,13 +368,13 @@ export default function StrukturPage() {
       </div>
 
       {/* ── Search Bar ── */}
-      <div className="relative max-w-sm">
+      <div className="relative w-full md:max-w-2xl">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
         <Input
           placeholder="Cari unit organisasi..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-9 bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700"
+          className="pl-9 h-11 bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700"
         />
       </div>
 
