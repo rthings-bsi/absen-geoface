@@ -84,7 +84,8 @@ export default function AbsensiPage() {
   const fetchTodayStatus = async () => {
     try {
       const res = await fetch("/api/absensi/hari-ini");
-      setTodayStatus(await res.json());
+      const data = await res.json().catch(() => null);
+      if (data) setTodayStatus(data);
     } catch {} finally { setLoading(false); }
   };
 
@@ -223,9 +224,10 @@ export default function AbsensiPage() {
 
       toast.success(type === "masuk" ? "Absen masuk berhasil" : "Absen pulang berhasil");
       playAbsensiSuccess();
-      await fetchTodayStatus();
       stopCamera();
       setFaceStatus("idle"); setGpsStatus("idle"); setDistance(null); setGpsPosition(null);
+      // Refresh status di luar jalur sukses — kegagalan di sini tidak boleh mengubah hasil absen
+      try { await fetchTodayStatus(); } catch {}
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Terjadi kesalahan";
       setError(msg); toast.error(msg);

@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from "@/components/ui/dialog";
 import {
   FileSpreadsheet, FileText, Search,
@@ -543,19 +543,24 @@ export default function RekapPage() {
       </Dialog>
 
       <Dialog open={!!deleteModal} onOpenChange={(open) => !open && setDeleteModal(null)}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Hapus Data Absensi</DialogTitle>
+        <DialogContent style={{ maxWidth: 420 }} className="w-[calc(100vw-2rem)]">
+          <DialogHeader className="flex flex-col items-center gap-2 text-center">
+            <div className="w-16 h-16 rounded-full bg-red-50 dark:bg-red-950/40 flex items-center justify-center">
+              <AlertTriangle className="h-8 w-8 text-red-500" />
+            </div>
+            <div>
+              <DialogTitle>Hapus Data Absensi</DialogTitle>
+              <DialogDescription className="text-xs mt-1">Konfirmasi penghapusan data</DialogDescription>
+            </div>
           </DialogHeader>
-          <div className="flex flex-col items-center gap-4 py-4">
-            <AlertTriangle className="h-12 w-12 text-red-500" />
-            <p className="text-sm text-center text-muted-foreground">
-              Yakin ingin menghapus data absensi <span className="font-semibold text-foreground">{deleteModal?.label}</span>? Tindakan ini tidak dapat dibatalkan.
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Yakin ingin menghapus data absensi <span className="font-semibold text-foreground break-words">{deleteModal?.label}</span>? Tindakan ini tidak dapat dibatalkan.
             </p>
           </div>
-          <div className="flex gap-3 justify-end">
-            <Button variant="outline" onClick={() => setDeleteModal(null)}>Batal</Button>
-            <Button variant="destructive" onClick={handleDelete}>Hapus</Button>
+          <div className="grid grid-cols-2 gap-3">
+            <Button variant="outline" onClick={() => setDeleteModal(null)} className="w-full">Batal</Button>
+            <Button variant="destructive" onClick={handleDelete} className="w-full">Hapus</Button>
           </div>
         </DialogContent>
       </Dialog>
