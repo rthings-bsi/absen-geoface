@@ -80,15 +80,7 @@
   --color-info: hsl(221.2 83.2% 53.3%);
   --color-info-foreground: hsl(210 40% 98%);
 
-  /* Spacing */
-  --spacing-base: 4px;
-  --spacing-xs: 8px;
-  --spacing-sm: 16px;
-  --spacing-md: 24px;
-  --spacing-lg: 32px;
-  --spacing-xl: 48px;
-  --spacing-gutter: 24px;
-  --spacing-margin: 32px;
+
 
   --animate-shimmer: shimmer-x 2s infinite linear;
   --animate-shake: shake 0.5s ease-in-out;

@@ -20,6 +20,15 @@ import Link from "next/link";
 import { useFaceRecognition } from "@/hooks/use-face-recognition";
 import { playAbsensiSuccess } from "@/lib/sound";
 import { cn } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 import dynamic from "next/dynamic";
 
@@ -61,6 +70,7 @@ export default function AbsensiPage() {
   const [maxDistance, setMaxDistance] = useState(100);
   const [gpsSkipped, setGpsSkipped] = useState(false);
   const [faceDescriptor, setFaceDescriptor] = useState<number[] | null>(null);
+  const [confirmDialog, setConfirmDialog] = useState<{ isOpen: boolean; type: "masuk" | "pulang" | null }>({ isOpen: false, type: null });
   const { modelsLoaded, modelError, loadingProgress, loadModels, detectFace } = useFaceRecognition();
 
   const fetchOfficeLocation = useCallback(async () => {
@@ -232,6 +242,14 @@ export default function AbsensiPage() {
       const msg = err instanceof Error ? err.message : "Terjadi kesalahan";
       setError(msg); toast.error(msg);
     } finally { setIsProcessing(false); }
+  };
+
+  const handleAbsenClick = (type: "masuk" | "pulang") => {
+    if (type === "pulang") {
+      setConfirmDialog({ isOpen: true, type: "pulang" });
+    } else {
+      handleAbsen(type);
+    }
   };
 
   if (loading) return <div className="flex items-center justify-center min-h-[60vh]"><Loader2 className="h-8 w-8 animate-spin text-indigo-500" /></div>;
@@ -585,7 +603,7 @@ export default function AbsensiPage() {
               </button>
 
               <button
-                onClick={() => handleAbsen("pulang")}
+                onClick={() => handleAbsenClick("pulang")}
                 disabled={isProcessing || !todayStatus?.masuk || todayStatus?.pulang !== null || faceStatus !== "verified"}
                 className={cn(
                   "relative overflow-hidden group flex flex-col items-center justify-center p-4 rounded-2xl border shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] transition-all active:scale-[0.98]",
@@ -628,6 +646,42 @@ export default function AbsensiPage() {
           </div>
         </div>
       </div>
+
+      {/* Konfirmasi Absen Pulang */}
+      <Dialog
+        open={confirmDialog.isOpen}
+        onOpenChange={(open) => {
+          if (!open) setConfirmDialog({ isOpen: false, type: null });
+        }}
+      >
+        <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-md rounded-2xl">
+          <DialogHeader className="flex flex-col items-center justify-center text-center">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mb-3 shadow-md shadow-blue-500/25 border border-white/40 dark:border-slate-700">
+              <LogOut className="w-6 h-6 text-white ml-1" />
+            </div>
+            <DialogTitle className="text-lg">Konfirmasi Absen Pulang</DialogTitle>
+            <DialogDescription className="text-sm">
+              Apakah Anda yakin ingin melakukan absen pulang sekarang?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:space-x-0">
+            <Button
+              variant="outline"
+              onClick={() => setConfirmDialog({ isOpen: false, type: null })}
+            >
+              Tidak
+            </Button>
+            <Button
+              onClick={() => {
+                setConfirmDialog({ isOpen: false, type: null });
+                handleAbsen("pulang");
+              }}
+            >
+              Ya, Absen
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }
