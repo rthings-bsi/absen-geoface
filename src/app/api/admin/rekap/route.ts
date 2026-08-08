@@ -52,6 +52,7 @@ export async function GET(request: Request) {
       ip_address: absensi.ip_address,
       lokasi_masuk: absensi.lokasi_masuk,
       lokasi_pulang: absensi.lokasi_pulang,
+      berita_acara: absensi.berita_acara,
       is_face_verified: absensi.is_face_verified,
       pegawai_nip: pegawai.nip,
       pegawai_nama: pegawai.nama,

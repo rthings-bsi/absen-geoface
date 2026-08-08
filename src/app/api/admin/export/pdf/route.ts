@@ -66,6 +66,7 @@ export async function GET(request: Request) {
       jam_masuk: absensi.jam_masuk,
       jam_pulang: absensi.jam_pulang,
       status_masuk: absensi.status_masuk,
+      berita_acara: absensi.berita_acara,
       pegawai_nip: pegawai.nip,
       pegawai_nama: pegawai.nama,
     })
@@ -97,11 +98,12 @@ export async function GET(request: Request) {
 
       colNo: { width: "5%" },
       colTanggal: { width: "11%", textAlign: "center" },
-      colNip: { width: "23%" },
-      colNama: { width: "29%" },
-      colMasuk: { width: "10%", textAlign: "center" },
-      colPulang: { width: "10%", textAlign: "center" },
-      colStatus: { width: "12%", textAlign: "center" },
+      colNip: { width: "20%" },
+      colNama: { width: "24%" },
+      colMasuk: { width: "8%", textAlign: "center" },
+      colPulang: { width: "8%", textAlign: "center" },
+      colStatus: { width: "10%", textAlign: "center" },
+      colBeritaAcara: { width: "14%" },
 
       signatureSection: { marginTop: 40, flexDirection: "row", justifyContent: "space-between" },
       signatureBlock: { width: "30%", textAlign: "center", flexDirection: "column" },
@@ -141,6 +143,7 @@ export async function GET(request: Request) {
             React.createElement(ReactPDF.Text, { style: { ...styles.cellHeader, ...styles.colMasuk } }, "Masuk"),
             React.createElement(ReactPDF.Text, { style: { ...styles.cellHeader, ...styles.colPulang } }, "Pulang"),
             React.createElement(ReactPDF.Text, { style: { ...styles.cellHeader, ...styles.colStatus } }, "Status"),
+            React.createElement(ReactPDF.Text, { style: { ...styles.cellHeader, ...styles.colBeritaAcara } }, "Berita Acara"),
           ),
           // Data
           ...data.map((a: any, i: number) =>
@@ -152,6 +155,7 @@ export async function GET(request: Request) {
               React.createElement(ReactPDF.Text, { style: { ...styles.cellData, ...styles.colMasuk } }, a.jam_masuk?.slice(0, 5) || "-"),
               React.createElement(ReactPDF.Text, { style: { ...styles.cellData, ...styles.colPulang } }, a.jam_pulang?.slice(0, 5) || "-"),
               React.createElement(ReactPDF.Text, { style: { ...styles.cellData, ...styles.colStatus } }, a.status_masuk || "Alpa"),
+              React.createElement(ReactPDF.Text, { style: { ...styles.cellData, ...styles.colBeritaAcara, fontSize: 7 } }, a.berita_acara || "-"),
             )
           )
         ),
@@ -227,6 +231,7 @@ export async function GET(request: Request) {
               <th>Jam Masuk</th>
               <th>Jam Pulang</th>
               <th>Status</th>
+              <th>Berita Acara</th>
             </tr>
           </thead>
           <tbody>
@@ -239,6 +244,7 @@ export async function GET(request: Request) {
                 <td>${a.jam_masuk?.slice(0, 5) || "-"}</td>
                 <td>${a.jam_pulang?.slice(0, 5) || "-"}</td>
                 <td>${a.status_masuk || "Alpa"}</td>
+                <td>${a.berita_acara || "-"}</td>
               </tr>
             `).join("")}
           </tbody>

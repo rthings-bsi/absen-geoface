@@ -28,6 +28,7 @@ interface RekapItem {
   keterangan?: string;
   foto_masuk?: string | null;
   foto_pulang?: string | null;
+  berita_acara?: string;
 }
 
 interface PaginationInfo {
@@ -105,6 +106,7 @@ export default function RekapPage() {
         keterangan: item.keterangan as string | undefined,
         foto_masuk: (item as any).foto_masuk || null,
         foto_pulang: (item as any).foto_pulang || null,
+        berita_acara: (item as any).berita_acara || "",
       })));
 
       setPagination({
@@ -336,6 +338,7 @@ export default function RekapPage() {
                       <th className="text-left py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Jam Masuk</th>
                       <th className="text-left py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Jam Keluar</th>
                       <th className="text-left py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Status</th>
+                      <th className="text-left py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider min-w-[180px]">Berita Acara</th>
                       <th className="text-left py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Keterangan</th>
                       <th className="text-center py-3 px-3 font-medium text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider w-16">Aksi</th>
                     </tr>
@@ -379,6 +382,13 @@ export default function RekapPage() {
                           </div>
                         </td>
                         <td className="py-3.5 px-3">{statusBadge(item.status)}</td>
+                        <td className="py-3.5 px-3">
+                          {item.berita_acara ? (
+                            <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-2 whitespace-pre-wrap max-w-[280px]">{item.berita_acara}</p>
+                          ) : (
+                            <span className="text-xs text-gray-400 dark:text-gray-500">—</span>
+                          )}
+                        </td>
                         <td className="py-3.5 px-3 text-gray-500 dark:text-gray-400 text-xs italic">{item.keterangan || "-"}</td>
                         <td className="py-3.5 px-3 text-center">
                           <div className="flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity">
@@ -420,6 +430,12 @@ export default function RekapPage() {
                         <span className="text-[10px] text-gray-400 dark:text-gray-500 block">Keterangan</span>
                         <span className="text-gray-700 dark:text-gray-300 italic">{item.keterangan || "-"}</span>
                       </div>
+                      {item.berita_acara && (
+                        <div className="col-span-2">
+                          <span className="text-[10px] text-gray-400 dark:text-gray-500 block">Berita Acara</span>
+                          <span className="text-gray-700 dark:text-gray-300 text-xs leading-relaxed whitespace-pre-wrap">{item.berita_acara}</span>
+                        </div>
+                      )}
                       <div>
                         <span className="text-[10px] text-gray-400 dark:text-gray-500 block">Jam Masuk</span>
                         <div className="flex items-center gap-1.5 mt-0.5">

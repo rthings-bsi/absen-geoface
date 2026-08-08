@@ -15,6 +15,7 @@ import {
   LogIn,
   LogOut,
   History,
+  FileText,
 } from "lucide-react";
 import Link from "next/link";
 import { useFaceRecognition } from "@/hooks/use-face-recognition";
@@ -71,6 +72,7 @@ export default function AbsensiPage() {
   const [gpsSkipped, setGpsSkipped] = useState(false);
   const [faceDescriptor, setFaceDescriptor] = useState<number[] | null>(null);
   const [confirmDialog, setConfirmDialog] = useState<{ isOpen: boolean; type: "masuk" | "pulang" | null }>({ isOpen: false, type: null });
+  const [beritaAcara, setBeritaAcara] = useState("");
   const { modelsLoaded, modelError, loadingProgress, loadModels, detectFace } = useFaceRecognition();
 
   const fetchOfficeLocation = useCallback(async () => {
@@ -221,6 +223,7 @@ export default function AbsensiPage() {
           confidence: Math.round(confidence),
           foto: fotoBase64 || captureFoto(),
           face_descriptor: faceDescriptor,
+          berita_acara: type === "pulang" ? beritaAcara : undefined,
         }),
       });
       if (res.status === 429) {
@@ -651,7 +654,10 @@ export default function AbsensiPage() {
       <Dialog
         open={confirmDialog.isOpen}
         onOpenChange={(open) => {
-          if (!open) setConfirmDialog({ isOpen: false, type: null });
+          if (!open) {
+            setConfirmDialog({ isOpen: false, type: null });
+            setBeritaAcara("");
+          }
         }}
       >
         <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-md rounded-2xl">
@@ -664,20 +670,39 @@ export default function AbsensiPage() {
               Apakah Anda yakin ingin melakukan absen pulang sekarang?
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:space-x-0">
+
+          <div className="py-2">
+            <label htmlFor="berita_acara" className="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">
+              <FileText className="w-3.5 h-3.5" />
+              Berita Acara / Laporan Kegiatan
+            </label>
+            <textarea
+              id="berita_acara"
+              value={beritaAcara}
+              onChange={(e) => setBeritaAcara(e.target.value)}
+              placeholder="Tuliskan laporan singkat kegiatan hari ini (opsional)..."
+              className="w-full min-h-[100px] text-sm p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+            />
+          </div>
+
+          <DialogFooter className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:space-x-0 mt-2">
             <Button
               variant="outline"
-              onClick={() => setConfirmDialog({ isOpen: false, type: null })}
+              onClick={() => {
+                setConfirmDialog({ isOpen: false, type: null });
+                setBeritaAcara("");
+              }}
             >
-              Tidak
+              Batal
             </Button>
             <Button
               onClick={() => {
                 setConfirmDialog({ isOpen: false, type: null });
                 handleAbsen("pulang");
               }}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
             >
-              Ya, Absen
+              Ya, Pulang
             </Button>
           </DialogFooter>
         </DialogContent>

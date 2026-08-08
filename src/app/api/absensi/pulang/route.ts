@@ -65,7 +65,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { latitude, longitude, confidence, foto, face_descriptor } = body;
+  const { latitude, longitude, confidence, foto, face_descriptor, berita_acara } = body;
 
   // --- Face Verification ---
   let is_face_verified = false;
@@ -130,6 +130,7 @@ export async function POST(request: Request) {
       foto_pulang: foto || null,
       confidence_pulang: confidence || null,
       lokasi_pulang: latitude && longitude ? JSON.stringify({ lat: latitude, lng: longitude }) : null,
+      berita_acara: berita_acara ? String(berita_acara).trim() : null,
     })
     .where(eq(absensi.id, existing.id));
 

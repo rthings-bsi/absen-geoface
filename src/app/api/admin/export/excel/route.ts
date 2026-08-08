@@ -53,6 +53,7 @@ export async function GET(request: Request) {
       jam_pulang: absensi.jam_pulang,
       status_masuk: absensi.status_masuk,
       is_face_verified: absensi.is_face_verified,
+      berita_acara: absensi.berita_acara,
       pegawai_nip: pegawai.nip,
       pegawai_nama: pegawai.nama,
       jabatan_nama: jabatan.nama,
@@ -74,9 +75,10 @@ export async function GET(request: Request) {
     { header: "Jam Pulang", key: "jam_pulang", width: 12 },
     { header: "Status", key: "status", width: 12 },
     { header: "Verifikasi", key: "verifikasi", width: 15 },
+    { header: "Berita Acara", key: "berita_acara", width: 40 },
   ];
 
-  data.forEach((row: { tanggal?: string; jam_masuk?: string; jam_pulang?: string; pegawai_nip?: string; pegawai_nama?: string; jabatan_nama?: string; status_masuk?: string; is_face_verified?: boolean | null }, i: number) => {
+  data.forEach((row: { tanggal?: string; jam_masuk?: string; jam_pulang?: string; pegawai_nip?: string; pegawai_nama?: string; jabatan_nama?: string; status_masuk?: string; is_face_verified?: boolean | null; berita_acara?: string | null }, i: number) => {
     sheet.addRow({
       no: i + 1,
       tanggal: row.tanggal || "-",
@@ -87,6 +89,7 @@ export async function GET(request: Request) {
       jam_pulang: row.jam_pulang?.slice(0, 5) || "-",
       status: row.status_masuk || "Alpa",
       verifikasi: row.is_face_verified ? "Wajah" : "-",
+      berita_acara: row.berita_acara || "-",
     });
   });
 

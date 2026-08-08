@@ -106,6 +106,7 @@ export const absensi = sqliteTable("absensi", {
   ip_address: text("ip_address"),
   lokasi_masuk: text("lokasi_masuk"),
   lokasi_pulang: text("lokasi_pulang"),
+  berita_acara: text("berita_acara"),
   is_face_verified: integer("is_face_verified", { mode: "boolean" }).notNull().default(false),
 }, (table) => ({
   absensiTanggalIdx: index("idx_absensi_tanggal").on(table.tanggal),

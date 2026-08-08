@@ -169,6 +169,12 @@ export default function RiwayatPage() {
                           <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />
                           <span>Pulang: {item.jam_pulang?.slice(0,5) || "--:--"}</span>
                         </div>
+                        {item.berita_acara && (
+                          <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-1">Berita Acara</p>
+                            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">{item.berita_acara}</p>
+                          </div>
+                        )}
                       </div>
                     );
                   })}
@@ -182,6 +188,7 @@ export default function RiwayatPage() {
                         <th className="px-6 py-4 text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Tanggal</th>
                         <th className="px-6 py-4 text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest hidden sm:table-cell">Jam Masuk</th>
                         <th className="px-6 py-4 text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest hidden sm:table-cell">Jam Pulang</th>
+                        <th className="px-6 py-4 text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest hidden lg:table-cell min-w-[220px]">Berita Acara</th>
                         <th className="px-6 py-4 text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest text-right">Status</th>
                       </tr>
                     </thead>
@@ -221,6 +228,13 @@ export default function RiwayatPage() {
                               <span className="text-xs font-bold text-on-surface tabular-nums">
                                 {item.jam_pulang?.slice(0,5) || <span className="text-slate-400 dark:text-slate-600 font-normal">--:--</span>}
                               </span>
+                            </td>
+                            <td className="px-6 py-4.5 hidden lg:table-cell">
+                              {item.berita_acara ? (
+                                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-2 whitespace-pre-wrap max-w-xs">{item.berita_acara}</p>
+                              ) : (
+                                <span className="text-xs text-slate-400 dark:text-slate-600">—</span>
+                              )}
                             </td>
                             <td className="px-6 py-4.5 text-right">
                               <span className={cn("text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border shadow-sm inline-flex items-center gap-1", sc.classes)}>

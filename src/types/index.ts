@@ -63,6 +63,7 @@ export interface Absensi {
   ip_address: string | null;
   lokasi_masuk: string | null;
   lokasi_pulang: string | null;
+  berita_acara: string | null;
   is_face_verified: boolean;
   pegawai?: Pegawai;
 }
